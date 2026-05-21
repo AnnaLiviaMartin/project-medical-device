@@ -16,26 +16,8 @@ from PIL import Image
 csv_path = "./data/Data_Entry_2017.csv"
 image_path = "./data/images"
 
-# Gegeben: Bild x/input + Was ist es (y/target) => Dict für Targets, Liste für Images
-# Frage: Wie viele Krankheiten?
-
-# Targets einlesen
 class PatientDataEntry:
       def __init__(self, line):
-            data_points = line.split(",")
-
-            self.image_index = data_points[0]
-            self.finding_labels = data_points[1].split("|")
-            self.follow_up = data_points[2]
-            self.patient_id = data_points[3]
-            self.patient_age = data_points[4]
-            self.patient_gender = data_points[5]
-            self.view_position = data_points[6]
-            self.original_image_width = data_points[7]
-            self.original_image_height = data_points[8]
-            self.original_image_pixel_spacing_x = data_points[9]
-            self.original_image_pixel_spacing_y = data_points[10]
-
             self.classes = [
                   "Atelectasis",
                   "Cardiomegaly",
@@ -50,8 +32,23 @@ class PatientDataEntry:
                   "Emphysema",
                   "Fibrosis",
                   "Pleural_Thickening",
-                  "Hernia"
+                  "Hernia",
+                  "No Finding"
             ]
+            data_points = line.split(",")
+
+            self.image_index = data_points[0]
+            self.finding_labels = data_points[1].split("|")
+            self.targets = multi_hot_encoding(data_points[1], self.classes)
+            self.follow_up = data_points[2]
+            self.patient_id = data_points[3]
+            self.patient_age = data_points[4]
+            self.patient_gender = data_points[5]
+            self.view_position = data_points[6]
+            self.original_image_width = data_points[7]
+            self.original_image_height = data_points[8]
+            self.original_image_pixel_spacing_x = data_points[9]
+            self.original_image_pixel_spacing_y = data_points[10]
 
       def add_img_tensor(self, img_tensor):
             self.img_tensor = img_tensor
@@ -64,7 +61,21 @@ class PatientDataEntry:
                 f"original_image_width={self.original_image_width!r}, "
                 f"original_image_height={self.original_image_height!r}, "
                 f"original_image_pixel_spacing_x={self.original_image_pixel_spacing_x!r}, "
-                f"original_image_pixel_spacing_y={self.original_image_pixel_spacing_y!r})")
+                f"original_image_pixel_spacing_y={self.original_image_pixel_spacing_y!r}, "
+                f"target={self.targets!r}, img_tensor={self.img_tensor!r})")
+
+def multi_hot_encoding(labels, classes):
+      target = torch.zeros(len(classes))
+
+      for label in labels.split("|"):
+            if label in classes:
+                  idx = classes.index(label)
+                  target[idx] = 1.0
+            else:
+                  print(f"ERROR: Desease not recognized: {label}.")
+                  exit()
+
+      return target
 
 def create_patient_data_entries():
       """Creates dictionary with key=image name && values=PatienDataEntry"""
@@ -73,6 +84,8 @@ def create_patient_data_entries():
       with open(csv_path, encoding='utf-8') as f:
             lines = f.read().split('\n')
             for line in lines:
+                  if line.startswith("#"):
+                        continue
                   entry = PatientDataEntry(line)
                   patient_data_entry_list[entry.image_index] = entry
 
@@ -122,7 +135,7 @@ def create_target_tensor(labels, classes):
 
       return target
 
-def pre_process():
+def pre_process(image_path):
       data = create_patient_data_entries()
 
       all_image_paths = glob.glob(
@@ -133,7 +146,7 @@ def pre_process():
       for image_path in all_image_paths:
             image = Image.open(image_path).convert("RGB")
 
-            image_name = image_path.split("/")[-1]
+            image_name = image_path.split("\\")[-1]
             img_tensor = transform(image)
 
             entry = data[image_name]
@@ -207,7 +220,7 @@ class Net(nn.Module):
             return F.log_softmax(x, dim=1) # dim musste ich ergänzen
 
 def train():
-      pass
+      criterion = torch.nn.BCEWithLogitsLoss()
 
 def test():
       """Wie sieht das Ergebnis mit anderen Zahlen aus?"""
@@ -225,7 +238,8 @@ def load_model(path="./mein_netz.pt"):
       return net
 
 def main():
-      pass
+      data = pre_process(image_path)
+      print(data["00000001_001.png"])
 
 if __name__ == '__main__':
       main()
