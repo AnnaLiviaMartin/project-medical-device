@@ -1,22 +1,35 @@
-# Virtual Environment
+# Python virtual environment
+.venv/
 venv/
+ENV/
 
-# Python
+# Python cache
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
 
-# Django
-db.sqlite3
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
 
-# Environment variables
-.env
-
-# VS Code
+# VSCode
 .vscode/
 
-# macOS
+# Jupyter
+.ipynb_checkpoints/
+
+# MacOS
 .DS_Store
 
-# Windows
-Thumbs.db
+# PyTorch / ML (optional, aber üblich)
+*.pt
+*.pth
+*.ckpt
+
+# Logs
+*.log
+
+#SQlite tool
+*sqlite3
