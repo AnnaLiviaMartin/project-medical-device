@@ -151,6 +151,8 @@ def create_batches(data, batch_size=64):
       training_batches = []
       batch_images = []
       batch_targets = []
+      total_batches = (len(data) + batch_size - 1) // batch_size
+
 
       for entry in data.values():
             batch_targets.append(entry.targets)
@@ -162,7 +164,6 @@ def create_batches(data, batch_size=64):
                   batch_images = []
                   batch_targets = []
 
-                  total_batches = (len(data) + batch_size - 1) // batch_size
                   print(f"Loaded batch {len(training_batches)} of {total_batches}")
                   print(f"Percentage done: {(len(training_batches) / total_batches * 100):.2f}%\n")
 
@@ -176,9 +177,25 @@ def create_batches(data, batch_size=64):
       return training_batches
 
 
-def devide_train_validation_test():
-      """TODO: devide data into train, validation and test set"""
-      pass
+def divide_train_validation_test(data,
+                                 train_ratio=0.7,
+                                 validation_ratio=0.15,
+                                 test_ratio=0.15):
+
+      data_list = list(data.values())
+
+      random.shuffle(data_list)
+
+      total_size = len(data_list)
+
+      train_end = int(total_size * train_ratio)
+      validation_end = train_end + int(total_size * validation_ratio)
+
+      train_data = data_list[:train_end]
+      validation_data = data_list[train_end:validation_end]
+      test_data = data_list[validation_end:]
+
+      return train_data, validation_data, test_data
 
 class Net(nn.Module):
       def __init__(self):
@@ -228,12 +245,45 @@ def train(epoch, net, training_data):
 
             print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(training_data)} ({100. * batch_idx / len(training_data):.0f}%)]\tLoss: {loss.item():.6f}")
 
-def test(model, test_data):
-      """Wie sieht das Ergebnis mit anderen Zahlen aus?"""
-      pass
+def test(net, test_data):
+      net.eval()
+      correct = 0
+      total = 0
 
-def validate():
-      pass
+      with torch.no_grad():
+            for data, targets in test_data:
+                  data = data.cuda() if torch.cuda.is_available() else data
+                  targets = targets.float()
+                  targets = targets.cuda() if torch.cuda.is_available() else targets
+
+                  output = net(data)
+
+                  probabilities = torch.sigmoid(output)
+                  predictions = (probabilities > 0.5).float()
+                  correct += (predictions == targets).sum().item()
+                  total += targets.numel()
+
+      accuracy = 100 * correct / total
+      print(f"\nTest Accuracy: {accuracy:.2f}%\n")
+
+def validate(net, validation_data):
+      net.eval()
+      criterion = nn.BCEWithLogitsLoss()
+      validation_loss = 0.0
+
+      with torch.no_grad():
+            for data, targets in validation_data:
+                  data = data.cuda() if torch.cuda.is_available() else data
+
+                  targets = targets.float()
+                  targets = targets.cuda() if torch.cuda.is_available() else targets
+
+                  output = net(data)
+                  loss = criterion(output, targets)
+                  validation_loss += loss.item()
+
+      average_loss = validation_loss / len(validation_data)
+      print(f"\nValidation Loss: {average_loss:.6f}\n")
 
 def save_model(net, path="./rnn.pt"):
       torch.save(net, path)
@@ -249,7 +299,11 @@ def main():
       print(data["00000001_001.png"])
 
       # Trainingsdaten in Batches aufteilen
-      training_data = create_batches(data)
+      train_entries, validation_entries, test_entries = divide_train_validation_test(data)
+      training_data = create_batches({e.image_index: e for e in train_entries})
+      validation_data = create_batches({e.image_index: e for e in validation_entries})
+      test_data = create_batches({e.image_index: e for e in test_entries})
+
       print(training_data[0][0].size())
 
       # Netz erstellen
@@ -259,10 +313,10 @@ def main():
 
       for epoch in range(1, 5):
             train(epoch, net, training_data)
+            validate(net, validation_data)
 
+      test(net, test_data)
       save_model(net)
-
-      #test(model, test_data)
 
 if __name__ == '__main__':
       main()
