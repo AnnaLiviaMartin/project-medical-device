@@ -1,6 +1,8 @@
 # convolutional neural network
 # nih chest x-ray
 
+from xml.parsers.expat import model
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -13,7 +15,8 @@ import os
 import random
 from PIL import Image
 
-csv_path = "./data/Data_Entry_2017.csv"
+#csv_path = "./data/Data_Entry_2017.csv"
+csv_path = "./data/Data_Entry_Test.csv"
 image_path = "./data/images"
 
 class PatientDataEntry:
@@ -34,7 +37,7 @@ class PatientDataEntry:
                   "Pleural_Thickening",
                   "Hernia",
                   "No Finding"
-            ]
+            ] # 15 Klassen
             data_points = line.split(",")
 
             self.image_index = data_points[0]
@@ -94,8 +97,8 @@ def create_patient_data_entries():
 
 # Bilder auf gleich groesse setzen, gleiche breite/hoehe, belichtung normalisieren
 normalize = transforms.Normalize(
-      mean = [0.485, 0.456, 0.406],
-      std = [0.229, 0.224, 0.225]
+      mean=[0.5],
+      std=[0.5]
 )
 transform = transforms.Compose([
       transforms.Resize(256), 
@@ -103,24 +106,6 @@ transform = transforms.Compose([
       transforms.ToTensor(),
       normalize
 ])
-
-# def pre_process():
-#       """Creates dictionary including all data (x, y)"""
-#       data = create_patient_data_entries() # add data entries y
-
-#       for name in os.listdir(image_path):
-#             full_path = os.path.join(image_path, name)
-
-#             if os.path.isdir(full_path):
-#                   print("Subfolder gefunden:", full_path)
-#                   for sub_name in os.listdir(full_path):
-#                         sub_path = os.path.join(full_path, sub_name)
-#                         images = listdir(sub_path)
-#                         for image_path in images: # add images
-#                               full_image_path = os.path.join(sub_path, image_path)
-#                               image = Image.open(full_image_path).convert("RGB")
-#                               img_tensor = transform(image)
-#                               data[image_path].add_img_tensor(img_tensor)
 
 def create_target_tensor(labels, classes):
       target = torch.zeros(len(classes))
@@ -143,8 +128,8 @@ def pre_process(image_path):
             recursive=True
       )
 
-      for image_path in all_image_paths:
-            image = Image.open(image_path).convert("RGB")
+      for idx, image_path in enumerate(all_image_paths, start=1):
+            image = Image.open(image_path).convert("L") # laden als Graustufenbild
 
             image_name = image_path.split("\\")[-1]
             img_tensor = transform(image)
@@ -157,40 +142,42 @@ def pre_process(image_path):
                   entry.classes
             )
 
+            print(f"Loaded {idx} / {len(all_image_paths)} images")
+            print(f"Percentage done: {(idx / len(all_image_paths) * 100):.2f}%\n")
+
       return data
 
-      # training_data_list = []
-      # training_data = []
-      # target_list = []
-      # files = listdir(train_path)
-      # for i in range(len(listdir(train_path))):
-      #       # zufälliges element aus liste mit dateinamen auswählen
-      #       f = random.choice(files)
-      #       files.remove(f)
+def create_batches(data, batch_size=64):
+      training_batches = []
+      batch_images = []
+      batch_targets = []
 
-      #       # bild laden zu tensor machen und in liste
-      #       #img = Image.open(train_path + f)
-      #       img_tensor = transform(img)
-      #       training_data_list.append(img_tensor)
+      for entry in data.values():
+            batch_targets.append(entry.targets)
+            batch_images.append(entry.img_tensor)
 
-      #       # add labels for each image
-      #       is_cat = 1 if 'cat' in f else 0
-      #       is_dog = 1 if 'dog' in f else 0
-      #       target = [is_cat, is_dog]
-      #       target_list.append(target)
+            if len(batch_images) >= batch_size:
+                  training_batches.append((torch.stack(batch_images) , torch.stack(batch_targets)))
 
-      #       if len(training_data_list) >= 64: # batch size
-      #             training_data.append((torch.stack(training_data_list), target_list)) # liste aus batches die wir durch netz jagen wollen mit targets
-      #             training_data_list = []
-      #             target_list = []
+                  batch_images = []
+                  batch_targets = []
 
-      #             #print(f"Loaded batch {len(training_data)} of {int(len(listdir(train_path)) / 64)}")
-      #             #print(f"Percentage done: {(len(training_data) / (len(listdir(train_path)) / 64) * 100):.2f}%\n")
-      #             #break
+                  total_batches = (len(data) + batch_size - 1) // batch_size
+                  print(f"Loaded batch {len(training_batches)} of {total_batches}")
+                  print(f"Percentage done: {(len(training_batches) / total_batches * 100):.2f}%\n")
+
+      # Reste-Batch (optional, falls noch Bilder übrig)
+      if len(batch_images) > 0:
+            training_batches.append((torch.stack(batch_images), torch.stack(batch_targets)))
             
-      #return training_data
+            print(f"Loaded batch {len(training_batches)} of {total_batches}")
+            print(f"Percentage done: {(len(training_batches) / total_batches * 100):.2f}%\n")
+
+      return training_batches
+
 
 def devide_train_validation_test():
+      """TODO: devide data into train, validation and test set"""
       pass
 
 class Net(nn.Module):
@@ -199,47 +186,83 @@ class Net(nn.Module):
             self.conv1 = nn.Conv2d(1, 10, kernel_size=5) # 1 bild reinkommen, 10 bilder output -> bilder werden kleiner/zusammengefasst, kernel size=>25 pixel werden zusammengefasst auf einen output pixel
             self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
             self.conv_dropout = nn.Dropout2d() # vergessen einzelner Pixel aber nicht des ganzen Bildes, damit das Netz nicht zu sehr auf bestimmte Pixel fixiert ist (memorizing)
-            self.fully_connected1 = nn.Linear(320, 60) # 320 weil 20 Bilder mit je 4x4 Pixeln
-            self.fully_connected2 = nn.Linear(60, 10) # am Ende 10 Klassen, von 0-9 für die jeweiligen Zahlen
+            self.fully_connected1 = nn.Linear(20 * 4 * 4, 60)
+            self.fully_connected2 = nn.Linear(60, 15) # am Ende 15 Klassen für jede Krankheit
 
       def forward(self, x):
             x = self.conv1(x)
-            x = F.max_pool2d(x, 2)
-            x = F.relu(x) # ReLU: wenn kleiner 0 dann 0, wenn größer 0 dann x
+            x = F.relu(F.max_pool2d(x, 2))
+
             x = self.conv2(x)
             x = self.conv_dropout(x)
-            x = F.max_pool2d(x, 2)
-            x = F.relu(x)
-            # jetzt mehr infos benötigt
-            #print(x.size())
-            #exit()
-            x = x.view(-1, 320)
+            x = F.relu(F.max_pool2d(x, 2))
+
+            x = F.adaptive_avg_pool2d(x, (4,4))
+
+            x = x.view(x.size(0), -1)
+
             x = self.fully_connected1(x)
             x = F.relu(x)
+
             x = self.fully_connected2(x)
-            return F.log_softmax(x, dim=1) # dim musste ich ergänzen
 
-def train():
-      criterion = torch.nn.BCEWithLogitsLoss()
+            return x
 
-def test():
+def train(epoch, net, training_data):
+      # Stochastic Gradient Descent, learning rate 0.01
+      optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.8)
+      net.train()
+      criterion = nn.BCEWithLogitsLoss()
+
+      for batch_idx, (data, target_list) in enumerate(training_data):
+            # auf Grafikkarte abspielen
+            data = data.cuda() if torch.cuda.is_available() else data
+            target = target_list.float() # multi-hot encoding
+            target = target.cuda() if torch.cuda.is_available() else target
+
+            optimizer.zero_grad()  # Gradienten auf 0 setzen, d.h. normalisieren
+            output = net(data)
+            loss = criterion(output, target)
+            loss.backward()
+            optimizer.step()
+
+            print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(training_data)} ({100. * batch_idx / len(training_data):.0f}%)]\tLoss: {loss.item():.6f}")
+
+def test(model, test_data):
       """Wie sieht das Ergebnis mit anderen Zahlen aus?"""
       pass
 
 def validate():
       pass
 
-def save_model(net, path="./mein_netz.pt"):
+def save_model(net, path="./rnn.pt"):
       torch.save(net, path)
 
-def load_model(path="./mein_netz.pt"):
+def load_model(path="./rnn.pt"):
       if os.path.isfile(path):
             net = torch.load(path)
       return net
 
 def main():
+      # Daten vorverarbeiten: alles in Dictionary packen, Bilder in Tensoren umwandeln, Bilder auf gleiche Größe bringen, Normalisieren
       data = pre_process(image_path)
       print(data["00000001_001.png"])
+
+      # Trainingsdaten in Batches aufteilen
+      training_data = create_batches(data)
+      print(training_data[0][0].size())
+
+      # Netz erstellen
+      net = Net()
+      #net = load_model()
+      net.cuda() if torch.cuda.is_available() else net
+
+      for epoch in range(1, 5):
+            train(epoch, net, training_data)
+
+      save_model(net)
+
+      #test(model, test_data)
 
 if __name__ == '__main__':
       main()
