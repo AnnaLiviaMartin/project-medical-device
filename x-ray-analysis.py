@@ -16,8 +16,9 @@ import random
 from PIL import Image
 
 #csv_path = "./data/Data_Entry_2017.csv"
-csv_path = "./data/Data_Entry_Test.csv"
 image_path = "./data/images"
+csv_path = "./data/Data_Entry_Test.csv"
+image_path = "./data_test/images"
 
 class PatientDataEntry:
       def __init__(self, line):
