@@ -1,15 +1,11 @@
 # convolutional neural network
 # nih chest x-ray
 
-from xml.parsers.expat import model
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-from torchvision import datasets, transforms
-from torch.autograd import Variable
-from os import listdir
+from torchvision import transforms
 import glob
 import os
 import random
@@ -17,7 +13,7 @@ from PIL import Image
 
 #csv_path = "./data/Data_Entry_2017.csv"
 #image_path = "./data/images"
-csv_path = "./data/Data_Entry_Test.csv"
+csv_path = "./data_test/Data_Entry_Test.csv"
 image_path = "./data_test/images"
 
 class PatientDataEntry:
