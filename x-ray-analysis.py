@@ -41,7 +41,6 @@ class PatientDataEntry:
             data_points = line.split(",")
 
             self.image_index = data_points[0]
-            self.finding_labels = data_points[1].split("|")
             self.targets = multi_hot_encoding(data_points[1], self.classes)
             self.follow_up = data_points[2]
             self.patient_id = data_points[3]
@@ -58,7 +57,6 @@ class PatientDataEntry:
 
       def __str__(self):
             return (f"PatientDataEntry(image_index={self.image_index!r}, "
-                f"finding_labels={self.finding_labels!r}, follow_up={self.follow_up!r}, "
                 f"patient_id={self.patient_id!r}, patient_age={self.patient_age!r}, "
                 f"patient_gender={self.patient_gender!r}, view_position={self.view_position!r}, "
                 f"original_image_width={self.original_image_width!r}, "
@@ -101,24 +99,11 @@ normalize = transforms.Normalize(
       std=[0.5]
 )
 transform = transforms.Compose([
-      transforms.Resize(256), 
+      transforms.Resize(256), # TODO größer?
       transforms.CenterCrop(256),
       transforms.ToTensor(),
       normalize
 ])
-
-def create_target_tensor(labels, classes):
-      target = torch.zeros(len(classes))
-
-      for label in labels:
-            if label == "No Finding":
-                  continue
-
-            if label in classes:
-                  idx = classes.index(label)
-                  target[idx] = 1.0
-
-      return target
 
 def pre_process(image_path):
       data = create_patient_data_entries()
@@ -137,16 +122,14 @@ def pre_process(image_path):
             entry = data[image_name]
             entry.add_img_tensor(img_tensor)
 
-            entry.target_tensor = create_target_tensor(
-                  entry.finding_labels,
-                  entry.classes
-            )
+            entry.target_tensor = entry.targets
 
             print(f"Loaded {idx} / {len(all_image_paths)} images")
             print(f"Percentage done: {(idx / len(all_image_paths) * 100):.2f}%\n")
 
       return data
 
+# training_batches => [ train1, train2, ... ] => train1 mit 64 items => [batch_images, batch_targets]
 def create_batches(data, batch_size=64):
       training_batches = []
       batch_images = []
@@ -202,7 +185,7 @@ class Net(nn.Module):
             super(Net, self).__init__()
             self.conv1 = nn.Conv2d(1, 10, kernel_size=5) # 1 bild reinkommen, 10 bilder output -> bilder werden kleiner/zusammengefasst, kernel size=>25 pixel werden zusammengefasst auf einen output pixel
             self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-            self.conv_dropout = nn.Dropout2d() # vergessen einzelner Pixel aber nicht des ganzen Bildes, damit das Netz nicht zu sehr auf bestimmte Pixel fixiert ist (memorizing)
+            self.conv_dropout = nn.Dropout2d(0.1) # vergessen einzelner Pixel aber nicht des ganzen Bildes, damit das Netz nicht zu sehr auf bestimmte Pixel fixiert ist (memorizing)
             self.fully_connected1 = nn.Linear(20 * 4 * 4, 60)
             self.fully_connected2 = nn.Linear(60, 15) # am Ende 15 Klassen für jede Krankheit
 
@@ -311,7 +294,7 @@ def main():
       #net = load_model()
       net.cuda() if torch.cuda.is_available() else net
 
-      for epoch in range(1, 5):
+      for epoch in range(1, 30):
             train(epoch, net, training_data)
             validate(net, validation_data)
 
