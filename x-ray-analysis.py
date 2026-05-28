@@ -15,7 +15,7 @@ import numpy as np
 
 csv_path = "/Users/davidrossel/Downloads/archive/Data_Entry_2017.csv"
 
-image_path = "/Users/davidrossel/Downloads/archive/"
+image_path = "/Users/davidrossel/Downloads/archive"
 #csv_path = "./data_test/Data_Entry_Test.csv"
 #image_path = "./data_test/images"
 
@@ -387,7 +387,7 @@ def main():
       net.cuda() if torch.cuda.is_available() else net
       optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-      for epoch in range(1, 30):
+      for epoch in range(1, 2):
             train(epoch, net, training_data, optimizer, pos_weights)
             #validate(net, validation_data, pos_weights)
 

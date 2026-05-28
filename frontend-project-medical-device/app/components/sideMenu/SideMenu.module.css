@@ -1,0 +1,61 @@
+.sideMenu {
+  height: 100vh;
+  width: 16rem;
+  display: flex;
+  flex-direction: column;
+
+  background: var(--color-surface);
+  color: var(--color-text);
+
+  border-right: 1px solid var(--color-border);
+}
+
+.logo {
+  padding: 1rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.nav {
+  flex: 1;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-sm);
+
+  cursor: pointer;
+  text-decoration: none;
+
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+/* ACTIVE STATE */
+.navItemActive {
+  background: var(--color-active);
+  border-left: 4px solid var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 500;
+}
+
+/* HOVER STATE */
+.navItemHover:hover {
+  background: var(--color-hover);
+}
+
+/* BOTTOM SECTION */
+.bottom {
+  border-top: 1px solid var(--color-border);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
