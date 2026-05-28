@@ -10,6 +10,8 @@ import glob
 import os
 import random
 from PIL import Image
+from sklearn.metrics import classification_report, roc_auc_score
+import numpy as np
 
 #csv_path = "./data/Data_Entry_2017.csv"
 #image_path = "./data/images"
@@ -178,38 +180,78 @@ def divide_train_validation_test(data,
       return train_data, validation_data, test_data
 
 class Net(nn.Module):
-      def __init__(self):
-            super(Net, self).__init__()
-            self.conv1 = nn.Conv2d(1, 10, kernel_size=5) # 1 bild reinkommen, 10 bilder output -> bilder werden kleiner/zusammengefasst, kernel size=>25 pixel werden zusammengefasst auf einen output pixel
-            self.conv2 = nn.Conv2d(10, 20, kernel_size=5)
-            self.conv_dropout = nn.Dropout2d(0.1) # vergessen einzelner Pixel aber nicht des ganzen Bildes, damit das Netz nicht zu sehr auf bestimmte Pixel fixiert ist (memorizing)
-            self.fully_connected1 = nn.Linear(20 * 4 * 4, 60)
-            self.fully_connected2 = nn.Linear(60, 15) # am Ende 15 Klassen für jede Krankheit
+    def __init__(self):
+        super(Net, self).__init__()
+        # Block 1: 256x256 -> MaxPool -> 126x126
+        self.conv1 = nn.Conv2d(1, 16, kernel_size=5, padding=2) 
+        
+        # Block 2: 126x126 -> MaxPool -> 61x61
+        self.conv2 = nn.Conv2d(16, 32, kernel_size=5, padding=2)
+        self.conv_dropout = nn.Dropout2d(0.1)
+        
+        # Block 3: 61x61 -> MaxPool -> 29x29
+        self.conv3 = nn.Conv2d(32, 64, kernel_size=3, padding=1)
+        
+        # Block 4: 29x29 -> MaxPool -> 13x13
+        self.conv4 = nn.Conv2d(64, 128, kernel_size=3, padding=1)
+        
+        # Der Fully Connected Layer erwartet jetzt 128 Kanäle * 1x1 Pixel = 128 Eingänge
+        self.fully_connected1 = nn.Linear(128 * 1 * 1, 64)
+        self.fully_connected2 = nn.Linear(64, 15)
 
-      def forward(self, x):
-            x = self.conv1(x)
-            x = F.relu(F.max_pool2d(x, 2))
+    def forward(self, x):
+        # Block 1
+        x = F.relu(F.max_pool2d(self.conv1(x), 2))
+        
+        # Block 2
+        x = self.conv2(x)
+        x = self.conv_dropout(x)
+        x = F.relu(F.max_pool2d(x, 2))
+        
+        # Block 3
+        x = F.relu(F.max_pool2d(self.conv3(x), 2))
+        
+        # Block 4
+        x = F.relu(F.max_pool2d(self.conv4(x), 2))
 
-            x = self.conv2(x)
-            x = self.conv_dropout(x)
-            x = F.relu(F.max_pool2d(x, 2))
+        # KORREKTUR: Global Average Pooling (reduziert jede Feature Map auf 1x1 Pixel)
+        x = F.adaptive_avg_pool2d(x, (1, 1))
 
-            x = F.adaptive_avg_pool2d(x, (4,4))
+        # Flattening (x.size(0) ist die Batch-Größe, -1 flacht den Rest zu 128 ab)
+        x = x.view(x.size(0), -1)
 
-            x = x.view(x.size(0), -1)
+        x = F.relu(self.fully_connected1(x))
+        x = self.fully_connected2(x)
+        return x
 
-            x = self.fully_connected1(x)
-            x = F.relu(x)
+def calculate_pos_weights(training_data_entries):
+    """
+    Berechnet die pos_weight Tensoren basierend auf den echten Trainingsdaten.
+    training_data_entries: Liste oder Dict deiner PatientDataEntry-Objekte
+    """
+    num_classes = 15
+    pos_counts = torch.zeros(num_classes)
+    neg_counts = torch.zeros(num_classes)
+    
+    for entry in training_data_entries:
+        targets = entry.targets  # Das ist dein Multi-Hot-Tensor der Größe 15
+        pos_counts += targets
+        neg_counts += (1.0 - targets)
+        
+    # Verhindere Division durch 0, falls eine Krankheit extrem selten ist (wird zu 1.0)
+    pos_counts = torch.clamp(pos_counts, min=1.0)
+    
+    # Berechne das Verhältnis Nullen / Einsen
+    pos_weights = neg_counts / pos_counts
+    
+    return pos_weights
 
-            x = self.fully_connected2(x)
-
-            return x
-
-def train(epoch, net, training_data):
+def train(epoch, net, training_data, optimizer, pos_weights):
       # Stochastic Gradient Descent, learning rate 0.01
-      optimizer = optim.SGD(net.parameters(), lr=0.1, momentum=0.8)
       net.train()
-      criterion = nn.BCEWithLogitsLoss()
+      pos_weights = pos_weights.cuda() if torch.cuda.is_available() else pos_weights
+        
+      criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
 
       for batch_idx, (data, target_list) in enumerate(training_data):
             # auf Grafikkarte abspielen
@@ -225,10 +267,35 @@ def train(epoch, net, training_data):
 
             print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(training_data)} ({100. * batch_idx / len(training_data):.0f}%)]\tLoss: {loss.item():.6f}")
 
+# def test(net, test_data):
+#     net.eval()
+#     correct_elements = 0
+#     total_elements = 0
+
+#     with torch.no_grad():
+#         for data, targets in test_data:
+#             data = data.cuda() if torch.cuda.is_available() else data
+#             targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
+#             print(f"Data targets: {targets}")
+
+#             output = net(data)
+#             print(f"Model output: {output}")
+#             probabilities = torch.sigmoid(output)
+#             predictions = (probabilities > 0.5).float()
+            
+#             # Das ist die Element-wise Accuracy (Achtung vor dem "Nullen-Bias"!)
+#             correct_elements += (predictions == targets).sum().item()
+#             total_elements += targets.numel()
+
+#     accuracy = 100 * correct_elements / total_elements
+#     print(f"\nTest Element-wise Accuracy: {accuracy:.2f}%\n")
+
 def test(net, test_data):
     net.eval()
-    correct_elements = 0
-    total_elements = 0
+    
+    all_targets = []
+    all_predictions = []
+    all_probabilities = []
 
     with torch.no_grad():
         for data, targets in test_data:
@@ -236,37 +303,54 @@ def test(net, test_data):
             targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
 
             output = net(data)
-
             probabilities = torch.sigmoid(output)
             predictions = (probabilities > 0.5).float()
             
-            # Das ist die Element-wise Accuracy (Achtung vor dem "Nullen-Bias"!)
-            correct_elements += (predictions == targets).sum().item()
-            total_elements += targets.numel()
+            # Daten für die Gesamtanalyse sammeln
+            all_targets.append(targets.cpu().numpy())
+            all_predictions.append(predictions.cpu().numpy())
+            all_probabilities.append(probabilities.cpu().numpy())
 
-    accuracy = 100 * correct_elements / total_elements
-    print(f"\nTest Element-wise Accuracy: {accuracy:.2f}%\n")
+    # Batches zusammenfügen
+    y_true = np.vstack(all_targets)
+    y_pred = np.vstack(all_predictions)
+    y_prob = np.vstack(all_probabilities)
 
-def validate(net, validation_data):
-    net.eval()
-    criterion = nn.BCEWithLogitsLoss()
+    # Zeigt dir exakt Precision, Recall und F1-Score für jede der 15 Klassen!
+    print("\n--- Detaillierter Klassifikationsbericht ---")
+    # zero_division=0 verhindert Warnungen, wenn eine Klasse nie vorhergesagt wird
+    print(classification_report(y_true, y_pred, zero_division=0)) 
     
-    validation_loss = 0.0
-    total_samples = 0  # Zählt die echten Bilder
+    # Der medizinische Standard: ROC-AUC Score
+    try:
+        macro_auc = roc_auc_score(y_true, y_prob, average='macro')
+        print(f"Macro ROC-AUC Score: {macro_auc:.4f}  (0.5 ist pures Raten, 1.0 ist perfekt)")
+    except ValueError:
+        # Falls im Testset für eine Klasse keine einzige 1 existiert
+        print("ROC-AUC konnte nicht berechnet werden (fehlende Klassenvarianz im Test-Batch).")
 
-    with torch.no_grad():
-        for data, targets in validation_data:
-            data = data.cuda() if torch.cuda.is_available() else data
-            targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
+# def validate(net, validation_data, pos_weights):
+#     net.eval()
+    
+#     pos_weights = pos_weights.cuda() if torch.cuda.is_available() else pos_weights  
+#     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
+    
+#     validation_loss = 0.0
+#     total_samples = 0  # Zählt die echten Bilder
 
-            output = net(data)
-            loss = criterion(output, targets)
+#     with torch.no_grad():
+#         for data, targets in validation_data:
+#             data = data.cuda() if torch.cuda.is_available() else data
+#             targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
+
+#             output = net(data)
+#             loss = criterion(output, targets)
             
-            validation_loss += loss.item() * data.size(0)
-            total_samples += data.size(0)
+#             validation_loss += loss.item() * data.size(0)
+#             total_samples += data.size(0)
 
-    average_loss = validation_loss / total_samples
-    print(f"\nValidation Loss: {average_loss:.6f}\n")
+#     average_loss = validation_loss / total_samples
+#     print(f"\nValidation Loss: {average_loss:.6f}\n")
 
 def save_model(net, path="./rnn.pt"):
       torch.save(net, path)
@@ -283,6 +367,10 @@ def main():
 
       # Trainingsdaten in Batches aufteilen
       train_entries, validation_entries, test_entries = divide_train_validation_test(data)
+
+      pos_weights = calculate_pos_weights(train_entries)
+      print(f"Berechnete pos_weights für die 15 Klassen:\n{pos_weights}\n")
+
       training_data = create_batches({e.image_index: e for e in train_entries})
       validation_data = create_batches({e.image_index: e for e in validation_entries})
       test_data = create_batches({e.image_index: e for e in test_entries})
@@ -293,10 +381,11 @@ def main():
       net = Net()
       #net = load_model()
       net.cuda() if torch.cuda.is_available() else net
+      optimizer = optim.Adam(net.parameters(), lr=0.001)
 
       for epoch in range(1, 30):
-            train(epoch, net, training_data)
-            validate(net, validation_data)
+            train(epoch, net, training_data, optimizer, pos_weights)
+            #validate(net, validation_data, pos_weights)
 
       test(net, test_data)
       save_model(net)
