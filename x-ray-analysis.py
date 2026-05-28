@@ -13,10 +13,11 @@ from PIL import Image
 from sklearn.metrics import classification_report, roc_auc_score
 import numpy as np
 
-#csv_path = "./data/Data_Entry_2017.csv"
-#image_path = "./data/images"
-csv_path = "./data_test/Data_Entry_Test.csv"
-image_path = "./data_test/images"
+csv_path = "/Users/davidrossel/Downloads/archive/Data_Entry_2017.csv"
+
+image_path = "/Users/davidrossel/Downloads/archive/"
+#csv_path = "./data_test/Data_Entry_Test.csv"
+#image_path = "./data_test/images"
 
 class PatientDataEntry:
       def __init__(self, line):
@@ -68,6 +69,8 @@ def multi_hot_encoding(labels, classes):
       target = torch.zeros(len(classes))
 
       for label in labels.split("|"):
+            if 'Finding Labels' in label:
+                  continue
             if label in classes:
                   idx = classes.index(label)
                   target[idx] = 1.0
@@ -115,7 +118,8 @@ def pre_process(image_path):
       for idx, image_path in enumerate(all_image_paths, start=1):
             image = Image.open(image_path).convert("L") # laden als Graustufenbild
 
-            image_name = image_path.split("\\")[-1]
+            #image_name = image_path.split("\\")[-1]#windows
+            image_name = image_path.split("/")[-1]#mac
             img_tensor = transform(image)
 
             entry = data[image_name]
