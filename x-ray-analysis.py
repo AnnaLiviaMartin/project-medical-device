@@ -226,44 +226,47 @@ def train(epoch, net, training_data):
             print(f"Train Epoch: {epoch} [{batch_idx * len(data)}/{len(training_data)} ({100. * batch_idx / len(training_data):.0f}%)]\tLoss: {loss.item():.6f}")
 
 def test(net, test_data):
-      net.eval()
-      correct = 0
-      total = 0
+    net.eval()
+    correct_elements = 0
+    total_elements = 0
 
-      with torch.no_grad():
-            for data, targets in test_data:
-                  data = data.cuda() if torch.cuda.is_available() else data
-                  targets = targets.float()
-                  targets = targets.cuda() if torch.cuda.is_available() else targets
+    with torch.no_grad():
+        for data, targets in test_data:
+            data = data.cuda() if torch.cuda.is_available() else data
+            targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
 
-                  output = net(data)
+            output = net(data)
 
-                  probabilities = torch.sigmoid(output)
-                  predictions = (probabilities > 0.5).float()
-                  correct += (predictions == targets).sum().item()
-                  total += targets.numel()
+            probabilities = torch.sigmoid(output)
+            predictions = (probabilities > 0.5).float()
+            
+            # Das ist die Element-wise Accuracy (Achtung vor dem "Nullen-Bias"!)
+            correct_elements += (predictions == targets).sum().item()
+            total_elements += targets.numel()
 
-      accuracy = 100 * correct / total
-      print(f"\nTest Accuracy: {accuracy:.2f}%\n")
+    accuracy = 100 * correct_elements / total_elements
+    print(f"\nTest Element-wise Accuracy: {accuracy:.2f}%\n")
 
 def validate(net, validation_data):
-      net.eval()
-      criterion = nn.BCEWithLogitsLoss()
-      validation_loss = 0.0
+    net.eval()
+    criterion = nn.BCEWithLogitsLoss()
+    
+    validation_loss = 0.0
+    total_samples = 0  # Zählt die echten Bilder
 
-      with torch.no_grad():
-            for data, targets in validation_data:
-                  data = data.cuda() if torch.cuda.is_available() else data
+    with torch.no_grad():
+        for data, targets in validation_data:
+            data = data.cuda() if torch.cuda.is_available() else data
+            targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
 
-                  targets = targets.float()
-                  targets = targets.cuda() if torch.cuda.is_available() else targets
+            output = net(data)
+            loss = criterion(output, targets)
+            
+            validation_loss += loss.item() * data.size(0)
+            total_samples += data.size(0)
 
-                  output = net(data)
-                  loss = criterion(output, targets)
-                  validation_loss += loss.item()
-
-      average_loss = validation_loss / len(validation_data)
-      print(f"\nValidation Loss: {average_loss:.6f}\n")
+    average_loss = validation_loss / total_samples
+    print(f"\nValidation Loss: {average_loss:.6f}\n")
 
 def save_model(net, path="./rnn.pt"):
       torch.save(net, path)
