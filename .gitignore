@@ -1,5 +1,5 @@
-./project-medical-device/machine_learning/.venv/
-./project-medical-device/machine_learning/artifacts/
-./project-medical-device/machine_learning/cache/
-./project-medical-device/machine_learning/poetry.lock
-./project-medical-device/machine_learning/pyproject.toml
+./machine_learning/.venv/
+./machine_learning/artifacts/
+./machine_learning/cache/
+./machine_learning/poetry.lock
+./machine_learning/pyproject.toml
