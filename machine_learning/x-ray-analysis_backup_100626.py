@@ -13,11 +13,11 @@ from PIL import Image
 from sklearn.metrics import classification_report, roc_auc_score
 import numpy as np
 
-csv_path = "/Users/davidrossel/Downloads/archive/Data_Entry_2017.csv"
+#csv_path = "/Users/davidrossel/Downloads/archive/Data_Entry_2017.csv"
 
-image_path = "/Users/davidrossel/Downloads/archive"
-#csv_path = "./data_test/Data_Entry_Test.csv"
-#image_path = "./data_test/images"
+#image_path = "/Users/davidrossel/Downloads/archive"
+csv_path = "./data_test/Data_Entry_Test.csv"
+image_path = "./data_test/images"
 
 class PatientDataEntry:
       def __init__(self, line):
@@ -101,8 +101,8 @@ normalize = transforms.Normalize(
       std=[0.5]
 )
 transform = transforms.Compose([
-      transforms.Resize(256), # TODO größer?
-      transforms.CenterCrop(256),
+      transforms.Resize(224),
+      transforms.CenterCrop(224),
       transforms.ToTensor(),
       normalize
 ])
