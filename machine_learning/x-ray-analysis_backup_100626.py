@@ -13,11 +13,8 @@ from PIL import Image
 from sklearn.metrics import classification_report, roc_auc_score
 import numpy as np
 
-#csv_path = "/Users/davidrossel/Downloads/archive/Data_Entry_2017.csv"
-
-#image_path = "/Users/davidrossel/Downloads/archive"
-csv_path = "./data_test/Data_Entry_Test.csv"
-image_path = "./data_test/images"
+csv_path = "./data/Data_Entry_2017_backup.csv"
+image_path = "./data/images"
 
 class PatientDataEntry:
       def __init__(self, line):
@@ -333,28 +330,28 @@ def test(net, test_data):
         # Falls im Testset für eine Klasse keine einzige 1 existiert
         print("ROC-AUC konnte nicht berechnet werden (fehlende Klassenvarianz im Test-Batch).")
 
-# def validate(net, validation_data, pos_weights):
-#     net.eval()
+def validate(net, validation_data, pos_weights):
+    net.eval()
     
-#     pos_weights = pos_weights.cuda() if torch.cuda.is_available() else pos_weights  
-#     criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
+    pos_weights = pos_weights.cuda() if torch.cuda.is_available() else pos_weights  
+    criterion = nn.BCEWithLogitsLoss(pos_weight=pos_weights)
     
-#     validation_loss = 0.0
-#     total_samples = 0  # Zählt die echten Bilder
+    validation_loss = 0.0
+    total_samples = 0  # Zählt die echten Bilder
 
-#     with torch.no_grad():
-#         for data, targets in validation_data:
-#             data = data.cuda() if torch.cuda.is_available() else data
-#             targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
+    with torch.no_grad():
+        for data, targets in validation_data:
+            data = data.cuda() if torch.cuda.is_available() else data
+            targets = targets.float().cuda() if torch.cuda.is_available() else targets.float()
 
-#             output = net(data)
-#             loss = criterion(output, targets)
+            output = net(data)
+            loss = criterion(output, targets)
             
-#             validation_loss += loss.item() * data.size(0)
-#             total_samples += data.size(0)
+            validation_loss += loss.item() * data.size(0)
+            total_samples += data.size(0)
 
-#     average_loss = validation_loss / total_samples
-#     print(f"\nValidation Loss: {average_loss:.6f}\n")
+    average_loss = validation_loss / total_samples
+    print(f"\nValidation Loss: {average_loss:.6f}\n")
 
 def save_model(net, path="./rnn.pt"):
       torch.save(net, path)
@@ -387,9 +384,9 @@ def main():
       net.cuda() if torch.cuda.is_available() else net
       optimizer = optim.Adam(net.parameters(), lr=0.001)
 
-      for epoch in range(1, 2):
+      for epoch in range(1, 30):
             train(epoch, net, training_data, optimizer, pos_weights)
-            #validate(net, validation_data, pos_weights)
+            validate(net, validation_data, pos_weights)
 
       test(net, test_data)
       save_model(net)
