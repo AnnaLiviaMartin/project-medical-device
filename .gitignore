@@ -3,3 +3,4 @@ machine_learning/artifacts/
 machine_learning/cache/
 machine_learning/poetry.lock
 machine_learning/pyproject.toml
+machine_learning/data/images/
