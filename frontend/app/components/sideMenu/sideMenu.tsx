@@ -19,7 +19,7 @@ export default function SideMenu() {
       
       {/* Logo */}
       <div className={styles.logo}>
-        MedImage AI
+        LMDR-AI
       </div>
 
       {/* Navigation */}
