@@ -2,7 +2,9 @@
    RESET
 ========================= */
 
-* {
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -13,14 +15,16 @@
 ========================= */
 
 :root {
-  /* Colors - Brand */
+  /* Brand */
   --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
   --color-secondary: #64748b;
   --color-tertiary: #0d9488;
 
-  /* Backgrounds */
+  /* Surfaces */
   --color-bg: #f8fafc;
   --color-surface: #ffffff;
+  --color-surface-soft: #f8fafc;
   --color-hover: #f3f4f6;
   --color-active: #eff6ff;
 
@@ -29,20 +33,35 @@
 
   /* Text */
   --color-text: #374151;
-  --color-text-dark: #000000;
+  --color-text-dark: #111827;
+  --color-text-muted: #6b7280;
   --color-text-light: #ffffff;
+  --color-text-faint: #9ca3af;
+
+  /* Status */
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-primary-soft: #eff6ff;
+  --color-primary-soft-border: #dbeafe;
 
   /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 16px;
+  --radius-xl: 18px;
+  --radius-pill: 999px;
 
-  /* Spacing base (optional future scaling) */
+  /* Spacing */
   --space-xs: 4px;
   --space-sm: 8px;
   --space-md: 12px;
   --space-lg: 16px;
   --space-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 10px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 4px 12px rgba(15, 74, 184, 0.24);
+  --shadow-soft: 0 2px 8px rgba(15, 23, 42, 0.04);
 
   /* Font */
   --font-sans: Arial, Helvetica, sans-serif;
@@ -54,6 +73,7 @@
 
 html,
 body {
+  width: 100%;
   height: 100%;
 }
 
@@ -64,9 +84,18 @@ body {
   line-height: 1.5;
 }
 
-/* =========================
-   LINKS
-========================= */
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
 
 a {
   color: inherit;
@@ -74,11 +103,12 @@ a {
 }
 
 /* =========================
-   SCROLLBAR (optional clean UI)
+   SCROLLBAR
 ========================= */
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-thumb {

@@ -5,9 +5,9 @@ import { usePathname } from "next/navigation";
 import styles from "./SideMenu.module.css";
 
 const navItems = [
-  { label: "Dashboard", href: "/" },
-  { label: "Scan Results", href: "/scan-results" },
+  { label: "Scan Results", href: "/" },
   { label: "Patient Management", href: "/patients" },
+  { label: "Patient dideludel", href: "/test" },
   { label: "System Monitors", href: "/system" },
 ];
 
@@ -19,7 +19,7 @@ export default function SideMenu() {
       
       {/* Logo */}
       <div className={styles.logo}>
-        LMDR-AI
+        ALM-DR-AI
       </div>
 
       {/* Navigation */}
