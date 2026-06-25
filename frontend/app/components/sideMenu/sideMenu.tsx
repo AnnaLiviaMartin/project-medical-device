@@ -17,12 +17,10 @@ export default function SideMenu() {
   return (
     <aside className={styles.sideMenu}>
       
-      {/* Logo */}
       <div className={styles.logo}>
         ALM-DR-AI
       </div>
 
-      {/* Navigation */}
       <nav className={styles.nav}>
         {navItems.map((item) => {
           const isActive = pathname === item.href;
@@ -41,7 +39,6 @@ export default function SideMenu() {
         })}
       </nav>
 
-      {/* Bottom Section */}
       <div className={styles.bottom}>
         <Link href="/support" className={styles.navItem}>
           Support

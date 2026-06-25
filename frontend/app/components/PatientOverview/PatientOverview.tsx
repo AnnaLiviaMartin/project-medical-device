@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./PatientOverview.module.css";
 
 export type Patient = {
@@ -19,6 +19,7 @@ export type Patient = {
 
 type PatientOverviewProps = {
   patients?: Patient[];
+  initialPatientId?: string;
 };
 
 const defaultPatients: Patient[] = [
@@ -89,10 +90,35 @@ const defaultPatients: Patient[] = [
   },
 ];
 
-export default function PatientOverview({ patients = defaultPatients }: PatientOverviewProps) {
+export default function PatientOverview({
+  patients = defaultPatients,
+  initialPatientId,
+}: PatientOverviewProps) {
   const [query, setQuery] = useState("");
   const [riskFilter, setRiskFilter] = useState<"Alle" | Patient["risk"]>("Alle");
-  const [selectedPatientId, setSelectedPatientId] = useState<string>(patients[0]?.id ?? "");
+  const [selectedPatientId, setSelectedPatientId] = useState("");
+
+  useEffect(() => {
+    const hasInitialPatient =
+      !!initialPatientId && patients.some((patient) => patient.id === initialPatientId);
+
+    if (hasInitialPatient) {
+      setSelectedPatientId(initialPatientId);
+      return;
+    }
+
+    setSelectedPatientId((currentSelectedId) => {
+      const currentStillExists = patients.some(
+        (patient) => patient.id === currentSelectedId
+      );
+
+      if (currentStillExists) {
+        return currentSelectedId;
+      }
+
+      return patients[0]?.id ?? "";
+    });
+  }, [patients, initialPatientId]);
 
   const filteredPatients = useMemo(() => {
     return patients.filter((patient) => {
@@ -107,13 +133,13 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
   }, [patients, query, riskFilter]);
 
   const selectedPatient =
-    filteredPatients.find((patient) => patient.id === selectedPatientId) ??
-    filteredPatients[0] ??
-    null;
+    patients.find((patient) => patient.id === selectedPatientId) ?? null;
 
   const totalCount = patients.length;
   const highRiskCount = patients.filter((patient) => patient.risk === "Hoch").length;
-  const observationCount = patients.filter((patient) => patient.status === "Beobachtung").length;
+  const observationCount = patients.filter(
+    (patient) => patient.status === "Beobachtung"
+  ).length;
   const acuteCount = patients.filter((patient) => patient.status === "Akut").length;
 
   return (
@@ -132,9 +158,23 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
 
       <section className={styles.kpiGrid}>
         <StatCard label="Gesamt" value={String(totalCount)} hint="aktive Einträge" />
-        <StatCard label="Hohes Risiko" value={String(highRiskCount)} hint="benötigen Priorisierung" danger />
-        <StatCard label="Beobachtung" value={String(observationCount)} hint="mit laufender Nachverfolgung" />
-        <StatCard label="Akut" value={String(acuteCount)} hint="sofortige Aufmerksamkeit" danger />
+        <StatCard
+          label="Hohes Risiko"
+          value={String(highRiskCount)}
+          hint="benötigen Priorisierung"
+          danger
+        />
+        <StatCard
+          label="Beobachtung"
+          value={String(observationCount)}
+          hint="mit laufender Nachverfolgung"
+        />
+        <StatCard
+          label="Akut"
+          value={String(acuteCount)}
+          hint="sofortige Aufmerksamkeit"
+          danger
+        />
       </section>
 
       <section className={styles.contentGrid}>
@@ -151,7 +191,9 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
               <select
                 className={styles.select}
                 value={riskFilter}
-                onChange={(event) => setRiskFilter(event.target.value as "Alle" | Patient["risk"])}
+                onChange={(event) =>
+                  setRiskFilter(event.target.value as "Alle" | Patient["risk"])
+                }
               >
                 <option value="Alle">Alle Risiken</option>
                 <option value="Niedrig">Niedrig</option>
@@ -169,7 +211,7 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
 
             <div className={styles.list}>
               {filteredPatients.map((patient) => {
-                const active = patient.id === selectedPatient?.id;
+                const active = patient.id === selectedPatientId;
 
                 return (
                   <button
@@ -198,7 +240,9 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
               })}
 
               {filteredPatients.length === 0 && (
-                <div className={styles.emptyState}>Keine Patient:innen für diese Suche gefunden.</div>
+                <div className={styles.emptyState}>
+                  Keine Patient:innen für diese Suche gefunden.
+                </div>
               )}
             </div>
           </div>
@@ -213,7 +257,8 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
                     <p className={styles.eyebrow}>Ausgewählter Datensatz</p>
                     <h2 className={styles.detailName}>{selectedPatient.name}</h2>
                     <p className={styles.subtitleSmall}>
-                      {selectedPatient.id} · behandelnde Ärztin / behandelnder Arzt: {selectedPatient.doctor}
+                      {selectedPatient.id} · behandelnde Ärztin / behandelnder Arzt:{" "}
+                      {selectedPatient.doctor}
                     </p>
                   </div>
 
@@ -234,19 +279,29 @@ export default function PatientOverview({ patients = defaultPatients }: PatientO
                 <div className={styles.notesCard}>
                   <p className={styles.sectionLabel}>Kurznotiz</p>
                   <p className={styles.noteText}>
-                    Patient befindet sich aktuell in {selectedPatient.status.toLowerCase()} mit {selectedPatient.risk.toLowerCase()}em
-                    Risikoprofil. Empfohlen wird die strukturierte Nachverfolgung vor dem Termin am {selectedPatient.nextAppointment}.
+                    Patient befindet sich aktuell in {selectedPatient.status.toLowerCase()} mit{" "}
+                    {selectedPatient.risk.toLowerCase()}em Risikoprofil. Empfohlen wird die
+                    strukturierte Nachverfolgung vor dem Termin am{" "}
+                    {selectedPatient.nextAppointment}.
                   </p>
                 </div>
 
                 <div className={styles.actionRow}>
-                  <button type="button" className={styles.primaryButtonFull}>Akte öffnen</button>
-                  <button type="button" className={styles.secondaryButton}>Termin anpassen</button>
-                  <button type="button" className={styles.secondaryButton}>Nachricht senden</button>
+                  <button type="button" className={styles.primaryButtonFull}>
+                    Akte öffnen
+                  </button>
+                  <button type="button" className={styles.secondaryButton}>
+                    Termin anpassen
+                  </button>
+                  <button type="button" className={styles.secondaryButton}>
+                    Nachricht senden
+                  </button>
                 </div>
               </>
             ) : (
-              <div className={styles.emptyState}>Bitte eine Person aus der Liste auswählen.</div>
+              <div className={styles.emptyState}>
+                Bitte eine Person aus der Liste auswählen.
+              </div>
             )}
           </div>
         </aside>
@@ -269,7 +324,9 @@ function StatCard({
   return (
     <div className={styles.kpiCard}>
       <span className={styles.kpiLabel}>{label}</span>
-      <strong className={`${styles.kpiValue} ${danger ? styles.kpiValueDanger : ""}`}>{value}</strong>
+      <strong className={`${styles.kpiValue} ${danger ? styles.kpiValueDanger : ""}`}>
+        {value}
+      </strong>
       <span className={styles.kpiHint}>{hint}</span>
     </div>
   );

@@ -44,21 +44,35 @@ export default function Home() {
         }}
       >
         <AnalysisResultCard
+          title="AI Analysis Results"
+          patient={{ id: "P-1025", name: "Mehmet Yilmaz" }}
           status="Anomalies detected"
           confidence={94.8}
           score={75}
           findings={[
             {
               title: "Nodular Opacity",
+              disease: "Pulmonary Nodule",
               text: "Suspected lesion in the left lower lobe (Region Critical-03), irregular margins noted.",
               variant: "blue",
               icon: "i",
+              confidence: 94.8,
             },
             {
               title: "Pleural Effusion",
+              disease: "Pleural Fluid",
               text: "Minor blunting of the costophrenic angle observed in the right lung field.",
               variant: "gray",
               icon: "○",
+              confidence: 81.2,
+            },
+            {
+              title: "Inflammatory Pattern",
+              disease: "Possible Infection",
+              text: "Diffuse lower-lung opacity may indicate an inflammatory process.",
+              variant: "gray",
+              icon: "!",
+              confidence: 76.5,
             },
           ]}
           onViewAll={() => console.log("View all clicked")}

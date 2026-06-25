@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState, type RefObject } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState, type RefObject } from "react";
 import styles from "./AnalysisResultCard.module.css";
 
 type Finding = {
@@ -9,12 +10,18 @@ type Finding = {
   disease?: string;
   variant?: "blue" | "gray";
   icon?: string;
+  confidence?: number;
 };
 
 type Doctor = {
   id: string;
   name: string;
   specialty: string;
+};
+
+type PatientLinkData = {
+  id: string;
+  name: string;
 };
 
 type AnalysisResultCardProps = {
@@ -24,6 +31,7 @@ type AnalysisResultCardProps = {
   confidence: number;
   score: number;
   findings: Finding[];
+  patient?: PatientLinkData;
   onViewAll?: () => void;
   doctors?: Doctor[];
   onRequestReview?: (doctor: Doctor) => void;
@@ -38,7 +46,7 @@ export default function AnalysisResultCard({
   confidence,
   score,
   findings,
-  onViewAll,
+  patient,
   doctors = [
     { id: "1", name: "Dr. Emily Carter", specialty: "Radiology" },
     { id: "2", name: "Dr. Michael Tan", specialty: "Pulmonology" },
@@ -51,6 +59,21 @@ export default function AnalysisResultCard({
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>(doctors[0]?.id ?? "");
   const [isExporting, setIsExporting] = useState(false);
+  const [selectedFindingIndex, setSelectedFindingIndex] = useState<number | null>(
+    findings.length > 0 ? 0 : null
+  );
+
+  useEffect(() => {
+    if (findings.length === 0) {
+      setSelectedFindingIndex(null);
+      return;
+    }
+
+    setSelectedFindingIndex((prev) => {
+      if (prev === null || prev >= findings.length) return 0;
+      return prev;
+    });
+  }, [findings]);
 
   const clampedScore = Math.max(0, Math.min(score, 100));
 
@@ -61,6 +84,9 @@ export default function AnalysisResultCard({
   }, [clampedScore]);
 
   const selectedDoctor = doctors.find((doctor) => doctor.id === selectedDoctorId);
+  const selectedFinding =
+    selectedFindingIndex !== null ? findings[selectedFindingIndex] : null;
+  const displayedConfidence = selectedFinding?.confidence ?? confidence;
 
   const handleConfirmDoctor = () => {
     if (!selectedDoctor) return;
@@ -126,7 +152,22 @@ export default function AnalysisResultCard({
     <>
       <div className={styles.card}>
         <div className={styles.header}>
-          <h2 className={styles.title}>{title}</h2>
+          <div className={styles.headerInfo}>
+            <div className={styles.titleRow}>
+              <h2 className={styles.title}>{title}</h2>
+
+              {patient && (
+                <Link
+                href={`/patients?patientId=${encodeURIComponent(patient.id)}`}
+                className={styles.patientLink}
+              >
+                {patient.name}
+              </Link>
+              )}
+            </div>
+
+          </div>
+
           <span className={styles.engine}>{engine}</span>
         </div>
 
@@ -142,7 +183,7 @@ export default function AnalysisResultCard({
           <div className={`${styles.statBox} ${styles.confidenceBox}`}>
             <p className={styles.statLabelBlue}>CONFIDENCE</p>
             <p className={styles.confidenceValue}>
-              {confidence.toFixed(1)} <span>%</span>
+              {displayedConfidence.toFixed(1)} <span>%</span>
             </p>
           </div>
         </div>
@@ -151,56 +192,50 @@ export default function AnalysisResultCard({
           <p className={styles.sectionLabel}>SUGGESTED CLINICAL FINDINGS</p>
 
           <div className={styles.findings}>
-            {findings.map((finding, index) => (
-              <div key={`${finding.title}-${index}`} className={styles.findingCard}>
-                <div
-                  className={
-                    finding.variant === "gray"
-                      ? styles.findingIconGray
-                      : styles.findingIconBlue
-                  }
+            {findings.map((finding, index) => {
+              const isActive = index === selectedFindingIndex;
+
+              return (
+                <button
+                  key={`${finding.title}-${index}`}
+                  type="button"
+                  className={`${styles.findingCard} ${isActive ? styles.findingCardActive : ""}`}
+                  onClick={() => setSelectedFindingIndex(index)}
                 >
-                  <span>{finding.icon ?? "i"}</span>
-                </div>
+                  <div className={styles.findingContent}>
+                    <h3 className={styles.findingTitle}>{finding.title}</h3>
 
-                <div>
-                  <h3 className={styles.findingTitle}>{finding.title}</h3>
+                    {finding.disease && (
+                      <p className={styles.findingDisease}>
+                        {finding.disease}
+                        {typeof finding.confidence === "number" && (
+                          <span className={styles.findingConfidence}>
+                            {" "}
+                            · {finding.confidence.toFixed(1)}%
+                          </span>
+                        )}
+                      </p>
+                    )}
 
-                  {finding.disease && (
-                    <p className={styles.findingDisease}>{finding.disease}</p>
-                  )}
+                    {!finding.disease && typeof finding.confidence === "number" && (
+                      <p className={styles.findingDisease}>
+                        <span className={styles.findingConfidence}>
+                          {finding.confidence.toFixed(1)}%
+                        </span>
+                      </p>
+                    )}
 
-                  <p className={styles.findingText}>{finding.text}</p>
-                </div>
-              </div>
-            ))}
+                    <p className={styles.findingText}>{finding.text}</p>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
 
         <div className={styles.divider} />
 
-        <div className={styles.historyHeader}>
-          <p className={styles.sectionLabel}>PATIENT HISTORY</p>
-          {onViewAll && (
-            <button className={styles.viewAll} onClick={onViewAll}>
-              View All
-            </button>
-          )}
-        </div>
-
-        <div className={styles.progressTrack}>
-          <div
-            className={styles.progressFill}
-            style={{ width: `${clampedScore}%` }}
-          />
-        </div>
-
-        <p className={styles.historyText}>
-          Historical risk alignment: {riskLevel} ({clampedScore}%)
-        </p>
-
-        <button className={styles.primaryButton}>
-          <span className={styles.primaryIcon}>✓</span>
+        <button type="button" className={styles.primaryButton}>
           Validate Result
         </button>
 
@@ -246,10 +281,7 @@ export default function AnalysisResultCard({
 
       {isDoctorModalOpen && (
         <div className={styles.modalOverlay} onClick={() => setIsDoctorModalOpen(false)}>
-          <div
-            className={styles.modal}
-            onClick={(event) => event.stopPropagation()}
-          >
+          <div className={styles.modal} onClick={(event) => event.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>Request Review</h3>
               <button
