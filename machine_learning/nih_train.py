@@ -1,11 +1,3 @@
-"""
-NIH Chest X-ray — Modell, Training & Evaluation
-=================================================
-Schritt 3: DenseNet-121 Architektur
-Schritt 4: Loss + Optimizer
-Schritt 5: Training Loop mit ROC-AUC Evaluation
-"""
-
 import os
 import time
 import numpy as np
