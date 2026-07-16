@@ -25,6 +25,12 @@ python manage.py makemigrations
 python manage.py migrate
 ```
 
+For testing please run:
+
+```bash
+python manage.py test
+```
+
 ## Overview
 
 This backend manages **patients**, **studies**, **X-ray images**, and the corresponding **machine learning results**.
