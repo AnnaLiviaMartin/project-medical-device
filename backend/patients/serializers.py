@@ -6,7 +6,6 @@ class PatientSerializer(serializers.ModelSerializer):
         model = Patient
         fields = [
             "id",
-            "patient_id",
             "first_name",
             "last_name",
             "date_of_birth",
