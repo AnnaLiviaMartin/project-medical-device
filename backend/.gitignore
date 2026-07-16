@@ -33,3 +33,7 @@ dist/
 
 #SQlite tool
 *sqlite3
+
+# Django
+*.sqlite3
+/studies
