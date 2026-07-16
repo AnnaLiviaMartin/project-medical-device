@@ -36,4 +36,4 @@ dist/
 
 # Django
 *.sqlite3
-/studies
+/xray_images
