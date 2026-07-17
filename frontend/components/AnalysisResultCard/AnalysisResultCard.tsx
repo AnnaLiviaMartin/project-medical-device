@@ -158,7 +158,7 @@ export default function AnalysisResultCard({
 
               {patient && (
                 <Link
-                href={`/patients?patientId=${encodeURIComponent(patient.id)}`}
+                href={`/patientmanagement?patientId=${encodeURIComponent(patient.id)}`}
                 className={styles.patientLink}
               >
                 {patient.name}

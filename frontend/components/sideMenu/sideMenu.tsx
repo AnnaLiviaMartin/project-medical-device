@@ -5,10 +5,7 @@ import { usePathname } from "next/navigation";
 import styles from "./SideMenu.module.css";
 
 const navItems = [
-  { label: "Scan Results", href: "/" },
-  { label: "Patient Management", href: "/patients" },
-  { label: "Patient dideludel", href: "/test" },
-  { label: "System Monitors", href: "/system" },
+  { label: "Patient Management", href: "/" },
 ];
 
 export default function SideMenu() {
