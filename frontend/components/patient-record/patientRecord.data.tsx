@@ -65,6 +65,15 @@ export type Analysis = {
   findings: AnalysisFinding[];
 };
 
+export type Attachment = {
+  id: string;
+  fileName: string;
+  fileType: string; // z.B. "application/pdf", "image/png"
+  fileSize: number; // in bytes
+  uploadedAt: string; // ISO date
+  url: string; // Download-/Preview-Link vom Backend
+};
+
 export type HistoryEntry = {
   id: string;
   date: string;
@@ -75,6 +84,7 @@ export type HistoryEntry = {
   department: string;
   scans?: Scan[];
   analysis?: Analysis;
+  attachments?: Attachment[];
 };
 
 export const patients: Patient[] = [

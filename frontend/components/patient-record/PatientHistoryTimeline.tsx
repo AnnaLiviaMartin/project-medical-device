@@ -1,6 +1,10 @@
+"use client";
+
+import { useState } from "react";
 import styles from "./patientRecord.module.css";
-import type { HistoryEntry } from "./patientRecord.data";
+import type { HistoryEntry, Scan } from "./patientRecord.data";
 import ScanLinkList from "./ScanLinkList";
+import AttachmentSection from "./AttachmentSection";
 
 type PatientHistoryTimelineProps = {
   history: HistoryEntry[];
@@ -11,6 +15,19 @@ export default function PatientHistoryTimeline({
   history,
   patientId,
 }: PatientHistoryTimelineProps) {
+  const [entries, setEntries] = useState<HistoryEntry[]>(history);
+
+  function handleScanUploaded(entryId: string, scan: Scan) {
+    setEntries(function (prev) {
+      return prev.map(function (entry) {
+        if (entry.id !== entryId) {
+          return entry;
+        }
+        return { ...entry, scans: (entry.scans || []).concat([scan]) };
+      });
+    });
+  }
+
   return (
     <div className={styles.panel}>
       <div className={styles.sectionHeader}>
@@ -18,16 +35,16 @@ export default function PatientHistoryTimeline({
           <p className={styles.sectionLabel}>Clinical History</p>
           <h2 className={styles.sectionTitle}>Treatment Timeline</h2>
         </div>
-        <span className={styles.countBadge}>{history.length} entries</span>
+        <span className={styles.countBadge}>{entries.length} entries</span>
       </div>
 
       <div className={styles.timeline}>
-        {history.length === 0 ? (
+        {entries.length === 0 ? (
           <div className={styles.emptyState}>
             No history entries are available for this patient.
           </div>
         ) : (
-          history.map((entry) => (
+          entries.map((entry) => (
             <article key={entry.id} className={styles.timelineItem}>
               <div className={styles.timelineRail}>
                 <span className={styles.timelineDot} />
@@ -58,6 +75,13 @@ export default function PatientHistoryTimeline({
                     entryId={entry.id}
                   />
                 </div>
+
+                <AttachmentSection
+                  attachments={entry.attachments}
+                  patientId={patientId}
+                  entryId={entry.id}
+                  onScanUploaded={(scan) => handleScanUploaded(entry.id, scan)}
+                />
               </div>
             </article>
           ))

@@ -501,3 +501,178 @@
     font-weight: 700;
     color: var(--color-primary);
   }
+
+  /* =========================
+   ATTACHMENTS
+========================= */
+
+.attachmentSection {
+  border-top: 1px dashed var(--color-border);
+  padding-top: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.attachmentHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+}
+
+.attachmentUploadButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-soft);
+  border: 1px solid var(--color-primary-soft-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.attachmentUploadButton:hover {
+  border-color: var(--color-primary);
+}
+
+.attachmentError {
+  font-size: 0.8125rem;
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+}
+
+.attachmentEmpty {
+  font-size: 0.8125rem;
+  color: var(--color-text-faint);
+  font-style: italic;
+}
+
+.attachmentList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.attachmentItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.attachmentItem:hover {
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.attachmentLink {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-text-dark);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachmentLink:hover {
+  color: var(--color-primary);
+}
+
+.attachmentMeta {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.attachmentDeleteButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.attachmentDeleteButton:hover {
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.attachmentAddWrapper {
+  position: relative;
+}
+
+.attachmentDropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  min-width: 220px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  overflow: hidden;
+}
+
+.attachmentDropdownItem,
+.attachmentDropdownItemXray {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+  background: var(--color-surface);
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.attachmentDropdownItem:hover {
+  background: var(--color-surface-soft);
+}
+
+.attachmentDropdownItemXray {
+  color: var(--color-primary);
+  border-top: 1px solid var(--color-border);
+}
+
+.attachmentDropdownItemXray:hover {
+  background: var(--color-primary-soft);
+}
+
+.attachmentXraySuccessMessage {
+  font-size: 0.8125rem;
+  color: var(--color-tertiary);
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-sm);
+}

@@ -1,0 +1,52 @@
+.page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: var(--space-xl) var(--space-lg) 64px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xl);
+  }
+  
+  .topBar {
+    display: flex;
+    align-items: center;
+  }
+  
+  .backLink {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-secondary);
+    transition: color 0.15s ease;
+  }
+  
+  .backLink:hover {
+    color: var(--color-primary);
+  }
+  
+  .hero {
+    padding-bottom: var(--space-lg);
+    border-bottom: 1px solid var(--color-border);
+  }
+  
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-primary);
+    margin-bottom: var(--space-xs);
+  }
+  
+  .title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-text-dark);
+    letter-spacing: -0.01em;
+  }
+  
+  .subtitle {
+    margin-top: var(--space-xs);
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }

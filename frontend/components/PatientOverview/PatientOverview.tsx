@@ -77,7 +77,9 @@ export default function PatientOverview({
           </p>
         </div>
 
-        <button className={styles.primaryButton}>+ New Patient</button>
+        <Link href="/patients/new" className={styles.primaryButton}>
+          + New Patient
+        </Link>
       </section>
 
       <section className={styles.contentGrid}>
