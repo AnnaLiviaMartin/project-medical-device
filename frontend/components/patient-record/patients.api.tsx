@@ -10,7 +10,7 @@ export async function createPatient(input: NewPatientInput): Promise<Patient> {
   });
 
   if (!res.ok) {
-    throw new Error(`Patient konnte nicht angelegt werden: ${res.status}`);
+    throw new Error(`The patient could not be admitted: ${res.status}`);
   }
 
   return res.json();

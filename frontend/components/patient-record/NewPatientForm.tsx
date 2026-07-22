@@ -85,7 +85,7 @@ export default function NewPatientForm() {
     setError(null);
 
     if (!name.trim() || !age.trim() || !diagnosis.trim() || !doctor.trim()) {
-      setError("Bitte fuellen Sie mindestens Name, Alter, Diagnose und Arzt aus.");
+      setError("Please provide at least your name, age, diagnosis, and doctor's name.");
       return;
     }
 

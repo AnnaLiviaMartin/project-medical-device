@@ -30,9 +30,6 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
           >
             {patient.status}
           </span>
-          <span className={styles.badgeMuted}>
-            {getStatusLabel(patient.status)}
-          </span>
         </div>
       </section>
     </>
