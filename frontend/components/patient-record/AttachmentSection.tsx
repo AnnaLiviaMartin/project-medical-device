@@ -176,7 +176,7 @@ export default function AttachmentSection(props: AttachmentSectionProps) {
               ? "Anhang wird hochgeladen..."
               : isUploadingXray
               ? "Roentgenaufnahme wird hochgeladen..."
-              : "+ Hinzufuegen"}
+              : "+ Add Attachment"}
           </button>
 
           {isMenuOpen ? (

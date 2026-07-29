@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./NewPatientForm.module.css";
 import type { Gender, PatientStatus } from "./patientRecord.data";
-import { createPatient } from "./patients.api";
+import { createPatient } from "../PatientOverview/patients.api";
 
 type MedicationRow = {
   name: string;
@@ -16,7 +16,7 @@ export default function NewPatientForm() {
   const router = useRouter();
 
   const [name, setName] = useState("");
-  const [age, setAge] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState("");
   const [gender, setGender] = useState<Gender>("female");
   const [diagnosis, setDiagnosis] = useState("");
   const [status, setStatus] = useState<PatientStatus>("Outpatient");
@@ -84,41 +84,41 @@ export default function NewPatientForm() {
     e.preventDefault();
     setError(null);
 
-    if (!name.trim() || !age.trim() || !diagnosis.trim() || !doctor.trim()) {
-      setError("Please provide at least your name, age, diagnosis, and doctor's name.");
+    if (!name.trim() || !dateOfBirth || !lastVisit || !diagnosis.trim() || !doctor.trim()) {
+      setError("Please provide at least your name, date of birth, last visit date, diagnosis, and doctor's name.");
       return;
     }
+
+    const [firstName, ...rest] = name.trim().split(" ");
+    const lastName = rest.join(" ") || firstName;
 
     setIsSubmitting(true);
     try {
       const created = await createPatient({
-        name: name.trim(),
-        age: Number(age),
-        gender,
+        first_name: firstName,
+        last_name: lastName,
+        date_of_birth: dateOfBirth,
+        sex: gender,
         diagnosis: diagnosis.trim(),
         status,
-        lastVisit,
-        nextAppointment,
+        last_visit: lastVisit,
+        next_appointment: nextAppointment || null,
         doctor: doctor.trim(),
         ward: ward.trim(),
-        address: { street: street.trim(), zip: zip.trim(), city: city.trim() },
-        emergencyContact: {
-          name: contactName.trim(),
-          relation: contactRelation.trim(),
-          phone: contactPhone.trim(),
-        },
-        insurance: {
-          provider: insuranceProvider.trim(),
-          policyNumber: policyNumber.trim(),
-        },
+        address_street: street.trim(),
+        address_zip: zip.trim(),
+        address_city: city.trim(),
+        emergency_contact_name: contactName.trim(),
+        emergency_contact_relation: contactRelation.trim(),
+        emergency_contact_phone: contactPhone.trim(),
+        insurance_provider: insuranceProvider.trim(),
+        insurance_policy_number: policyNumber.trim(),
+        vitals_blood_pressure: bloodPressure.trim(),
+        vitals_heart_rate: heartRate.trim(),
+        vitals_oxygen_saturation: oxygenSaturation.trim(),
+        vitals_temperature: temperature.trim(),
         allergies,
         medications,
-        vitals: {
-          bloodPressure: bloodPressure.trim(),
-          heartRate: heartRate.trim(),
-          oxygenSaturation: oxygenSaturation.trim(),
-          temperature: temperature.trim(),
-        },
       });
 
       router.push(`/patients/${created.id}`);
@@ -147,14 +147,12 @@ export default function NewPatientForm() {
             />
           </Field>
 
-          <Field label="Age" required>
+          <Field label="Date of Birth" required>
             <input
-              type="number"
-              min={0}
+              type="date"
               className={styles.input}
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              placeholder="e.g. 47"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
             />
           </Field>
 
@@ -210,19 +208,19 @@ export default function NewPatientForm() {
 
           <Field label="Last Visit">
             <input
+              type="date"
               className={styles.input}
               value={lastVisit}
               onChange={(e) => setLastVisit(e.target.value)}
-              placeholder="TT.MM.JJJJ"
             />
           </Field>
 
           <Field label="Next Appointment">
             <input
+              type="date"
               className={styles.input}
               value={nextAppointment}
               onChange={(e) => setNextAppointment(e.target.value)}
-              placeholder="TT.MM.JJJJ"
             />
           </Field>
         </div>

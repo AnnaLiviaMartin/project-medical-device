@@ -1,0 +1,710 @@
+[
+  {
+    "model": "patients.patient",
+    "pk": 1,
+    "fields": {
+      "first_name": "Anna",
+      "last_name": "Becker",
+      "date_of_birth": "1979-03-15",
+      "sex": "female",
+      "diagnosis": "Hypertension",
+      "status": "Outpatient",
+      "last_visit": "2026-06-21",
+      "next_appointment": "2026-06-30",
+      "doctor": "Dr. Klein",
+      "ward": "Outpatient Unit A",
+      "address_street": "Rheinstraße 12",
+      "address_zip": "65185",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Thomas Becker",
+      "emergency_contact_relation": "Husband",
+      "emergency_contact_phone": "+49 171 2345678",
+      "insurance_provider": "AOK Hessen",
+      "insurance_policy_number": "AOK-7741-92",
+      "vitals_blood_pressure": "142/89 mmHg",
+      "vitals_heart_rate": "78 bpm",
+      "vitals_oxygen_saturation": "98%",
+      "vitals_temperature": "36.8°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.patient",
+    "pk": 2,
+    "fields": {
+      "first_name": "Mehmet",
+      "last_name": "Yilmaz",
+      "date_of_birth": "1963-05-10",
+      "sex": "male",
+      "diagnosis": "Type 2 Diabetes",
+      "status": "Inpatient",
+      "last_visit": "2026-06-24",
+      "next_appointment": "2026-06-26",
+      "doctor": "Dr. Schneider",
+      "ward": "Ward 3",
+      "address_street": "Bleichstraße 44",
+      "address_zip": "65183",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Aylin Yilmaz",
+      "emergency_contact_relation": "Daughter",
+      "emergency_contact_phone": "+49 176 9876543",
+      "insurance_provider": "TK",
+      "insurance_policy_number": "TK-2204-18",
+      "vitals_blood_pressure": "136/84 mmHg",
+      "vitals_heart_rate": "82 bpm",
+      "vitals_oxygen_saturation": "97%",
+      "vitals_temperature": "37.0°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.patient",
+    "pk": 3,
+    "fields": {
+      "first_name": "Laura",
+      "last_name": "Schmidt",
+      "date_of_birth": "1995-02-01",
+      "sex": "female",
+      "diagnosis": "Asthma",
+      "status": "Outpatient",
+      "last_visit": "2026-06-18",
+      "next_appointment": "2026-07-05",
+      "doctor": "Dr. Weber",
+      "ward": "Outpatient Unit B",
+      "address_street": "Mainzer Straße 88",
+      "address_zip": "65189",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Julia Schmidt",
+      "emergency_contact_relation": "Sister",
+      "emergency_contact_phone": "+49 160 4567890",
+      "insurance_provider": "Barmer",
+      "insurance_policy_number": "BAR-5190-33",
+      "vitals_blood_pressure": "118/76 mmHg",
+      "vitals_heart_rate": "72 bpm",
+      "vitals_oxygen_saturation": "99%",
+      "vitals_temperature": "36.7°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.patient",
+    "pk": 4,
+    "fields": {
+      "first_name": "Jonas",
+      "last_name": "Hartmann",
+      "date_of_birth": "1970-04-20",
+      "sex": "male",
+      "diagnosis": "Suspected Pneumonia",
+      "status": "Inpatient",
+      "last_visit": "2026-06-25",
+      "next_appointment": "2026-07-02",
+      "doctor": "Dr. Fischer",
+      "ward": "Emergency Department",
+      "address_street": "Schwalbacher Straße 31",
+      "address_zip": "65183",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Mara Hartmann",
+      "emergency_contact_relation": "Wife",
+      "emergency_contact_phone": "+49 152 7654321",
+      "insurance_provider": "DAK-Gesundheit",
+      "insurance_policy_number": "DAK-9043-77",
+      "vitals_blood_pressure": "138/88 mmHg",
+      "vitals_heart_rate": "94 bpm",
+      "vitals_oxygen_saturation": "93%",
+      "vitals_temperature": "38.4°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.patient",
+    "pk": 5,
+    "fields": {
+      "first_name": "Sofia",
+      "last_name": "Wagner",
+      "date_of_birth": "1954-07-11",
+      "sex": "female",
+      "diagnosis": "Postoperative Follow-up",
+      "status": "Inpatient",
+      "last_visit": "2026-06-23",
+      "next_appointment": "2026-06-27",
+      "doctor": "Dr. Braun",
+      "ward": "Ward 1",
+      "address_street": "Dotzheimer Straße 55",
+      "address_zip": "65197",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Daniel Wagner",
+      "emergency_contact_relation": "Son",
+      "emergency_contact_phone": "+49 170 1122334",
+      "insurance_provider": "BARMER",
+      "insurance_policy_number": "BAR-8801-52",
+      "vitals_blood_pressure": "129/79 mmHg",
+      "vitals_heart_rate": "76 bpm",
+      "vitals_oxygen_saturation": "96%",
+      "vitals_temperature": "36.6°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.patient",
+    "pk": 6,
+    "fields": {
+      "first_name": "Alex",
+      "last_name": "Demir",
+      "date_of_birth": "1987-09-05",
+      "sex": "diverse",
+      "diagnosis": "Chronic Cough Evaluation",
+      "status": "Outpatient",
+      "last_visit": "2026-06-26",
+      "next_appointment": "2026-07-08",
+      "doctor": "Dr. Neumann",
+      "ward": "Pulmonology Outpatient Clinic",
+      "address_street": "Luisenstraße 19",
+      "address_zip": "65185",
+      "address_city": "Wiesbaden",
+      "emergency_contact_name": "Selin Demir",
+      "emergency_contact_relation": "Partner",
+      "emergency_contact_phone": "+49 151 3344556",
+      "insurance_provider": "Techniker Krankenkasse",
+      "insurance_policy_number": "TK-6612-40",
+      "vitals_blood_pressure": "121/80 mmHg",
+      "vitals_heart_rate": "74 bpm",
+      "vitals_oxygen_saturation": "97%",
+      "vitals_temperature": "36.9°C",
+      "created_at": "2026-06-01T08:00:00Z",
+      "updated_at": "2026-06-26T08:00:00Z"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "name": "Penicillin"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 2,
+    "fields": {
+      "patient": 2,
+      "name": "No known allergies"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 3,
+    "fields": {
+      "patient": 3,
+      "name": "Pollen"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 4,
+    "fields": {
+      "patient": 4,
+      "name": "Contrast agent"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 5,
+    "fields": {
+      "patient": 5,
+      "name": "Latex"
+    }
+  },
+  {
+    "model": "patients.allergy",
+    "pk": 6,
+    "fields": {
+      "patient": 6,
+      "name": "No known allergies"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "name": "Ramipril",
+      "dosage": "5 mg",
+      "schedule": "1x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 2,
+    "fields": {
+      "patient": 1,
+      "name": "Amlodipine",
+      "dosage": "5 mg",
+      "schedule": "1x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 3,
+    "fields": {
+      "patient": 2,
+      "name": "Metformin",
+      "dosage": "1000 mg",
+      "schedule": "2x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 4,
+    "fields": {
+      "patient": 2,
+      "name": "Insulin Glargine",
+      "dosage": "10 IU",
+      "schedule": "Nightly"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 5,
+    "fields": {
+      "patient": 3,
+      "name": "Salbutamol",
+      "dosage": "100 µg",
+      "schedule": "As needed"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 6,
+    "fields": {
+      "patient": 3,
+      "name": "Budesonide",
+      "dosage": "200 µg",
+      "schedule": "2x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 7,
+    "fields": {
+      "patient": 4,
+      "name": "Amoxicillin",
+      "dosage": "1000 mg",
+      "schedule": "3x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 8,
+    "fields": {
+      "patient": 4,
+      "name": "Paracetamol",
+      "dosage": "500 mg",
+      "schedule": "As needed"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 9,
+    "fields": {
+      "patient": 5,
+      "name": "Ibuprofen",
+      "dosage": "400 mg",
+      "schedule": "3x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 10,
+    "fields": {
+      "patient": 5,
+      "name": "Pantoprazole",
+      "dosage": "40 mg",
+      "schedule": "1x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 11,
+    "fields": {
+      "patient": 6,
+      "name": "Ambroxol",
+      "dosage": "30 mg",
+      "schedule": "3x daily"
+    }
+  },
+  {
+    "model": "patients.medication",
+    "pk": 12,
+    "fields": {
+      "patient": 6,
+      "name": "Montelukast",
+      "dosage": "10 mg",
+      "schedule": "1x daily"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 2,
+    "fields": {
+      "patient": 2,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 3,
+    "fields": {
+      "patient": 3,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 4,
+    "fields": {
+      "patient": 4,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 5,
+    "fields": {
+      "patient": 5,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.study",
+    "pk": 6,
+    "fields": {
+      "patient": 6,
+      "created_at": "2026-06-24T09:00:00Z"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 1,
+    "fields": {
+      "study": 1,
+      "image": "xray_images/sample_1.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "done"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 2,
+    "fields": {
+      "study": 2,
+      "image": "xray_images/sample_2.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "done"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 3,
+    "fields": {
+      "study": 3,
+      "image": "xray_images/sample_3.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "done"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 4,
+    "fields": {
+      "study": 4,
+      "image": "xray_images/sample_4.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "done"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 5,
+    "fields": {
+      "study": 5,
+      "image": "xray_images/sample_5.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "done"
+    }
+  },
+  {
+    "model": "imaging.xrayimage",
+    "pk": 6,
+    "fields": {
+      "study": 6,
+      "image": "xray_images/sample_6.png",
+      "uploaded_at": "2026-06-24T09:05:00Z",
+      "prediction_status": "pending"
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "date": "2026-05-10",
+      "title": "Initial Diagnosis",
+      "category": "Visit",
+      "description": "Diagnosed with hypertension after routine screening.",
+      "doctor": "Dr. Klein",
+      "department": "Cardiology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 2,
+    "fields": {
+      "patient": 1,
+      "date": "2026-06-21",
+      "title": "Follow-up Visit",
+      "category": "Visit",
+      "description": "Blood pressure still elevated, medication dosage reviewed.",
+      "doctor": "Dr. Klein",
+      "department": "Cardiology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 3,
+    "fields": {
+      "patient": 1,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Routine chest X-ray, no abnormalities detected.",
+      "doctor": "Dr. Klein",
+      "department": "Radiology",
+      "study": 1
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 4,
+    "fields": {
+      "patient": 2,
+      "date": "2026-04-02",
+      "title": "Diabetes Management Review",
+      "category": "Visit",
+      "description": "Adjusted insulin dosage following elevated HbA1c levels.",
+      "doctor": "Dr. Schneider",
+      "department": "Endocrinology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 5,
+    "fields": {
+      "patient": 2,
+      "date": "2026-06-24",
+      "title": "Inpatient Admission",
+      "category": "Procedure",
+      "description": "Admitted for glucose monitoring and medication adjustment.",
+      "doctor": "Dr. Schneider",
+      "department": "Internal Medicine",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 6,
+    "fields": {
+      "patient": 2,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Chest X-ray performed as part of admission workup, unremarkable.",
+      "doctor": "Dr. Schneider",
+      "department": "Radiology",
+      "study": 2
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 7,
+    "fields": {
+      "patient": 3,
+      "date": "2026-03-15",
+      "title": "Asthma Diagnosis",
+      "category": "Visit",
+      "description": "Diagnosed with mild persistent asthma, inhaler therapy started.",
+      "doctor": "Dr. Weber",
+      "department": "Pulmonology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 8,
+    "fields": {
+      "patient": 3,
+      "date": "2026-06-18",
+      "title": "Routine Follow-up",
+      "category": "Visit",
+      "description": "Symptoms well controlled, continue current medication.",
+      "doctor": "Dr. Weber",
+      "department": "Pulmonology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 9,
+    "fields": {
+      "patient": 3,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Chest X-ray performed for baseline comparison, no abnormalities.",
+      "doctor": "Dr. Weber",
+      "department": "Radiology",
+      "study": 3
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 10,
+    "fields": {
+      "patient": 4,
+      "date": "2026-06-25",
+      "title": "Emergency Admission",
+      "category": "Visit",
+      "description": "Presented with fever and cough, suspected pneumonia.",
+      "doctor": "Dr. Fischer",
+      "department": "Emergency Department",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 11,
+    "fields": {
+      "patient": 4,
+      "date": "2026-06-25",
+      "title": "Antibiotic Therapy Started",
+      "category": "Medication",
+      "description": "Started on Amoxicillin 1000 mg three times daily.",
+      "doctor": "Dr. Fischer",
+      "department": "Emergency Department",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 12,
+    "fields": {
+      "patient": 4,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Chest X-ray shows signs consistent with early pneumonia.",
+      "doctor": "Dr. Fischer",
+      "department": "Radiology",
+      "study": 4
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 13,
+    "fields": {
+      "patient": 5,
+      "date": "2026-06-15",
+      "title": "Surgical Procedure",
+      "category": "Procedure",
+      "description": "Underwent scheduled abdominal surgery without complications.",
+      "doctor": "Dr. Braun",
+      "department": "Surgery",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 14,
+    "fields": {
+      "patient": 5,
+      "date": "2026-06-23",
+      "title": "Postoperative Follow-up",
+      "category": "Follow-up",
+      "description": "Wound healing well, no signs of infection.",
+      "doctor": "Dr. Braun",
+      "department": "Surgery",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 15,
+    "fields": {
+      "patient": 5,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Postoperative chest X-ray, lungs clear.",
+      "doctor": "Dr. Braun",
+      "department": "Radiology",
+      "study": 5
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 16,
+    "fields": {
+      "patient": 6,
+      "date": "2026-06-01",
+      "title": "Chronic Cough Evaluation",
+      "category": "Visit",
+      "description": "Referred for evaluation of persistent cough lasting over 6 weeks.",
+      "doctor": "Dr. Neumann",
+      "department": "Pulmonology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 17,
+    "fields": {
+      "patient": 6,
+      "date": "2026-06-26",
+      "title": "Follow-up Visit",
+      "category": "Visit",
+      "description": "Symptoms improved with Ambroxol and Montelukast therapy.",
+      "doctor": "Dr. Neumann",
+      "department": "Pulmonology",
+      "study": null
+    }
+  },
+  {
+    "model": "patients.historyentry",
+    "pk": 18,
+    "fields": {
+      "patient": 6,
+      "date": "2026-06-24",
+      "title": "Chest X-Ray",
+      "category": "Finding",
+      "description": "Chest X-ray pending radiologist review.",
+      "doctor": "Dr. Neumann",
+      "department": "Radiology",
+      "study": 6
+    }
+  }
+]
