@@ -1,14 +1,3 @@
-"""
-NIH Chest X-ray — Visualisierung
-==================================
-Schritt 6: Ergebnisse sichtbar machen
-
-  A) Trainingshistorie    — Loss & AUC über Epochen
-  B) ROC-Kurven           — Eine Kurve pro Pathologie
-  C) AUC-Balkendiagramm   — Vergleich aller 14 Klassen
-  D) Grad-CAM Heatmaps    — Wo "schaut" das Modell hin?
-"""
-
 import os
 import numpy as np
 import torch
