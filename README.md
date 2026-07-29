@@ -73,6 +73,15 @@ megagpu-0 RTX A6000
 ## Ordner auf HSRM
 /data/stud/2026-MA_project-Martin-Rossel
 
+## Get probability of one image
+
+analyse.py -> bild heißt mein_roentgenbild.png
+
+d.h. diese beiden konstanten muss man reingeben in die Mehtode als werte:
+
+MODEL_PATH = "./cnn_state_dict.pt"
+IMAGE_PATH = "./mein_roentgenbild.png"
+
 ## Usability
 
 Allgemein: https://user-experience-methods.com/05_evaluate/questionnaire.html
