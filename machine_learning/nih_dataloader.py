@@ -238,8 +238,6 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
     """
     Gibt die richtigen Transforms für Training oder Validation/Test zurück.
     """
-    imagenet_mean = [0.485, 0.456, 0.406]
-    imagenet_std  = [0.229, 0.224, 0.225]
 
     if mode == "train":
         return transforms.Compose([
