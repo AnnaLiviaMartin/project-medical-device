@@ -150,7 +150,7 @@ def plot_roc_curves(all_probs: np.ndarray,
                     all_labels: np.ndarray,
                     save_path: str):
     """
-    Zeichnet alle 14 ROC-Kurven in einem 4×4-Grid.
+    Zeichnet alle 14 ROC-Kurven in einem 4x4-Grid.
 
     Jede Kurve zeigt den Trade-off zwischen True Positive Rate (Sensitivität)
     und False Positive Rate (1 - Spezifität). Je näher an der oberen linken
