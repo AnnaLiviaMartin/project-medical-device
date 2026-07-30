@@ -201,8 +201,8 @@ def train(config: dict) -> nn.Module:
 
     images, labels = next(iter(train_loader))
     print(f"\n=== Batch-Inspektion für Training ===")
-    print(f"  Bild-Shape:   {images.shape}")   # → torch.Size([32, 3, 224, 224])
-    print(f"  Label-Shape:  {labels.shape}")   # → torch.Size([32, 14])
+    print(f"  Bild-Shape:   {images.shape}")
+    print(f"  Label-Shape:  {labels.shape}")
     print(f"  pos_weights:  {pos_weights}")    # → Tensor der Länge 14
 
     model = get_model(num_classes=config["num_classes"]).to(device)

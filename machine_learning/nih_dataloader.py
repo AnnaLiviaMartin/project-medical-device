@@ -243,7 +243,7 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
         return transforms.Compose([
             transforms.Resize(PIXEL),
             transforms.RandomCrop(PIXEL),
-            transforms.RandomHorizontalFlip(p=0.5), # so kann Herz auf der falschen Seite erscheinen, was die Klassifikation erschwert?
+            #transforms.RandomHorizontalFlip(p=0.5), # so kann Herz auf der falschen Seite erscheinen, was die Klassifikation erschwert?
             transforms.RandomRotation(degrees=5),
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
             transforms.ToTensor(),
