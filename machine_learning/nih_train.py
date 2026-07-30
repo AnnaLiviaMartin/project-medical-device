@@ -207,7 +207,7 @@ def train(config: dict) -> nn.Module:
 
     model = get_model(num_classes=config["num_classes"]).to(device)
 
-    # --- Loss: BCEWithLogitsLoss mit Class Weights ---
+    # --- Loss: BCEWithLogitsLoss mit Class Weights (numerisch sauberer wie Sigmoid-Aktivierung) ---
     criterion = nn.BCEWithLogitsLoss(
         pos_weight=pos_weights.to(device)
     )

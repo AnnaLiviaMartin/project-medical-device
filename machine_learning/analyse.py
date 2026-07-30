@@ -4,7 +4,7 @@ from torchvision import transforms
 from nih_train import get_model
 from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST
 
-MODEL_PATH = "./cnn_state_dict.pt"
+MODEL_PATH = "./checkpoints/cnn_state_dict.pt"
 IMAGE_PATH = "./mein_roentgenbild.png"
 
 NUM_CLASSES = 14

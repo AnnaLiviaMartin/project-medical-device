@@ -480,7 +480,7 @@ def plot_gradcam(model: nn.Module,
 # ALLES ZUSAMMEN AUSFÜHREN
 # ==============================================================================
 
-if __name__ == "__main__":
+def visualise_all():
     print("=" * 60)
     print("  NIH Chest X-ray — Visualisierung")
     print("=" * 60)
@@ -532,3 +532,6 @@ if __name__ == "__main__":
     else:
         print("  Hinweis: Passe 'sample_images' auf echte Bildpfade an.")
         print("  Beispiel: sample_images = ['./data/images/00000013_005.png']")
+
+if __name__ == "__main__":
+    visualise_all()
