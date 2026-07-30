@@ -2,11 +2,13 @@ import os
 import time
 import numpy as np
 import torch
+import json
 import torch.nn as nn
 from torchvision import models
 from sklearn.metrics import roc_auc_score
 
 from nih_dataloader import create_dataloaders
+from nih_threshold import find_optimal_thresholds, evaluate_with_thresholds, print_threshold_report
 from constants import PATHOLOGY_LIST, CONFIG
 
 # ==============================================================================
@@ -171,6 +173,32 @@ def validate(
     return val_loss, macro_auc, auc_scores
 
 
+def get_probs_and_labels(
+    model: nn.Module,
+    loader: torch.utils.data.DataLoader,
+    device: torch.device,
+):
+    """
+    Sammelt rohe Sigmoid-Wahrscheinlichkeiten und Labels für einen
+    kompletten Loader. Wird für die Threshold-Optimierung gebraucht.
+    Returns:
+        all_probs:  (N, 14) np.ndarray
+        all_labels: (N, 14) np.ndarray
+    """
+    model.eval()
+    all_probs, all_labels = [], []
+
+    with torch.no_grad():
+        for images, labels in loader:
+            images = images.to(device, non_blocking=True)
+            logits = model(images)
+            probs  = torch.sigmoid(logits)
+            all_probs.append(probs.cpu().numpy())
+            all_labels.append(labels.numpy())
+
+    return np.concatenate(all_probs, axis=0), np.concatenate(all_labels, axis=0)
+
+
 # ==============================================================================
 # 4. TRAINING LOOP
 # ==============================================================================
@@ -321,8 +349,10 @@ def evaluate_on_test(config: dict):
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Testdaten und Modell laden 
-    _, _, test_loader, pos_weights = create_dataloaders(
+    # Val-Loader wird jetzt zusätzlich gebraucht: die Decision-Thresholds
+    # werden AUSSCHLIESSLICH auf dem Val-Set bestimmt, niemals auf dem Test-Set
+    # (sonst Data Leakage bei der Threshold-Wahl).
+    _, val_loader, test_loader, pos_weights = create_dataloaders(
         data_dir=config["data_dir"],
         batch_size=config["batch_size"],
         num_workers=config["num_workers"],
@@ -349,3 +379,15 @@ def evaluate_on_test(config: dict):
     for name, auc in sorted(auc_dict.items(), key=lambda x: -x[1]):
         bar = "█" * int(auc * 20)
         print(f"    {name:<22} {auc:.4f}  {bar}")
+
+    # ==========================================================================
+    # Klassenspezifische Decision-Thresholds statt pauschal 0.5
+    # ==========================================================================
+    # Schritt 1: Schwellenwerte NUR auf dem Val-Set bestimmen
+    val_probs, val_labels = get_probs_and_labels(model, val_loader, device)
+    thresholds = find_optimal_thresholds(val_probs, val_labels, method="youden")
+
+    # Schritt 2: Diese (fixen) Schwellenwerte EINMAL auf das Test-Set anwenden
+    test_probs, test_labels = get_probs_and_labels(model, test_loader, device)
+    threshold_results = evaluate_with_thresholds(test_probs, test_labels, thresholds)
+    print_threshold_report(threshold_results)
