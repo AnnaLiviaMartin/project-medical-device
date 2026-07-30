@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-from constants import PATHOLOGY_LIST, NUM_CLASSES
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, NUM_CLASSES
 from pathlib import Path
 
 """
@@ -249,16 +249,15 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
             transforms.RandomRotation(degrees=5),
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
             transforms.ToTensor(),
-            transforms.Normalize(mean=imagenet_mean, std=imagenet_std),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ])
     else:  # val / test
         return transforms.Compose([
             transforms.Resize(224),
             transforms.CenterCrop(224),
             transforms.ToTensor(),
-            transforms.Normalize(mean=imagenet_mean, std=imagenet_std),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ])
-
 
 # ==============================================================================
 # 7. DATALOADER FACTORY
@@ -266,7 +265,7 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
 
 def create_dataloaders(
     data_dir: str,
-    batch_size: int = 32, # TODO 64?
+    batch_size: int = 64,
     num_workers: int = 4,
     val_fraction: float = 0.1,
     random_seed: int = 42,
@@ -334,3 +333,4 @@ def create_dataloaders(
     print(f"  Test-Batches:  {len(test_loader)}")
 
     return train_loader, val_loader, test_loader, pos_weights
+    

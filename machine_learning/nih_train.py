@@ -296,12 +296,16 @@ def train(config: dict) -> nn.Module:
             print(f"\n  Early Stopping nach Epoche {epoch}.")
             break
 
-        print()
-
     print(f"\n{'='*60}")
     print(f"Training abgeschlossen. Bestes Val-AUC: {best_auc:.4f}")
     print(f"Checkpoint: {os.path.join(config['output_dir'], 'best_model.pt')}")
     print(f"{'='*60}")
+
+    # Speichere Trainingshistorie als JSON für spätere Visualisierung
+    history_path = os.path.join(config["output_dir"], "history.json")
+    with open(history_path, "w") as f:
+        json.dump(history, f, indent=2)
+    print(f"Trainingshistorie gespeichert: {history_path}")
 
     return model
 
