@@ -7,6 +7,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from .models import Study, XRayImage
 from .serializers import StudySerializer, XRayImageSerializer
+from .utils import is_dicom_file, convert_dicom_to_png
 from ml.models import Prediction
 from ml.services import run_model_on_image
 from patients.models import HistoryEntry
@@ -29,7 +30,19 @@ class XRayImageViewSet(ModelViewSet):
     parser_classes = [MultiPartParser, FormParser]
 
     def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        data = request.data.copy()
+        uploaded_file = data.get("image")
+
+        if uploaded_file and is_dicom_file(uploaded_file):
+            try:
+                data["image"] = convert_dicom_to_png(uploaded_file)
+            except Exception as exc:
+                return Response(
+                    {"detail": f"DICOM-Konvertierung fehlgeschlagen: {str(exc)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
         image = None
@@ -77,6 +90,15 @@ class HistoryScanUploadView(APIView):
                 {"detail": "Keine Datei übermittelt."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
+
+        if is_dicom_file(file):
+            try:
+                file = convert_dicom_to_png(file)
+            except Exception as exc:
+                return Response(
+                    {"detail": f"DICOM-Konvertierung fehlgeschlagen: {str(exc)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
         if entry.study_id is None:
             study = Study.objects.create(patient_id=patient_id)
