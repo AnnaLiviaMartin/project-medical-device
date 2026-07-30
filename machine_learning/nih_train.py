@@ -207,7 +207,7 @@ def train(config: dict) -> nn.Module:
 
     model = get_model(num_classes=config["num_classes"]).to(device)
 
-    # --- Loss: BCEWithLogitsLoss mit Class Weights ---
+    # --- Loss: BCEWithLogitsLoss mit Class Weights (numerisch sauberer wie Sigmoid-Aktivierung) ---
     criterion = nn.BCEWithLogitsLoss(
         pos_weight=pos_weights.to(device)
     )
@@ -287,21 +287,25 @@ def train(config: dict) -> nn.Module:
                 "best_auc":    best_auc,
                 "config":      config,
             }, checkpoint_path)
-            print(f"  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
+            print(f"\n  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
         else:
             patience_counter += 1
-            print(f"  Kein Fortschritt ({patience_counter}/{config['patience']})")
+            print(f"\n  Kein Fortschritt ({patience_counter}/{config['patience']})")
 
         if patience_counter >= config["patience"]:
             print(f"\n  Early Stopping nach Epoche {epoch}.")
             break
 
-        print()
-
     print(f"\n{'='*60}")
     print(f"Training abgeschlossen. Bestes Val-AUC: {best_auc:.4f}")
     print(f"Checkpoint: {os.path.join(config['output_dir'], 'best_model.pt')}")
     print(f"{'='*60}")
+
+    # Speichere Trainingshistorie als JSON für spätere Visualisierung
+    history_path = os.path.join(config["output_dir"], "history.json")
+    with open(history_path, "w") as f:
+        json.dump(history, f, indent=2)
+    print(f"Trainingshistorie gespeichert: {history_path}")
 
     return model
 

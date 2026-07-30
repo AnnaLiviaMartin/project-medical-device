@@ -1,4 +1,5 @@
 import os
+import json
 import numpy as np
 import torch
 import torch.nn as nn
@@ -10,9 +11,9 @@ import cv2
 from PIL import Image
 from torchvision import transforms, models
 from sklearn.metrics import roc_curve, roc_auc_score
-
+from matplotlib.patches import Patch
 from nih_dataloader import create_dataloaders
-from constants import PATHOLOGY_LIST, CONFIG
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, CONFIG, PIXEL
 from nih_train import get_model
 
 plt.rcParams.update({
@@ -59,6 +60,9 @@ def load_model_and_preds(config: dict):
     print(f"Modell geladen (Epoche {checkpoint['epoch']}, "
           f"Val-AUC {checkpoint['best_auc']:.4f})")
 
+    filenames   = test_loader.dataset.df["Image Index"].tolist()
+    image_index = test_loader.dataset.image_index  # dict: Dateiname -> echter Pfad
+
     all_probs, all_labels = [], []
     with torch.no_grad():
         for images, labels in test_loader:
@@ -71,7 +75,7 @@ def load_model_and_preds(config: dict):
     all_probs  = np.concatenate(all_probs,  axis=0)  # (N, 14)
     all_labels = np.concatenate(all_labels, axis=0)  # (N, 14)
 
-    return model, all_probs, all_labels, device
+    return model, all_probs, all_labels, filenames, image_index, device
 
 
 # ==============================================================================
@@ -257,7 +261,6 @@ def plot_auc_barchart(all_probs: np.ndarray,
     ax.grid(axis="x", alpha=0.3, zorder=1)
 
     # Legende für Farbkodierung
-    from matplotlib.patches import Patch
     legend_elements = [
         Patch(facecolor="#16a34a", label="AUC ≥ 0.80"),
         Patch(facecolor="#ca8a04", label="AUC 0.70–0.80"),
@@ -320,12 +323,12 @@ class GradCAM:
         Berechnet die Grad-CAM-Heatmap für eine gegebene Klasse.
 
         Args:
-            image_tensor: (1, 3, 224, 224) — normalisiertes Bild
+            image_tensor: normalisiertes Bild
             class_idx:    Index der Ziel-Pathologie (0–13)
             device:       torch.device
 
         Returns:
-            heatmap: (224, 224) — Werte zwischen 0 und 1
+            heatmap: Werte zwischen 0 und 1
         """
         image_tensor = image_tensor.to(device).requires_grad_(True)
 
@@ -354,7 +357,7 @@ class GradCAM:
 
         # Auf Bildgröße hochskalieren und normalisieren [0, 1]
         cam = cam.detach().cpu().numpy()
-        cam = cv2.resize(cam, (224, 224))
+        cam = cv2.resize(cam, (PIXEL, PIXEL))
         if cam.max() > 0:
             cam = (cam - cam.min()) / (cam.max() - cam.min())
 
@@ -367,10 +370,8 @@ class GradCAM:
 
 def denormalize(tensor: torch.Tensor) -> np.ndarray:
     """Macht die ImageNet-Normalisierung rückgängig für die Visualisierung."""
-    mean = np.array([0.485, 0.456, 0.406])
-    std  = np.array([0.229, 0.224, 0.225])
     img  = tensor.squeeze().permute(1, 2, 0).numpy()
-    img  = std * img + mean
+    img  = IMAGENET_STD * img + IMAGENET_MEAN
     img  = np.clip(img, 0, 1)
     return img
 
@@ -399,11 +400,10 @@ def plot_gradcam(model: nn.Module,
         )
     """
     transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(PIXEL),
+        transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406],
-                             [0.229, 0.224, 0.225]),
+        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])
 
     grad_cam = GradCAM(model)
@@ -424,8 +424,8 @@ def plot_gradcam(model: nn.Module,
     for row, img_path in enumerate(image_paths):
         # Bild laden und vorbereiten
         pil_img    = Image.open(img_path).convert("RGB")
-        img_tensor = transform(pil_img).unsqueeze(0)      # (1, 3, 224, 224)
-        img_np     = denormalize(img_tensor)              # (224, 224, 3)
+        img_tensor = transform(pil_img).unsqueeze(0)
+        img_np     = denormalize(img_tensor)
 
         # Modell-Vorhersage für dieses Bild
         with torch.no_grad():
@@ -476,29 +476,87 @@ def plot_gradcam(model: nn.Module,
     plt.show()
 
 
+def get_auc_per_class(all_probs: np.ndarray, all_labels: np.ndarray) -> dict:
+    """AUC pro Pathologie — wird sowohl für den Barchart als auch für die
+    automatische Grad-CAM-Klassenauswahl gebraucht."""
+    scores = {}
+    for i, p in enumerate(PATHOLOGY_LIST):
+        try:
+            scores[p] = roc_auc_score(all_labels[:, i], all_probs[:, i])
+        except ValueError:
+            scores[p] = float("nan")
+    return scores
+
+def select_gradcam_examples(
+    all_probs: np.ndarray,
+    all_labels: np.ndarray,
+    filenames: list[str],
+    image_index: dict,
+    pathology_idx: int,
+    n_per_group: int = 2,
+) -> dict:
+    """
+    Wählt aussagekräftige Beispielbilder für eine Pathologie aus:
+      - true_positives:  echte Positive mit HOHER Konfidenz
+                          -> schaut das Modell auf die richtige Region?
+      - false_positives: echte Negative mit HOHER Konfidenz
+                          -> reagiert das Modell auf Artefakte
+                             (Tubus, EKG-Elektroden, Beschriftung)?
+      - false_negatives: echte Positive mit NIEDRIGER Konfidenz
+                          -> was übersieht das Modell?
+
+    Nutzt image_index (Dateiname -> echter Pfad), das test_loader.dataset
+    bereits beim Aufbau per rglob() über ALLE images_XXX-Unterordner erstellt
+    hat — keine eigene Annahme über die Ordnerstruktur nötig.
+
+    Returns: dict mit Listen von vollständigen Bildpfaden je Gruppe
+    """
+    probs  = all_probs[:, pathology_idx]
+    labels = all_labels[:, pathology_idx]
+
+    pos_idx = np.where(labels == 1)[0]
+    neg_idx = np.where(labels == 0)[0]
+
+    tp_idx = pos_idx[np.argsort(-probs[pos_idx])][:n_per_group]   # höchste Prob unter Positiven
+    fn_idx = pos_idx[np.argsort(probs[pos_idx])][:n_per_group]    # niedrigste Prob unter Positiven
+    fp_idx = neg_idx[np.argsort(-probs[neg_idx])][:n_per_group]   # höchste Prob unter Negativen
+
+    def to_paths(idx_array):
+        return [image_index[filenames[i]] for i in idx_array if filenames[i] in image_index]
+
+    return {
+        "true_positives":  to_paths(tp_idx),
+        "false_positives": to_paths(fp_idx),
+        "false_negatives": to_paths(fn_idx),
+    }
+
+
 # ==============================================================================
 # ALLES ZUSAMMEN AUSFÜHREN
 # ==============================================================================
 
-if __name__ == "__main__":
+def visualise_all():
     print("=" * 60)
     print("  NIH Chest X-ray — Visualisierung")
     print("=" * 60)
 
     # --- Modell & Vorhersagen laden ---
-    model, all_probs, all_labels, device = load_model_and_preds(CONFIG)
+    model, all_probs, all_labels, filenames, image_index, device = load_model_and_preds(CONFIG)
 
     # --- A) Trainingshistorie ---
-    # Wenn du history aus dem Training gespeichert hast (z.B. als JSON),
-    # lade sie hier. Für Demo-Zwecke eine synthetische History:
-    demo_history = {
-        "train_loss": [0.42, 0.38, 0.35, 0.31, 0.28, 0.25, 0.23],
-        "val_loss":   [0.45, 0.41, 0.38, 0.34, 0.32, 0.31, 0.31],
-        "val_auc":    [0.74, 0.77, 0.79, 0.80, 0.81, 0.82, 0.82],
-    }
-    # Ersetze demo_history mit deinem echten history-Dict aus nih_train.py
     print("\n[A] Trainingshistorie...")
-    plot_training_history(demo_history, "plots/training_history.png")
+    history_path = os.path.join(CONFIG["output_dir"], "history.json")
+
+    if os.path.exists(history_path):
+        with open(history_path) as f:
+            history = json.load(f)
+        print(f"  Geladen: {history_path}")
+        plot_training_history(history, "plots/training_history.png")
+    else:
+        print(f"  Warnung: '{history_path}' nicht gefunden.")
+        print("  (Datei entsteht automatisch beim nächsten Trainingslauf.)")
+
+    plot_training_history(history, "plots/training_history.png")
 
     # --- B) ROC-Kurven ---
     print("\n[B] ROC-Kurven...")
@@ -509,26 +567,39 @@ if __name__ == "__main__":
     plot_auc_barchart(all_probs, all_labels, "plots/auc_barchart.png")
 
     # --- D) Grad-CAM ---
-    # Einige Beispielbilder aus dem Test-Set auswählen:
     print("\n[D] Grad-CAM Heatmaps...")
 
-    sample_images = [
-        "./data/images/00000001_000.png",   # Beispiel 1
-        "./data/images/00000001_001.png",   # Beispiel 2
-    ]
-    # Welche Pathologien visualisieren? Index 2 = Effusion, 7 = Pneumothorax
-    sample_classes = [2, 7]
+    # Datengetriebene Auswahl: die N Pathologien mit der
+    # SCHLECHTESTEN Test-AUC sind die naheliegendsten Kandidaten, um zu prüfen,
+    # ob das Modell auf die falschen Bildregionen schaut.
+    N_WORST = 3
+    auc_scores = get_auc_per_class(all_probs, all_labels)
+    worst_pathologies = sorted(auc_scores, key=lambda p: auc_scores[p])[:N_WORST]
 
-    # Nur ausführen wenn Bilder vorhanden:
-    existing = [p for p in sample_images if os.path.exists(p)]
-    if existing:
-        plot_gradcam(
-            model=model,
-            image_paths=existing,
-            pathology_indices=sample_classes,
-            device=device,
-            save_path="plots/gradcam.png"
+    print(f"  Schwächste {N_WORST} Pathologien (niedrigste Test-AUC):")
+    for p in worst_pathologies:
+        print(f"    {p:<22} AUC={auc_scores[p]:.3f}")
+
+    for pathology_name in worst_pathologies:
+        pathology_idx = PATHOLOGY_LIST.index(pathology_name)
+
+        examples = select_gradcam_examples(
+            all_probs, all_labels, filenames, image_index,
+            pathology_idx=pathology_idx, n_per_group=2,
         )
-    else:
-        print("  Hinweis: Passe 'sample_images' auf echte Bildpfade an.")
-        print("  Beispiel: sample_images = ['./data/images/00000013_005.png']")
+
+        for group_name, paths in examples.items():
+            if not paths:
+                print(f"  Keine Bilder für '{pathology_name}' / '{group_name}' gefunden.")
+                continue
+            print(f"  {pathology_name} / {group_name} ({len(paths)} Bilder)")
+            plot_gradcam(
+                model=model,
+                image_paths=paths,
+                pathology_indices=[pathology_idx],
+                device=device,
+                save_path=f"plots/gradcam_{pathology_name}_{group_name}.png",
+            )
+
+if __name__ == "__main__":
+    visualise_all()
