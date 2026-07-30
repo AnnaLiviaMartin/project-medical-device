@@ -235,9 +235,6 @@ export default function AnalysisResultCard({
 
         <div className={styles.divider} />
 
-        <button type="button" className={styles.primaryButton}>
-          Validate Result
-        </button>
 
         <div className={styles.actions}>
           <button

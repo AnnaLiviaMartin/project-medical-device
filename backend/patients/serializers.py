@@ -175,25 +175,58 @@ class AttachmentSerializer(serializers.ModelSerializer):
 class HistoryEntrySerializer(serializers.ModelSerializer):
     scans = serializers.SerializerMethodField()
     attachments = AttachmentSerializer(many=True, read_only=True)
+    analysis = serializers.SerializerMethodField()
 
     class Meta:
         model = HistoryEntry
         fields = [
             "id", "patient", "study", "date", "title", "category",
             "description", "doctor", "department", "scans", "attachments",
+            "analysis",
         ]
         read_only_fields = ["id"]
 
     def get_scans(self, obj):
         if not obj.study:
             return []
-        return [
-            {
+        request = self.context.get("request")
+        result = []
+        for img in obj.study.xray_images.all():
+            url = img.image.url
+            if request:
+                url = request.build_absolute_uri(url)
+            result.append({
                 "id": img.id,
                 "title": "Chest X-Ray",
                 "date": img.uploaded_at.strftime("%d.%m.%Y"),
                 "modality": "X-Ray",
-                "href": img.image.url,
-            }
-            for img in obj.study.xray_images.all()
-        ]
+                "href": url,
+            })
+        return result
+
+    def get_analysis(self, obj):
+        if not obj.study:
+            return None
+
+        image = obj.study.xray_images.order_by("-uploaded_at").first()
+        if not image:
+            return None
+
+        prediction = getattr(image, "prediction", None)
+        if not prediction:
+            return None
+
+        request = self.context.get("request")
+        image_url = image.image.url
+        if request:
+            image_url = request.build_absolute_uri(image_url)
+
+        return {
+            "imageSrc": image_url,
+            "title": "Chest X-Ray Analysis",
+            "engine": "AI Model v1",
+            "status": image.prediction_status,
+            "confidence": prediction.confidence,
+            "score": prediction.confidence,
+            "findings": [prediction.label],
+        }

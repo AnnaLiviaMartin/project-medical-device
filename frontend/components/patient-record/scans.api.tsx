@@ -1,5 +1,7 @@
 import type { Scan } from "../patient-record/patientRecord.data";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 export async function uploadXrayScan(
   patientId: string,
   entryId: string,
@@ -9,7 +11,7 @@ export async function uploadXrayScan(
   formData.append("file", file);
 
   const res = await fetch(
-    `/api/patients/${patientId}/history/${entryId}/scans`,
+    `${BASE_URL}/api/patients/${patientId}/history/${entryId}/scans/`,
     { method: "POST", body: formData }
   );
 
