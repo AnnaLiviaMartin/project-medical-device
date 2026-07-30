@@ -221,12 +221,34 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
         if request:
             image_url = request.build_absolute_uri(image_url)
 
+        raw_result = prediction.raw_result or {}
+        positive_findings = raw_result.get("positive_findings", {})
+
+        if positive_findings:
+            findings = [
+                {
+                    "title": pathology,
+                    "text": f"Wahrscheinlichkeit fuer {pathology} liegt bei {round(score * 100, 1)}%.",
+                    "disease": pathology,
+                    "confidence": round(score * 100, 1),
+                }
+                for pathology, score in positive_findings.items()
+            ]
+        else:
+            findings = [
+                {
+                    "title": "No Finding",
+                    "text": "Keine auffälligen Befunde erkannt.",
+                    "confidence": round(prediction.confidence * 100, 1),
+                }
+            ]
+
         return {
             "imageSrc": image_url,
             "title": "Chest X-Ray Analysis",
             "engine": "AI Model v1",
-            "status": image.prediction_status,
-            "confidence": prediction.confidence,
-            "score": prediction.confidence,
-            "findings": [prediction.label],
+            "status": "No Finding" if not positive_findings else "Findings Detected",
+            "confidence": round(prediction.confidence * 100, 1),
+            "score": round(prediction.confidence * 100, 1),
+            "findings": findings,
         }

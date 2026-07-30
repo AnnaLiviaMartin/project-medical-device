@@ -83,6 +83,11 @@ export default function AnalysisResultCard({
     return "Low";
   }, [clampedScore]);
 
+  const isNoFinding = useMemo(() => {
+    if (findings.length === 0) return true;
+    return findings.every((finding) => finding.title === "No Finding");
+  }, [findings]);
+
   const selectedDoctor = doctors.find((doctor) => doctor.id === selectedDoctorId);
   const selectedFinding =
     selectedFindingIndex !== null ? findings[selectedFindingIndex] : null;
@@ -158,25 +163,36 @@ export default function AnalysisResultCard({
 
               {patient && (
                 <Link
-                href={`/patients/${encodeURIComponent(patient.id)}`}
-                className={styles.patientLink}
-              >
-                {patient.name}
-              </Link>
+                  href={`/patients/${encodeURIComponent(patient.id)}`}
+                  className={styles.patientLink}
+                >
+                  {patient.name}
+                </Link>
               )}
             </div>
-
           </div>
 
           <span className={styles.engine}>{engine}</span>
         </div>
 
         <div className={styles.stats}>
-          <div className={`${styles.statBox} ${styles.statusBox}`}>
-            <p className={styles.statLabel}>STATUS</p>
+          <div
+            className={`${styles.statBox} ${
+              isNoFinding ? styles.statusBoxOk : styles.statusBox
+            }`}
+          >
+            <p className={isNoFinding ? styles.statLabelOk : styles.statLabel}>
+              STATUS
+            </p>
             <div className={styles.statusRow}>
-              <span className={styles.statusDot} />
-              <p className={styles.statusText}>{status}</p>
+              <span
+                className={`${styles.statusDot} ${
+                  isNoFinding ? styles.statusDotOk : ""
+                }`}
+              />
+              <p className={isNoFinding ? styles.statusTextOk : styles.statusText}>
+                {status}
+              </p>
             </div>
           </div>
 
@@ -194,22 +210,44 @@ export default function AnalysisResultCard({
           <div className={styles.findings}>
             {findings.map((finding, index) => {
               const isActive = index === selectedFindingIndex;
+              const isFindingOk = finding.title === "No Finding";
 
               return (
                 <button
                   key={`${finding.title}-${index}`}
                   type="button"
-                  className={`${styles.findingCard} ${isActive ? styles.findingCardActive : ""}`}
+                  className={`${styles.findingCard} ${
+                    isActive
+                      ? isFindingOk
+                        ? styles.findingCardActiveOk
+                        : styles.findingCardActive
+                      : ""
+                  }`}
                   onClick={() => setSelectedFindingIndex(index)}
                 >
                   <div className={styles.findingContent}>
-                    <h3 className={styles.findingTitle}>{finding.title}</h3>
+                    <h3 className={styles.findingTitle}>
+                      {isFindingOk ? "✓ " : ""}
+                      {finding.title}
+                    </h3>
 
                     {finding.disease && (
-                      <p className={styles.findingDisease}>
+                      <p
+                        className={
+                          isFindingOk
+                            ? styles.findingDiseaseOk
+                            : styles.findingDisease
+                        }
+                      >
                         {finding.disease}
                         {typeof finding.confidence === "number" && (
-                          <span className={styles.findingConfidence}>
+                          <span
+                            className={
+                              isFindingOk
+                                ? styles.findingConfidenceOk
+                                : styles.findingConfidence
+                            }
+                          >
                             {" "}
                             · {finding.confidence.toFixed(1)}%
                           </span>
@@ -218,8 +256,20 @@ export default function AnalysisResultCard({
                     )}
 
                     {!finding.disease && typeof finding.confidence === "number" && (
-                      <p className={styles.findingDisease}>
-                        <span className={styles.findingConfidence}>
+                      <p
+                        className={
+                          isFindingOk
+                            ? styles.findingDiseaseOk
+                            : styles.findingDisease
+                        }
+                      >
+                        <span
+                          className={
+                            isFindingOk
+                              ? styles.findingConfidenceOk
+                              : styles.findingConfidence
+                          }
+                        >
                           {finding.confidence.toFixed(1)}%
                         </span>
                       </p>
@@ -234,7 +284,6 @@ export default function AnalysisResultCard({
         </div>
 
         <div className={styles.divider} />
-
 
         <div className={styles.actions}>
           <button

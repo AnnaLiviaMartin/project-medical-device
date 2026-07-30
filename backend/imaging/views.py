@@ -120,7 +120,7 @@ class HistoryScanUploadView(APIView):
                     defaults={
                         "label": result["label"],
                         "confidence": result["confidence"],
-                        "raw_result": result,
+                        "raw_result": result["raw_result"],
                     },
                 )
                 image.prediction_status = "done"
