@@ -1,5 +1,7 @@
 import type { Attachment } from "./patientRecord.data";
 
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
 export async function uploadAttachment(
   patientId: string,
   entryId: string,
@@ -9,7 +11,7 @@ export async function uploadAttachment(
   formData.append("file", file);
 
   const res = await fetch(
-    `/api/patients/${patientId}/history/${entryId}/attachments`,
+    `${BASE_URL}/api/patients/${patientId}/history/${entryId}/attachments/`,
     {
       method: "POST",
       body: formData,
@@ -29,7 +31,7 @@ export async function deleteAttachment(
   attachmentId: string
 ): Promise<void> {
   const res = await fetch(
-    `/api/patients/${patientId}/history/${entryId}/attachments/${attachmentId}`,
+    `${BASE_URL}/api/patients/${patientId}/history/${entryId}/attachments/${attachmentId}/`,
     { method: "DELETE" }
   );
 

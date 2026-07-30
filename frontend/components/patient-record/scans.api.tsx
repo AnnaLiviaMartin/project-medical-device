@@ -1,4 +1,4 @@
-import type { Scan } from "./patientRecord.data";
+import type { Scan } from "../patient-record/patientRecord.data";
 
 export async function uploadXrayScan(
   patientId: string,
@@ -16,6 +16,5 @@ export async function uploadXrayScan(
   if (!res.ok) {
     throw new Error(`Roentgenaufnahme-Upload fehlgeschlagen: ${res.status}`);
   }
-
   return res.json();
 }

@@ -4,10 +4,9 @@ import PatientHistoryTimeline from "../../../components/patient-record/PatientHi
 import PatientInfoGrid from "../../../components/patient-record/PatientInfoGrid";
 import PatientMedicationCard from "../../../components/patient-record/PatientMedicationCard";
 import PatientVitalsCard from "../../../components/patient-record/PatientVitalsCard";
-import {
-  patientHistory,
-  patients,
-} from "../../../components/patient-record/patientRecord.data";
+import { fetchPatientById } from "../../../components/PatientOverview/patients.api";
+import { fetchHistoryByPatient } from "../../../components/PatientOverview/patients.api";
+import type { HistoryEntry } from "../../../components/patient-record/patientRecord.data";
 import styles from "../../../components/patient-record/patientRecord.module.css";
 
 type PageProps = {
@@ -18,7 +17,13 @@ type PageProps = {
 
 export default async function PatientRecordPage({ params }: PageProps) {
   const { id } = await params;
-  const patient = patients.find((entry) => entry.id === id);
+
+  let patient;
+  try {
+    patient = await fetchPatientById(id);
+  } catch {
+    patient = null;
+  }
 
   if (!patient) {
     return (
@@ -34,7 +39,12 @@ export default async function PatientRecordPage({ params }: PageProps) {
     );
   }
 
-  const history = patientHistory[patient.id] ?? [];
+  let history: HistoryEntry[] = [];
+  try {
+    history = await fetchHistoryByPatient(id);
+  } catch {
+    history = [];
+  }
 
   return (
     <main className={styles.page}>

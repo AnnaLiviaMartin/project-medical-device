@@ -1,9 +1,7 @@
 import { notFound } from "next/navigation";
 import AnalysisPageClient from "./AnalysisPageClient";
-import {
-  patients,
-  patientHistory,
-} from "components/patient-record/patientRecord.data";
+import { fetchPatientById } from "components/PatientOverview/patients.api";
+import { fetchHistoryByPatient } from "components/PatientOverview/patients.api";
 
 type PageProps = {
   params: Promise<{ id: string; entryId: string }>;
@@ -12,9 +10,16 @@ type PageProps = {
 export default async function PatientAnalysisPage({ params }: PageProps) {
   const { id, entryId } = await params;
 
-  const patient = patients.find((entry) => entry.id === id);
-  const history = patientHistory[id] ?? [];
-  const historyEntry = history.find((entry) => entry.id === entryId);
+  let patient;
+  let history;
+  try {
+    patient = await fetchPatientById(id);
+    history = await fetchHistoryByPatient(id);
+  } catch {
+    notFound();
+  }
+
+  const historyEntry = history.find((entry) => String(entry.id) === entryId);
 
   if (!patient || !historyEntry || !historyEntry.analysis) {
     notFound();

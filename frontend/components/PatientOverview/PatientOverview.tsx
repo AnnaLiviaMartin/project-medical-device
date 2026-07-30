@@ -3,29 +3,31 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./PatientOverview.module.css";
-import {
-  patients as defaultPatients,
-  type Patient,
-  type PatientStatus,
-} from "components/patient-record/patientRecord.data";
+import { fetchPatients } from "components/PatientOverview/patients.api";
+import type { Patient, PatientStatus } from "components/patient-record/patientRecord.data";
 
 type PatientOverviewProps = {
-  patients?: Patient[];
   initialPatientId?: string;
 };
 
+export default function PatientOverview({ initialPatientId }: PatientOverviewProps) {
+  const [patients, setPatients] = useState<Patient[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-export default function PatientOverview({
-  patients = defaultPatients,
-  initialPatientId,
-}: PatientOverviewProps) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"All" | PatientStatus>("All");
-  const [selectedPatientId, setSelectedPatientId] = useState(() => {
-    const matchedPatient = patients.find((patient) => patient.id === initialPatientId);
-    return matchedPatient?.id ?? patients[0]?.id ?? "";
-  });
+  const [selectedPatientId, setSelectedPatientId] = useState("");
 
+  // Daten vom Backend laden
+  useEffect(() => {
+    fetchPatients()
+      .then(setPatients)
+      .catch((err) => setError(err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Auswahl synchronisieren, sobald Patienten geladen sind oder initialPatientId sich ändert
   useEffect(() => {
     const matchedPatient = patients.find((patient) => patient.id === initialPatientId);
 
@@ -59,12 +61,20 @@ export default function PatientOverview({
       const matchesStatus =
         statusFilter === "All" || patient.status === statusFilter;
 
-        return matchesQuery && matchesStatus;
+      return matchesQuery && matchesStatus;
     });
   }, [patients, query, statusFilter]);
 
   const selectedPatient =
     patients.find((patient) => patient.id === selectedPatientId) ?? null;
+
+  if (loading) {
+    return <main className={styles.page}>Load patients...</main>;
+  }
+
+  if (error) {
+    return <main className={styles.page}>Error while loading: {error}</main>;
+  }
 
   return (
     <main className={styles.page}>
