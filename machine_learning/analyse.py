@@ -2,7 +2,7 @@ import torch
 from PIL import Image
 from torchvision import transforms
 from nih_train import get_model
-from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL
 
 MODEL_PATH = "./checkpoints/best_model.pt"
 IMAGE_PATH = "./mein_roentgenbild.png"
@@ -18,8 +18,8 @@ def choose_gpu():
 def load_image(image_path, device):
     # Bild Transformation
     transform = transforms.Compose([
-        transforms.Resize(224),
-        transforms.CenterCrop(224),
+        transforms.Resize(PIXEL),
+        transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])
@@ -28,7 +28,6 @@ def load_image(image_path, device):
     image_tensor = transform(image)
 
     # Batch-Dimension hinzufügen:
-    # Aus [3, 224, 224] wird [1, 3, 224, 224]
     image_tensor = image_tensor.unsqueeze(0)
     image_tensor = image_tensor.to(device)
 

@@ -287,10 +287,10 @@ def train(config: dict) -> nn.Module:
                 "best_auc":    best_auc,
                 "config":      config,
             }, checkpoint_path)
-            print(f"  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
+            print(f"\n  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
         else:
             patience_counter += 1
-            print(f"  Kein Fortschritt ({patience_counter}/{config['patience']})")
+            print(f"\n  Kein Fortschritt ({patience_counter}/{config['patience']})")
 
         if patience_counter >= config["patience"]:
             print(f"\n  Early Stopping nach Epoche {epoch}.")

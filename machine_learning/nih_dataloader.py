@@ -11,7 +11,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, NUM_CLASSES
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, NUM_CLASSES, PIXEL
 from pathlib import Path
 
 """
@@ -241,8 +241,8 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
 
     if mode == "train":
         return transforms.Compose([
-            transforms.Resize(224),
-            transforms.RandomCrop(224),
+            transforms.Resize(PIXEL),
+            transforms.RandomCrop(PIXEL),
             transforms.RandomHorizontalFlip(p=0.5), # so kann Herz auf der falschen Seite erscheinen, was die Klassifikation erschwert?
             transforms.RandomRotation(degrees=5),
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
@@ -251,8 +251,8 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
         ])
     else:  # val / test
         return transforms.Compose([
-            transforms.Resize(224),
-            transforms.CenterCrop(224),
+            transforms.Resize(PIXEL),
+            transforms.CenterCrop(PIXEL),
             transforms.ToTensor(),
             transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ])

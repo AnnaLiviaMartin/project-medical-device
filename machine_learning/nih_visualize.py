@@ -13,7 +13,7 @@ from torchvision import transforms, models
 from sklearn.metrics import roc_curve, roc_auc_score
 from matplotlib.patches import Patch
 from nih_dataloader import create_dataloaders
-from constants import PATHOLOGY_LIST, CONFIG
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, CONFIG, PIXEL
 from nih_train import get_model
 
 plt.rcParams.update({
@@ -323,12 +323,12 @@ class GradCAM:
         Berechnet die Grad-CAM-Heatmap für eine gegebene Klasse.
 
         Args:
-            image_tensor: (1, 3, 224, 224) — normalisiertes Bild
+            image_tensor: normalisiertes Bild
             class_idx:    Index der Ziel-Pathologie (0–13)
             device:       torch.device
 
         Returns:
-            heatmap: (224, 224) — Werte zwischen 0 und 1
+            heatmap: Werte zwischen 0 und 1
         """
         image_tensor = image_tensor.to(device).requires_grad_(True)
 
@@ -357,7 +357,7 @@ class GradCAM:
 
         # Auf Bildgröße hochskalieren und normalisieren [0, 1]
         cam = cam.detach().cpu().numpy()
-        cam = cv2.resize(cam, (224, 224))
+        cam = cv2.resize(cam, (PIXEL, PIXEL))
         if cam.max() > 0:
             cam = (cam - cam.min()) / (cam.max() - cam.min())
 
@@ -370,10 +370,8 @@ class GradCAM:
 
 def denormalize(tensor: torch.Tensor) -> np.ndarray:
     """Macht die ImageNet-Normalisierung rückgängig für die Visualisierung."""
-    mean = np.array([0.485, 0.456, 0.406])
-    std  = np.array([0.229, 0.224, 0.225])
     img  = tensor.squeeze().permute(1, 2, 0).numpy()
-    img  = std * img + mean
+    img  = IMAGENET_STD * img + IMAGENET_MEAN
     img  = np.clip(img, 0, 1)
     return img
 
@@ -402,11 +400,10 @@ def plot_gradcam(model: nn.Module,
         )
     """
     transform = transforms.Compose([
-        transforms.Resize(256),
-        transforms.CenterCrop(224),
+        transforms.Resize(PIXEL),
+        transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406],
-                             [0.229, 0.224, 0.225]),
+        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])
 
     grad_cam = GradCAM(model)
@@ -427,8 +424,8 @@ def plot_gradcam(model: nn.Module,
     for row, img_path in enumerate(image_paths):
         # Bild laden und vorbereiten
         pil_img    = Image.open(img_path).convert("RGB")
-        img_tensor = transform(pil_img).unsqueeze(0)      # (1, 3, 224, 224)
-        img_np     = denormalize(img_tensor)              # (224, 224, 3)
+        img_tensor = transform(pil_img).unsqueeze(0)
+        img_np     = denormalize(img_tensor)
 
         # Modell-Vorhersage für dieses Bild
         with torch.no_grad():
