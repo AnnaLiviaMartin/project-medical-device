@@ -4,7 +4,7 @@ from torchvision import transforms
 from nih_train import get_model
 from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST
 
-MODEL_PATH = "./checkpoints/cnn_state_dict.pt"
+MODEL_PATH = "./checkpoints/best_model.pt"
 IMAGE_PATH = "./mein_roentgenbild.png"
 
 NUM_CLASSES = 14
@@ -49,15 +49,17 @@ def predict_image(model_path=MODEL_PATH, image_path=IMAGE_PATH):
     # Modell laden
     model = get_model(num_classes=NUM_CLASSES)
 
-    state_dict = torch.load(
-        model_path,
-        map_location=device,
-        weights_only=True
+    checkpoint = torch.load(
+    model_path,
+    map_location=device,
+    weights_only=False,
     )
 
-    model.load_state_dict(state_dict)
+    model.load_state_dict(checkpoint["model_state"])
     model = model.to(device)
     model.eval()
+
+    print(f"Modell geladen (Epoche {checkpoint['epoch']}, Val-AUC {checkpoint['best_auc']:.4f})")
 
     # Bild laden und vorbereiten
     image = load_image(image_path, device)
