@@ -53,6 +53,7 @@ export type AnalysisFinding = {
   text: string;
   disease?: string;
   confidence?: number;
+  gradCamSrc?: string | null;
 };
 
 export type Analysis = {
@@ -68,10 +69,10 @@ export type Analysis = {
 export type Attachment = {
   id: string;
   fileName: string;
-  fileType: string; // z.B. "application/pdf", "image/png"
-  fileSize: number; // in bytes
-  uploadedAt: string; // ISO date
-  url: string; // Download-/Preview-Link vom Backend
+  fileType: string;
+  fileSize: number;
+  uploadedAt: string;
+  url: string;
 };
 
 export type HistoryEntry = {

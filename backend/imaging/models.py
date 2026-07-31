@@ -13,7 +13,9 @@ class Study(models.Model):
 class XRayImage(models.Model):
     class PredictionStatus(models.TextChoices):
         PENDING = "pending", "Pending"
+        RUNNING = "running", "Running"
         DONE = "done", "Done"
+        FAILED = "failed", "Failed"
 
     study = models.ForeignKey(Study, on_delete=models.CASCADE, related_name="xray_images")
     image = models.ImageField(upload_to="xray_images/")

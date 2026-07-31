@@ -45,12 +45,14 @@ class XRayImageViewSet(ModelViewSet):
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
 
-        image = None
-        try:
-            with transaction.atomic():
-                image = serializer.save(prediction_status="running")
-                result = run_model_on_image(image.image.path)
+        # Insert außerhalb von atomic(), damit ein späterer ML-Fehler
+        # diesen Datensatz nicht per Rollback wieder entfernt.
+        image = serializer.save(prediction_status="running")
 
+        try:
+            result = run_model_on_image(image.image.path)
+
+            with transaction.atomic():
                 Prediction.objects.update_or_create(
                     xray_image=image,
                     defaults={
@@ -63,9 +65,8 @@ class XRayImageViewSet(ModelViewSet):
                 image.save(update_fields=["prediction_status"])
 
         except Exception as exc:
-            if image is not None:
-                image.prediction_status = "failed"
-                image.save(update_fields=["prediction_status"])
+            image.prediction_status = "failed"
+            image.save(update_fields=["prediction_status"])
 
             return Response(
                 {"detail": f"Inferenz fehlgeschlagen: {str(exc)}"},
@@ -107,14 +108,16 @@ class HistoryScanUploadView(APIView):
         else:
             study = entry.study
 
-        image = None
-        try:
-            with transaction.atomic():
-                image = XRayImage.objects.create(
-                    study=study, image=file, prediction_status="running"
-                )
-                result = run_model_on_image(image.image.path)
+        # XRayImage-Insert außerhalb von atomic(), damit ein späterer
+        # ML-Fehler diesen Datensatz nicht per Rollback wieder entfernt.
+        image = XRayImage.objects.create(
+            study=study, image=file, prediction_status="running"
+        )
 
+        try:
+            result = run_model_on_image(image.image.path)
+
+            with transaction.atomic():
                 Prediction.objects.update_or_create(
                     xray_image=image,
                     defaults={
@@ -127,9 +130,8 @@ class HistoryScanUploadView(APIView):
                 image.save(update_fields=["prediction_status"])
 
         except Exception as exc:
-            if image is not None:
-                image.prediction_status = "failed"
-                image.save(update_fields=["prediction_status"])
+            image.prediction_status = "failed"
+            image.save(update_fields=["prediction_status"])
 
             return Response(
                 {"detail": f"Inferenz fehlgeschlagen: {str(exc)}"},

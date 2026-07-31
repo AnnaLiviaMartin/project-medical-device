@@ -1,9 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import ImagePanZoom from "components/ImagePanZoom/ImagePanZoom";
 import AnalysisResultCard from "components/AnalysisResultCard/AnalysisResultCard";
 import type { Analysis, Patient } from "components/patient-record/patientRecord.data";
+
+type Finding = Analysis["findings"][number];
 
 type AnalysisPageClientProps = {
   patient: Patient;
@@ -16,6 +18,7 @@ export default function AnalysisPageClient({
 }: AnalysisPageClientProps) {
   const imageExportRef = useRef<HTMLDivElement | null>(null);
   const cardExportRef = useRef<HTMLDivElement | null>(null);
+  const [selectedFinding, setSelectedFinding] = useState<Finding | null>(null);
 
   return (
     <section
@@ -35,7 +38,11 @@ export default function AnalysisPageClient({
           background: "#fff",
         }}
       >
-        <ImagePanZoom src={analysis.imageSrc} alt={`${patient.name} scan`} />
+        <ImagePanZoom
+          src={analysis.imageSrc}
+          gradCamSrc={selectedFinding?.gradCamSrc ?? null}
+          alt={`${patient.name} scan`}
+        />
       </div>
 
       <div
@@ -58,6 +65,7 @@ export default function AnalysisPageClient({
           onRequestReview={(doctor) => {
             console.log("Selected doctor:", doctor);
           }}
+          onSelectFinding={setSelectedFinding}
           imageExportRef={imageExportRef}
           cardExportRef={cardExportRef}
         />

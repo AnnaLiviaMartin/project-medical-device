@@ -1,20 +1,32 @@
 import sys
 from pathlib import Path
+from uuid import uuid4
 
+
+import numpy as np
 import torch
 from PIL import Image
 from torchvision import transforms
+from django.conf import settings
+
 
 ML_DIR = Path(__file__).resolve().parent.parent.parent / "machine_learning"
 if str(ML_DIR) not in sys.path:
     sys.path.insert(0, str(ML_DIR))
 
+
 from nih_train import get_model
 from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL
+
 
 MODEL_PATH = ML_DIR / "checkpoints" / "best_model.pt"
 NUM_CLASSES = 14
 THRESHOLD = 0.5
+
+
+GRADCAM_DIR = Path(settings.MEDIA_ROOT) / "gradcam"
+GRADCAM_DIR.mkdir(parents=True, exist_ok=True)
+
 
 _device = None
 _model = None
@@ -35,12 +47,7 @@ def _load_model():
     device = _get_device()
     model = get_model(num_classes=NUM_CLASSES)
 
-    checkpoint = torch.load(
-        MODEL_PATH,
-        map_location=device,
-        weights_only=False,
-    )
-
+    checkpoint = torch.load(MODEL_PATH, map_location=device, weights_only=False)
     model.load_state_dict(checkpoint["model_state"])
     model = model.to(device)
     model.eval()
@@ -49,31 +56,88 @@ def _load_model():
     return _model
 
 
-def _load_image_tensor(image_path, device):
-    transform = transforms.Compose([
+def _build_transform():
+    return transforms.Compose([
         transforms.Resize(PIXEL),
         transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])
 
-    image = Image.open(image_path).convert("RGB")
-    image_tensor = transform(image)
-    image_tensor = image_tensor.unsqueeze(0)
-    image_tensor = image_tensor.to(device)
 
-    return image_tensor
+def _load_image_tensor(pil_image, device):
+    transform = _build_transform()
+    image_tensor = transform(pil_image)
+    image_tensor = image_tensor.unsqueeze(0)
+    return image_tensor.to(device)
+
+
+def _generate_gradcam_map(model, image_tensor, target_index):
+    activations = []
+    gradients = []
+
+    image_tensor = image_tensor.clone().detach().requires_grad_(True)
+
+    target_layer = model.features
+
+    def forward_hook(module, input, output):
+        activations.append(output)
+        output.register_hook(lambda grad: gradients.append(grad))
+
+    handle_f = target_layer.register_forward_hook(forward_hook)
+
+    model.zero_grad()
+    output = model(image_tensor)
+    score = output[0, target_index]
+    score.backward(retain_graph=True)
+
+    handle_f.remove()
+
+    if not activations or not gradients:
+        raise RuntimeError(
+            "Grad-CAM: Keine Aktivierungen/Gradienten am Ziellayer erfasst. "
+            "Pruefe, ob 'model.features' im Forward-Pfad liegt und nicht "
+            "vollstaendig eingefroren ist."
+        )
+
+    acts = activations[0].detach()[0]
+    grads = gradients[0].detach()[0]
+    weights = grads.mean(dim=(1, 2))
+
+    cam = torch.zeros(acts.shape[1:], dtype=torch.float32)
+    for i, w in enumerate(weights):
+        cam += w * acts[i]
+
+    cam = torch.relu(cam)
+    cam -= cam.min()
+    if cam.max() > 0:
+        cam /= cam.max()
+
+    return cam.cpu().numpy()
+
+
+def _overlay_heatmap(base_image, cam, alpha=0.45):
+    cam_resized = Image.fromarray((cam * 255).astype(np.uint8)).resize(base_image.size)
+    cam_arr = np.array(cam_resized).astype(np.float32) / 255.0
+
+    heatmap = np.zeros((*cam_arr.shape, 3), dtype=np.uint8)
+    heatmap[..., 0] = (cam_arr * 255).astype(np.uint8)
+    heatmap[..., 2] = ((1 - cam_arr) * 255).astype(np.uint8)
+
+    heatmap_img = Image.fromarray(heatmap).convert("RGB")
+    base = base_image.convert("RGB")
+    return Image.blend(base, heatmap_img, alpha)
 
 
 def run_model_on_image(image_path):
     device = _get_device()
     model = _load_model()
 
-    image_tensor = _load_image_tensor(image_path, device)
+    pil_image = Image.open(image_path).convert("RGB")
+    image_tensor = _load_image_tensor(pil_image, device)
 
     with torch.no_grad():
         logits = model(image_tensor)
-
     probabilities = torch.sigmoid(logits)[0]
 
     scores = {}
@@ -84,10 +148,22 @@ def run_model_on_image(image_path):
     best_confidence = scores[best_pathology]
 
     positive_findings = {
-        pathology: score
-        for pathology, score in scores.items()
-        if score >= THRESHOLD
+        pathology: score for pathology, score in scores.items() if score >= THRESHOLD
     }
+
+    resized_base = pil_image.resize((PIXEL, PIXEL))
+    gradcam_paths = {}
+
+    for pathology in positive_findings:
+        target_index = PATHOLOGY_LIST.index(pathology)
+        cam = _generate_gradcam_map(model, image_tensor, target_index)
+        overlay = _overlay_heatmap(resized_base, cam)
+
+        filename = f"{uuid4().hex}_{pathology}.png"
+        filepath = GRADCAM_DIR / filename
+        overlay.save(filepath, format="PNG")
+
+        gradcam_paths[pathology] = f"gradcam/{filename}"
 
     return {
         "label": best_pathology if best_confidence >= THRESHOLD else "No Finding",
@@ -95,6 +171,7 @@ def run_model_on_image(image_path):
         "raw_result": {
             "scores": scores,
             "positive_findings": positive_findings,
+            "gradcam_paths": gradcam_paths,
             "threshold": THRESHOLD,
         },
     }

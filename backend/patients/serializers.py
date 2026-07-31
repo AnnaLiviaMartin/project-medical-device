@@ -217,12 +217,19 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
             return None
 
         request = self.context.get("request")
+
+        def to_absolute(relative_media_path):
+            from django.conf import settings
+            url = settings.MEDIA_URL + relative_media_path
+            return request.build_absolute_uri(url) if request else url
+
         image_url = image.image.url
         if request:
             image_url = request.build_absolute_uri(image_url)
 
         raw_result = prediction.raw_result or {}
         positive_findings = raw_result.get("positive_findings", {})
+        gradcam_paths = raw_result.get("gradcam_paths", {})
 
         if positive_findings:
             findings = [
@@ -231,6 +238,7 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
                     "text": f"Wahrscheinlichkeit fuer {pathology} liegt bei {round(score * 100, 1)}%.",
                     "disease": pathology,
                     "confidence": round(score * 100, 1),
+                    "gradCamSrc": to_absolute(gradcam_paths[pathology]) if pathology in gradcam_paths else None,
                 }
                 for pathology, score in positive_findings.items()
             ]

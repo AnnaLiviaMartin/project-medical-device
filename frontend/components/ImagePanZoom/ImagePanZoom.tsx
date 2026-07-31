@@ -1,25 +1,34 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./ImagePanZoom.module.css";
 
 type Point = { x: number; y: number };
 
 type ImagePanZoomProps = {
   src?: string;
+  gradCamSrc?: string | null;
   alt?: string;
 };
 
 export default function ImagePanZoom({
   src = "/test.png",
+  gradCamSrc = null,
   alt = "Medical image",
 }: ImagePanZoomProps) {
   const [scale, setScale] = useState(1);
   const [position, setPosition] = useState<Point>({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
+  const [viewMode, setViewMode] = useState<"normal" | "gradcam">("normal");
 
   const startRef = useRef<Point>({ x: 0, y: 0 });
   const startPosRef = useRef<Point>({ x: 0, y: 0 });
+
+  useEffect(() => {
+    if (!gradCamSrc) {
+      setViewMode("normal");
+    }
+  }, [gradCamSrc]);
 
   const zoomIn = () => setScale((s) => Math.min(s + 0.2, 4));
   const zoomOut = () => setScale((s) => Math.max(s - 0.2, 0.5));
@@ -52,32 +61,34 @@ export default function ImagePanZoom({
     setDragging(false);
   };
 
+  const activeSrc = viewMode === "gradcam" && gradCamSrc ? gradCamSrc : src;
+
   return (
     <div className={styles["image-pan-zoom"]}>
       <div className={styles["image-pan-zoom__toolbar"]}>
-        <button
-          type="button"
-          className={styles["image-pan-zoom__button"]}
-          onClick={zoomIn}
-        >
+        <button type="button" className={styles["image-pan-zoom__button"]} onClick={zoomIn}>
           +
         </button>
 
-        <button
-          type="button"
-          className={styles["image-pan-zoom__button"]}
-          onClick={zoomOut}
-        >
+        <button type="button" className={styles["image-pan-zoom__button"]} onClick={zoomOut}>
           −
         </button>
 
-        <button
-          type="button"
-          className={styles["image-pan-zoom__button"]}
-          onClick={reset}
-        >
+        <button type="button" className={styles["image-pan-zoom__button"]} onClick={reset}>
           Reset
         </button>
+
+        {gradCamSrc ? (
+          <button
+            type="button"
+            className={styles["image-pan-zoom__button"]}
+            onClick={() =>
+              setViewMode((mode) => (mode === "normal" ? "gradcam" : "normal"))
+            }
+          >
+            {viewMode === "normal" ? "Grad-CAM" : "Original"}
+          </button>
+        ) : null}
       </div>
 
       <div
@@ -88,7 +99,7 @@ export default function ImagePanZoom({
         onPointerLeave={onPointerUp}
       >
         <img
-          src={src}
+          src={activeSrc}
           alt={alt}
           draggable={false}
           className={`${styles["image-pan-zoom__image"]} ${

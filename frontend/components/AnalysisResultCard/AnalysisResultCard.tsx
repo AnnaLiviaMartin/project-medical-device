@@ -11,6 +11,7 @@ type Finding = {
   variant?: "blue" | "gray";
   icon?: string;
   confidence?: number;
+  gradCamSrc?: string | null;
 };
 
 type Doctor = {
@@ -37,6 +38,7 @@ type AnalysisResultCardProps = {
   onRequestReview?: (doctor: Doctor) => void;
   imageExportRef: RefObject<HTMLDivElement | null>;
   cardExportRef: RefObject<HTMLDivElement | null>;
+  onSelectFinding?: (finding: Finding | null) => void;
 };
 
 export default function AnalysisResultCard({
@@ -55,6 +57,7 @@ export default function AnalysisResultCard({
   onRequestReview,
   imageExportRef,
   cardExportRef,
+  onSelectFinding,
 }: AnalysisResultCardProps) {
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>(doctors[0]?.id ?? "");
@@ -101,6 +104,10 @@ export default function AnalysisResultCard({
   const selectedFinding =
     selectedFindingIndex !== null ? sortedFindings[selectedFindingIndex] : null;
   const displayedConfidence = selectedFinding?.confidence ?? confidence;
+
+  useEffect(() => {
+    onSelectFinding?.(selectedFinding ?? null);
+  }, [selectedFinding, onSelectFinding]);
 
   const handleConfirmDoctor = () => {
     if (!selectedDoctor) return;
