@@ -59,21 +59,30 @@ export default function AnalysisResultCard({
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedDoctorId, setSelectedDoctorId] = useState<string>(doctors[0]?.id ?? "");
   const [isExporting, setIsExporting] = useState(false);
+
+  const sortedFindings = useMemo(() => {
+    return [...findings].sort((a, b) => {
+      const confA = a.confidence ?? -1;
+      const confB = b.confidence ?? -1;
+      return confB - confA;
+    });
+  }, [findings]);
+
   const [selectedFindingIndex, setSelectedFindingIndex] = useState<number | null>(
-    findings.length > 0 ? 0 : null
+    sortedFindings.length > 0 ? 0 : null
   );
 
   useEffect(() => {
-    if (findings.length === 0) {
+    if (sortedFindings.length === 0) {
       setSelectedFindingIndex(null);
       return;
     }
 
     setSelectedFindingIndex((prev) => {
-      if (prev === null || prev >= findings.length) return 0;
+      if (prev === null || prev >= sortedFindings.length) return 0;
       return prev;
     });
-  }, [findings]);
+  }, [sortedFindings]);
 
   const clampedScore = Math.max(0, Math.min(score, 100));
 
@@ -84,13 +93,13 @@ export default function AnalysisResultCard({
   }, [clampedScore]);
 
   const isNoFinding = useMemo(() => {
-    if (findings.length === 0) return true;
-    return findings.every((finding) => finding.title === "No Finding");
-  }, [findings]);
+    if (sortedFindings.length === 0) return true;
+    return sortedFindings.every((finding) => finding.title === "No Finding");
+  }, [sortedFindings]);
 
   const selectedDoctor = doctors.find((doctor) => doctor.id === selectedDoctorId);
   const selectedFinding =
-    selectedFindingIndex !== null ? findings[selectedFindingIndex] : null;
+    selectedFindingIndex !== null ? sortedFindings[selectedFindingIndex] : null;
   const displayedConfidence = selectedFinding?.confidence ?? confidence;
 
   const handleConfirmDoctor = () => {
@@ -208,7 +217,7 @@ export default function AnalysisResultCard({
           <p className={styles.sectionLabel}>SUGGESTED CLINICAL FINDINGS</p>
 
           <div className={styles.findings}>
-            {findings.map((finding, index) => {
+            {sortedFindings.map((finding, index) => {
               const isActive = index === selectedFindingIndex;
               const isFindingOk = finding.title === "No Finding";
 
