@@ -21,7 +21,7 @@ export async function uploadAttachment(
   );
 
   if (!res.ok) {
-    throw new Error(`Upload fehlgeschlagen: ${res.status}`);
+    throw new Error(`Upload failed: ${res.status}`);
   }
 
   return res.json();
@@ -45,7 +45,7 @@ export async function uploadScan(
 
   if (!res.ok) {
     const errorBody = await res.json().catch(() => null);
-    const message = errorBody?.detail ?? `Scan-Upload fehlgeschlagen: ${res.status}`;
+    const message = errorBody?.detail ?? `Scan-Upload failed: ${res.status}`;
     throw new Error(message);
   }
 
@@ -63,6 +63,6 @@ export async function deleteAttachment(
   );
 
   if (!res.ok) {
-    throw new Error(`Löschen fehlgeschlagen: ${res.status}`);
+    throw new Error(`Delete failed: ${res.status}`);
   }
 }
