@@ -157,9 +157,10 @@ class AttachmentSerializer(serializers.ModelSerializer):
         read_only_fields = ["id", "history_entry", "uploaded_at"]
 
     def get_url(self, obj):
-        request = self.context.get("request")
-        if request and obj.file:
-            return request.build_absolute_uri(obj.file.url)
+        # Bewusst KEINE absolute URL per request.build_absolute_uri() mehr:
+        # der Host des eingehenden Requests kann intern (Docker-/Container-
+        # Netzwerk) oder extern (oeffentliche Backend-URL) sein - das
+        # Frontend haengt die fuer den Browser richtige Basis-URL selbst an.
         return obj.file.url if obj.file else None
 
     def get_fileName(self, obj):
@@ -189,18 +190,15 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
     def get_scans(self, obj):
         if not obj.study:
             return []
-        request = self.context.get("request")
         result = []
         for img in obj.study.xray_images.all():
-            url = img.image.url
-            if request:
-                url = request.build_absolute_uri(url)
             result.append({
                 "id": img.id,
                 "title": "Chest X-Ray",
                 "date": img.uploaded_at.strftime("%d.%m.%Y"),
                 "modality": "X-Ray",
-                "href": url,
+                # Relativ statt absolut - siehe Kommentar in get_url() oben.
+                "href": img.image.url,
             })
         return result
 
@@ -216,16 +214,11 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
         if not prediction:
             return None
 
-        request = self.context.get("request")
-
-        def to_absolute(relative_media_path):
+        def to_media_url(relative_media_path):
             from django.conf import settings
-            url = settings.MEDIA_URL + relative_media_path
-            return request.build_absolute_uri(url) if request else url
+            return settings.MEDIA_URL + relative_media_path
 
         image_url = image.image.url
-        if request:
-            image_url = request.build_absolute_uri(image_url)
 
         raw_result = prediction.raw_result or {}
         positive_findings = raw_result.get("positive_findings", {})
@@ -238,7 +231,7 @@ class HistoryEntrySerializer(serializers.ModelSerializer):
                     "text": f"Wahrscheinlichkeit fuer {pathology} liegt bei {round(score * 100, 1)}%.",
                     "disease": pathology,
                     "confidence": round(score * 100, 1),
-                    "gradCamSrc": to_absolute(gradcam_paths[pathology]) if pathology in gradcam_paths else None,
+                    "gradCamSrc": to_media_url(gradcam_paths[pathology]) if pathology in gradcam_paths else None,
                 }
                 for pathology, score in positive_findings.items()
             ]

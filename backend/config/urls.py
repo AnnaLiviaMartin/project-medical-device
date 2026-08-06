@@ -15,9 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.conf import settings
-from django.conf.urls.static import static
+from django.views.static import serve as serve_media
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -31,4 +31,17 @@ urlpatterns = [
 # ueber Django. Bei der hier zu erwartenden Last (wenige Zugriffe/Tag)
 # ist die direkte Auslieferung durch Django voellig ausreichend und
 # spart die zusaetzliche Infrastruktur - daher unabhaengig von DEBUG.
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+#
+# WICHTIG: Der frueher hier verwendete django.conf.urls.static.static()-
+# Shortcut sieht zwar so aus, als wuerde er das leisten - er registriert
+# aber intern GAR KEINE Route, sobald DEBUG=False ist (das ist in Django
+# so fest verdrahtet, static() ist nur fuer die lokale Entwicklung
+# gedacht). Da wir hier bewusst mit DJANGO_DEBUG=False produktiv fahren,
+# rufen wir die dahinterliegende serve()-View direkt und unconditional auf.
+urlpatterns += [
+    re_path(
+        r"^%s(?P<path>.*)$" % settings.MEDIA_URL.lstrip("/"),
+        serve_media,
+        {"document_root": settings.MEDIA_ROOT},
+    ),
+]

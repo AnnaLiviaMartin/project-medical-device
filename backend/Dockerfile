@@ -24,11 +24,10 @@ COPY backend/requirements.txt ./requirements.txt
 # torch/torchvision zuerst gezielt als reine CPU-Wheels installieren.
 # Ohne den expliziten --index-url wuerden die Standard-PyPI-Pakete
 # installiert, die CUDA-Bibliotheken enthalten (mehrere GB, hier
-# unnoetig, da nur CPU-Inferenz bei 4 Requests/Tag benoetigt wird).	
-RUN pip install --default-timeout=300 \
-        --index-url https://download.pytorch.org/whl/cpu \
+# unnoetig, da nur CPU-Inferenz bei 4 Requests/Tag benoetigt wird).
+RUN pip install --index-url https://download.pytorch.org/whl/cpu \
         torch==2.5.1 torchvision==0.20.1 \
-    && pip install --default-timeout=300 -r requirements.txt
+    && pip install -r requirements.txt
 
 COPY backend/ ./
 COPY machine_learning/ ../machine_learning/

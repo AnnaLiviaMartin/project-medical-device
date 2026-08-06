@@ -1,4 +1,5 @@
 import type { Attachment, Scan } from "./patientRecord.data";
+import { resolveMediaUrl } from "../mediaUrl";
 
 // Serverseitig (SSR/Server Components, laeuft im Next.js-Container) und
 // clientseitig (Browser) muessen unterschiedliche URLs verwenden: der
@@ -34,7 +35,8 @@ export async function uploadAttachment(
     throw new Error(`Upload failed: ${res.status}`);
   }
 
-  return res.json();
+  const attachment: Attachment = await res.json();
+  return { ...attachment, url: resolveMediaUrl(attachment.url) ?? attachment.url };
 }
 
 export async function uploadScan(
@@ -59,7 +61,8 @@ export async function uploadScan(
     throw new Error(message);
   }
 
-  return res.json();
+  const scan: Scan = await res.json();
+  return { ...scan, href: resolveMediaUrl(scan.href) ?? scan.href };
 }
 
 export async function deleteAttachment(

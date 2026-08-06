@@ -1,4 +1,5 @@
 import type { Scan } from "../patient-record/patientRecord.data";
+import { resolveMediaUrl } from "../mediaUrl";
 
 // Serverseitig (SSR/Server Components, laeuft im Next.js-Container) und
 // clientseitig (Browser) muessen unterschiedliche URLs verwenden: der
@@ -28,5 +29,6 @@ export async function uploadXrayScan(
   if (!res.ok) {
     throw new Error(`Roentgenaufnahme-Upload fehlgeschlagen: ${res.status}`);
   }
-  return res.json();
+  const scan: Scan = await res.json();
+  return { ...scan, href: resolveMediaUrl(scan.href) ?? scan.href };
 }

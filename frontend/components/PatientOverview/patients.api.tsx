@@ -1,4 +1,5 @@
 import type { Patient, HistoryEntry } from "../patient-record/patientRecord.data";
+import { resolveMediaUrl } from "../mediaUrl";
 
 // Serverseitig (SSR/Server Components, laeuft im Next.js-Container) und
 // clientseitig (Browser) muessen unterschiedliche URLs verwenden: der
@@ -27,7 +28,32 @@ export async function fetchPatientById(id: string): Promise<Patient> {
 export async function fetchHistoryByPatient(patientId: string): Promise<HistoryEntry[]> {
   const res = await fetch(`${BASE_URL}/api/history/?patient=${patientId}`);
   if (!res.ok) throw new Error(`Error loading history: ${res.status}`);
-  return res.json();
+  const entries: HistoryEntry[] = await res.json();
+
+  // Backend liefert Media-Pfade relativ (siehe Kommentar in mediaUrl.ts) -
+  // hier fuer alle Bild-/Datei-URLs innerhalb der History auf eine fuer
+  // den Browser erreichbare absolute URL auflösen.
+  return entries.map((entry) => ({
+    ...entry,
+    scans: entry.scans?.map((scan) => ({
+      ...scan,
+      href: resolveMediaUrl(scan.href) ?? scan.href,
+    })),
+    attachments: entry.attachments?.map((attachment) => ({
+      ...attachment,
+      url: resolveMediaUrl(attachment.url) ?? attachment.url,
+    })),
+    analysis: entry.analysis
+      ? {
+          ...entry.analysis,
+          imageSrc: resolveMediaUrl(entry.analysis.imageSrc) ?? entry.analysis.imageSrc,
+          findings: entry.analysis.findings.map((finding) => ({
+            ...finding,
+            gradCamSrc: resolveMediaUrl(finding.gradCamSrc),
+          })),
+        }
+      : entry.analysis,
+  }));
 }
 
 export async function createPatient(payload: Record<string, unknown>): Promise<Patient> {
