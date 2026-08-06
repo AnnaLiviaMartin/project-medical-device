@@ -26,5 +26,9 @@ urlpatterns = [
     path("api/", include("ml.urls")),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# Hinweis: In einer groesseren Produktivumgebung wuerde man Media-Dateien
+# ueber einen dedizierten Webserver oder Blob-Storage ausliefern statt
+# ueber Django. Bei der hier zu erwartenden Last (wenige Zugriffe/Tag)
+# ist die direkte Auslieferung durch Django voellig ausreichend und
+# spart die zusaetzliche Infrastruktur - daher unabhaengig von DEBUG.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

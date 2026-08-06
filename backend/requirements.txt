@@ -6,3 +6,15 @@ numpy==2.5.1
 pillow==12.3.0
 pydicom==3.0.2
 sqlparse==0.5.5
+
+# Production-Server & Static Files
+gunicorn==23.0.0
+whitenoise==6.9.0
+
+# ML
+torch==2.5.1
+torchvision==0.20.1
+scikit-learn==1.6.1
+pandas
+Pillow
+numpy

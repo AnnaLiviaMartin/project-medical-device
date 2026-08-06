@@ -1,3 +1,4 @@
+import os
 import sys
 from pathlib import Path
 from uuid import uuid4
@@ -19,7 +20,12 @@ from nih_train import get_model
 from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL
 
 
-MODEL_PATH = ML_DIR / "checkpoints" / "best_model.pt"
+# Optional per Env-Var ueberschreibbar, z.B. wenn der Checkpoint (der wegen
+# seiner Groesse nicht im Docker-Image liegt) per Azure Files Volume unter
+# einem anderen Pfad gemountet wird, statt ihn ins Image zu backen.
+MODEL_PATH = Path(
+    os.environ.get("ML_MODEL_PATH", str(ML_DIR / "checkpoints" / "best_model.pt"))
+)
 NUM_CLASSES = 14
 THRESHOLD = 0.5
 
