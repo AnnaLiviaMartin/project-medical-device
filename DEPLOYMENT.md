@@ -32,6 +32,12 @@ LOCATION="germanywestcentral"
 ACR_NAME="medicstudyacr$RANDOM"   # muss global eindeutig sein
 
 az group create --name $RESOURCE_GROUP --location $LOCATION
+
+windows:
+$RESOURCE_GROUP = "medic-study-rg"
+$LOCATION = "germanywestcentral"
+$ACR_NAME = "medicstudyacr$((Get-Random))"
+
 ```
 
 ---
@@ -43,11 +49,22 @@ mit ausreichend Ressourcen noetig, funktioniert auch von einem schwaecheren
 Laptop aus).
 
 ```bash
+az account show
+az provider register --namespace Microsoft.ContainerRegistry --wait
+az provider show --namespace Microsoft.ContainerRegistry --query registrationState -o tsv
+
 az acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic
 
 # Backend-Image bauen (Context = Projekt-Root, siehe backend/Dockerfile)
-az acr build --registry $ACR_NAME --image medic-backend:latest \
-  --file backend/Dockerfile .
+#if:
+az acr build --registry $ACR_NAME --image medic-backend:latest --file backend/Dockerfile .
+#alt:
+docker build -t medic-backend -f backend/Dockerfile .
+az acr login --name $ACR_NAME
+docker tag medic-backend:latest $ACR_NAME.azurecr.io/medic-backend:latest
+docker tag medic-backend:latest medicstudyacr1288038825.azurecr.io/medic-backend:latest
+docker push $ACR_NAME.azurecr.io/medic-backend:latest
+docker push medicstudyacr1288038825.azurecr.io/medic-backend:latest
 ```
 
 Das Frontend-Image bauen wir bewusst **erst in Schritt 6**, nachdem das
@@ -65,26 +82,31 @@ Azure Files Share.
 
 ```bash
 STORAGE_ACCOUNT="medicstudystorage$RANDOM"
+$STORAGE_ACCOUNT="medicdata$((Get-Random))"
 FILE_SHARE="medic-data"
 
-az storage account create --resource-group $RESOURCE_GROUP \
-  --name $STORAGE_ACCOUNT --location $LOCATION --sku Standard_LRS
+#$STORAGE_ACCOUNT = "medicstudystorage$((Get-Random))"
+#$FILE_SHARE = "medic-data"
 
-STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP \
-  --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
+az provider register --namespace Microsoft.Storage --wait
 
-az storage share-rm create --resource-group $RESOURCE_GROUP \
-  --storage-account $STORAGE_ACCOUNT --name $FILE_SHARE --quota 5
+az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --location $LOCATION --sku Standard_LRS
 
-az containerapp env create --resource-group $RESOURCE_GROUP \
-  --name medic-env --location $LOCATION
+STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
+#alt:
+$STORAGE_KEY = az storage account keys list `
+  --resource-group $RESOURCE_GROUP `
+  --account-name $STORAGE_ACCOUNT `
+  --query "[0].value" `
+  -o tsv
 
-az containerapp env storage set --resource-group $RESOURCE_GROUP \
-  --name medic-env --storage-name medic-data-storage \
-  --azure-file-account-name $STORAGE_ACCOUNT \
-  --azure-file-account-key $STORAGE_KEY \
-  --azure-file-share-name $FILE_SHARE \
-  --access-mode ReadWrite
+az storage share-rm create --resource-group $RESOURCE_GROUP --storage-account $STORAGE_ACCOUNT --name $FILE_SHARE --quota 5
+
+az containerapp env create --resource-group $RESOURCE_GROUP --name medic-env --location $LOCATION
+
+az provider register -n Microsoft.OperationalInsights --wait
+
+az containerapp env storage set --resource-group $RESOURCE_GROUP --name medic-env --storage-name medic-data-storage --azure-file-account-name $STORAGE_ACCOUNT --azure-file-account-key $STORAGE_KEY --azure-file-share-name $FILE_SHARE --access-mode ReadWrite
 ```
 
 ---
@@ -103,62 +125,38 @@ Wichtige Punkte bei diesem Setup:
 
 ```bash
 ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --query loginServer -o tsv)
+# $ACR_LOGIN_SERVER = az acr show `
+  --name $ACR_NAME `
+  --query loginServer `
+  -o tsv
 
-az containerapp create \
-  --resource-group $RESOURCE_GROUP \
-  --name medic-backend \
-  --environment medic-env \
-  --image "$ACR_LOGIN_SERVER/medic-backend:latest" \
-  --registry-server $ACR_LOGIN_SERVER \
-  --target-port 8000 \
-  --ingress external \
-  --min-replicas 0 \
-  --max-replicas 1 \
-  --cpu 1.0 --memory 2.0Gi \
-  --env-vars \
-    DJANGO_SECRET_KEY=secretref:django-secret-key \
-    DJANGO_DEBUG=False \
-    DJANGO_ALLOWED_HOSTS=placeholder \
-    DJANGO_CORS_ALLOWED_ORIGINS=placeholder \
-    DJANGO_DB_PATH=/data/db.sqlite3 \
-    DJANGO_MEDIA_ROOT=/data/media \
-  --secrets django-secret-key="$(python3 -c 'import secrets; print(secrets.token_urlsafe(50))')"
+#az acr update `
+  --name $ACR_NAME `
+  --admin-enabled true
+# Adding registry password as a secret with name "medicstudyacr1288038825azurecrio-medicstudyacr1288038825"
+
+az containerapp create --resource-group $RESOURCE_GROUP --name medic-backend --environment medic-env --image "$ACR_LOGIN_SERVER/medic-backend:latest" --registry-server $ACR_LOGIN_SERVER --target-port 8000 --ingress external --min-replicas 0 --max-replicas 1 --cpu 1.0 --memory 2.0Gi --env-vars DJANGO_SECRET_KEY=secretref:django-secret-key DJANGO_DEBUG=False DJANGO_ALLOWED_HOSTS=placeholder DJANGO_CORS_ALLOWED_ORIGINS=placeholder DJANGO_DB_PATH=/data/db.sqlite3 DJANGO_MEDIA_ROOT=/data/media --secrets django-secret-key="$(python -c 'import secrets; print(secrets.token_urlsafe(50))')"
 
 # Persistenten Storage einhaengen (aktuell nur per update-Befehl moeglich)
-az containerapp update \
-  --resource-group $RESOURCE_GROUP \
-  --name medic-backend \
-  --set-volume-mounts '[{"volumeName":"medic-data","mountPath":"/data"}]'
+az containerapp update `
+  --resource-group $RESOURCE_GROUP `
+  --name medic-backend `
+  --yaml .\backend-volume.yaml
 ```
 
 Backend-URL ermitteln (wird gleich fuer CORS und das Frontend-Build gebraucht):
 
 ```bash
-BACKEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP \
-  --name medic-backend --query properties.configuration.ingress.fqdn -o tsv)
+BACKEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-backend --query properties.configuration.ingress.fqdn -o tsv)
+
 echo "https://$BACKEND_URL"
+# https://medic-backend.calmhill-fe300a55.germanywestcentral.azurecontainerapps.io
 ```
 
 `DJANGO_ALLOWED_HOSTS` jetzt mit der echten URL setzen:
 
 ```bash
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend \
-  --set-env-vars DJANGO_ALLOWED_HOSTS="$BACKEND_URL"
-```
-
-### 5b. Alternative: Checkpoint per Volume statt im Image (bei grossem Modell)
-
-Falls `best_model.pt` sehr gross ist, kannst du ihn statt ins Image zu
-backen auch auf den gleichen Azure Files Share legen und per Env-Var
-referenzieren:
-
-```bash
-az storage file upload --account-name $STORAGE_ACCOUNT --account-key $STORAGE_KEY \
-  --share-name $FILE_SHARE --source machine_learning/checkpoints/best_model.pt \
-  --path checkpoints/best_model.pt
-
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend \
-  --set-env-vars ML_MODEL_PATH=/data/checkpoints/best_model.pt
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --set-env-vars DJANGO_ALLOWED_HOSTS="$BACKEND_URL"
 ```
 
 ---
@@ -178,26 +176,23 @@ az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend \
 Jetzt, wo `$BACKEND_URL` feststeht, das Frontend-Image damit bauen:
 
 ```bash
-az acr build --registry $ACR_NAME --image medic-frontend:latest \
-  --file frontend/Dockerfile \
-  --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" \
+#if
+az acr build --registry $ACR_NAME --image medic-frontend:latest --file frontend/Dockerfile --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" frontend
+#alt
+docker build `
+  -t medic-frontend:latest `
+  -f frontend/Dockerfile `
+  --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" `
   frontend
+docker tag medic-frontend:latest medicstudyacr1288038825.azurecr.io/medic-frontend:latest
+docker push medicstudyacr1288038825.azurecr.io/medic-frontend:latest
 
-az containerapp create \
-  --resource-group $RESOURCE_GROUP \
-  --name medic-frontend \
-  --environment medic-env \
-  --image "$ACR_LOGIN_SERVER/medic-frontend:latest" \
-  --registry-server $ACR_LOGIN_SERVER \
-  --target-port 3000 \
-  --ingress external \
-  --min-replicas 0 \
-  --max-replicas 1 \
-  --cpu 0.5 --memory 1.0Gi
+az containerapp create --resource-group $RESOURCE_GROUP --name medic-frontend --environment medic-env --image "$ACR_LOGIN_SERVER/medic-frontend:latest" --registry-server $ACR_LOGIN_SERVER --target-port 3000 --ingress external --min-replicas 0 --max-replicas 1 --cpu 0.5 --memory 1.0Gi
 
-FRONTEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP \
-  --name medic-frontend --query properties.configuration.ingress.fqdn -o tsv)
+FRONTEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-frontend --query properties.configuration.ingress.fqdn -o tsv)
+
 echo "https://$FRONTEND_URL"
+#https://medic-frontend.calmhill-fe300a55.germanywestcentral.azurecontainerapps.io
 ```
 
 ---
@@ -208,40 +203,12 @@ Jetzt, wo beide URLs feststehen, dem Backend die echte Frontend-URL fuer
 CORS (und optional CSRF fuer `/admin/`) mitgeben:
 
 ```bash
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend \
-  --set-env-vars \
-    DJANGO_CORS_ALLOWED_ORIGINS="https://$FRONTEND_URL" \
-    DJANGO_CSRF_TRUSTED_ORIGINS="https://$BACKEND_URL"
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --set-env-vars DJANGO_CORS_ALLOWED_ORIGINS="https://$FRONTEND_URL" DJANGO_CSRF_TRUSTED_ORIGINS="https://$BACKEND_URL"
 ```
 
 Die App ist jetzt unter `https://$FRONTEND_URL` erreichbar.
 
 ---
-
-## 8. Admin-User anlegen (optional)
-
-```bash
-az containerapp exec --resource-group $RESOURCE_GROUP --name medic-backend \
-  --command "python manage.py createsuperuser"
-```
-
----
-
-## Kosten-Einordnung (Student-Tarif)
-
-- **Container Apps (Consumption Plan)**: Abrechnung nach vCPU-Sekunden/GiB-Sekunden,
-  mit Free-Grant pro Monat. Bei `min-replicas 0` und 4 Zugriffen/Tag bleibst
-  du damit realistisch im Cent-Bereich bis kostenlos.
-- **Container Registry (Basic)**: ca. 0,17 $/Tag Fixkosten, unabhaengig von Zugriffen.
-  Alternative: Registry nach dem letzten Image-Push wieder loeschen, wenn
-  Kosten minimiert werden sollen (Images koennen bei Bedarf neu gebaut werden).
-- **Azure Files (5 GiB, LRS)**: wenige Cent/Monat.
-- **Cold Start**: Bei `min-replicas 0` dauert der erste Request nach
-  Inaktivitaet spuerbar laenger (Container-Start + Laden des ML-Modells in
-  den Speicher, typischerweise einige Sekunden bis niedrige zweistellige
-  Sekundenzahl). Falls das bei einer Live-Demo stoert, `min-replicas` auf
-  `1` setzen - dann laeuft eine Instanz dauerhaft (mehr Kosten, aber kein
-  Cold Start).
 
 ## Kurz-Checkliste bei Aenderungen am Code
 
@@ -256,4 +223,12 @@ az acr build --registry $ACR_NAME --image medic-frontend:latest --file frontend/
   --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" frontend
 az containerapp update --resource-group $RESOURCE_GROUP --name medic-frontend \
   --image "$ACR_LOGIN_SERVER/medic-frontend:latest"
+```
+
+---
+
+## Abschalten
+
+```bash
+az group delete --name medic-study-rg --yes
 ```
