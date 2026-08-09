@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside class="chart-nav" th:fragment="nav(active)">
+    <div class="chart-nav__brand">
+        <span class="chart-nav__mark">MI</span>
+        <div>
+            <div class="chart-nav__title">MedIC Chart</div>
+            <div class="chart-nav__subtitle">Patient records</div>
+        </div>
+    </div>
+
+    <nav class="chart-nav__tabs">
+        <a th:href="@{/patients}"
+           th:classappend="${active == 'patients'} ? 'is-active'"
+           class="chart-nav__tab">
+            <span class="chart-nav__tab-index">01</span>
+            <span>Patients</span>
+        </a>
+        <a th:href="@{/patients/new}"
+           th:classappend="${active == 'new-patient'} ? 'is-active'"
+           class="chart-nav__tab">
+            <span class="chart-nav__tab-index">02</span>
+            <span>Admit new patient</span>
+        </a>
+    </nav>
+
+    <div class="chart-nav__footer">
+        <a th:href="@{/dsgvo/impressum}"
+           class="chart-nav__tab">
+            <span class="chart-nav__tab-index">03</span>
+            <span>Impressum</span>
+        </a>
+        <a th:href="@{/dsgvo/datenschutzerklaerung}"
+           class="chart-nav__tab">
+            <span class="chart-nav__tab-index">04</span>
+            <span>Datenschutzerklärung</span>
+        </a>
+    </div>
+</aside>
+</body>
+</html>
