@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${patient.fullName})}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+
+    <main class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <span class="page-eyebrow" th:text="'Patient · #' + ${patient.id}">Patient</span>
+                <h1 th:text="${patient.fullName}">Patient name</h1>
+                <div class="page-header__meta"
+                     th:text="${patient.age} + ' yrs · ' + ${patient.sex.label} + ' · born ' + ${#temporals.format(patient.dateOfBirth, 'dd MMM yyyy')}">
+                    Meta
+                </div>
+            </div>
+            <div style="display:flex; gap:10px;">
+                <a class="btn btn-secondary" th:href="@{'/patients/' + ${patient.id} + '/edit'}">Edit</a>
+                <a class="btn btn-primary" th:href="@{'/patients/' + ${patient.id} + '/history/new'}">+ Add history entry</a>
+                <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}"
+                      onsubmit="return confirm('Delete this patient and all history? This cannot be undone.');">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Overview</h2>
+            <div class="info-grid">
+                <dl class="info-block">
+                    <dt>Diagnosis</dt>
+                    <dd th:text="${patient.diagnosis}">—</dd>
+                    <dt>Status</dt>
+                    <dd>
+                        <span class="badge"
+                              th:classappend="${patient.status.name() == 'INPATIENT'} ? 'badge--inpatient' : 'badge--outpatient'"
+                              th:text="${patient.status.label}">Status</span>
+                    </dd>
+                    <dt>Doctor</dt>
+                    <dd th:text="${patient.doctor}">—</dd>
+                    <dt>Ward</dt>
+                    <dd th:text="${#strings.isEmpty(patient.ward)} ? '—' : ${patient.ward}">—</dd>
+                </dl>
+                <dl class="info-block">
+                    <dt>Last visit</dt>
+                    <dd th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : '—'}">—</dd>
+                    <dt>Next appointment</dt>
+                    <dd th:text="${patient.nextAppointment != null ? #temporals.format(patient.nextAppointment, 'dd MMM yyyy') : '—'}">—</dd>
+                    <dt>Address</dt>
+                    <dd th:if="${#strings.isEmpty(patient.addressStreet) and #strings.isEmpty(patient.addressCity)}">—</dd>
+                    <dd th:unless="${#strings.isEmpty(patient.addressStreet) and #strings.isEmpty(patient.addressCity)}"
+                        th:text="${patient.addressStreet} + ', ' + ${patient.addressZip} + ' ' + ${patient.addressCity}">—</dd>
+                </dl>
+                <dl class="info-block">
+                    <dt>Emergency contact</dt>
+                    <dd th:if="${#strings.isEmpty(patient.emergencyContactName)}">—</dd>
+                    <dd th:unless="${#strings.isEmpty(patient.emergencyContactName)}"
+                        th:text="${patient.emergencyContactName} + ' (' + ${patient.emergencyContactRelation} + ')'">—</dd>
+                    <dd th:text="${patient.emergencyContactPhone}"></dd>
+                    <dt>Insurance</dt>
+                    <dd th:text="${#strings.isEmpty(patient.insuranceProvider)} ? '—' : ${patient.insuranceProvider}">—</dd>
+                    <dd th:text="${patient.insurancePolicyNumber}"></dd>
+                </dl>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Allergies &amp; medications</h2>
+            <div class="info-grid" style="grid-template-columns: 1fr 1fr;">
+                <div>
+                    <div class="field-hint" style="margin-bottom:10px;">Allergies</div>
+                    <div class="tag-list" th:if="${not #lists.isEmpty(patient.allergies)}">
+                        <span class="tag" th:each="allergy : ${patient.allergies}" th:text="${allergy.name}">Allergy</span>
+                    </div>
+                    <div th:if="${#lists.isEmpty(patient.allergies)}" style="color: var(--ink-faint); font-size: 13px;">No known allergies.</div>
+                </div>
+                <div>
+                    <div class="field-hint" style="margin-bottom:10px;">Medications</div>
+                    <div th:if="${not #lists.isEmpty(patient.medications)}">
+                        <div th:each="med : ${patient.medications}" style="margin-bottom:6px; font-size: 13.5px;">
+                            <strong th:text="${med.name}">Name</strong>
+                            <span style="color: var(--ink-muted);" th:text="' · ' + ${med.dosage} + ' · ' + ${med.schedule}"></span>
+                        </div>
+                    </div>
+                    <div th:if="${#lists.isEmpty(patient.medications)}" style="color: var(--ink-faint); font-size: 13px;">No current medications.</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>History timeline</h2>
+            <div th:if="${#lists.isEmpty(historyEntries)}" class="empty-state">
+                No history entries yet.
+            </div>
+            <div class="timeline" th:unless="${#lists.isEmpty(historyEntries)}">
+                <div class="timeline-item" th:each="entry : ${historyEntries}">
+                    <div class="timeline-item__date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</div>
+                    <div class="timeline-item__title">
+                        <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" th:text="${entry.title}">Title</a>
+                        <span class="badge"
+                              th:class="'badge badge--category-' + ${#strings.toLowerCase(entry.category.name())}"
+                              th:text="${entry.category.label}">Category</span>
+                    </div>
+                    <div style="font-size: 13.5px; color: var(--ink-muted);" th:text="${entry.doctor} + (${#strings.isEmpty(entry.department)} ? '' : ' · ' + ${entry.department})">Doctor</div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>

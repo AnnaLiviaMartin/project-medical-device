@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Patients')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+
+    <main class="main">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <div class="page-header">
+            <div>
+                <span class="page-eyebrow">Register</span>
+                <h1>Patients</h1>
+                <div class="page-header__meta" th:text="${#lists.size(patients)} + ' patient(s) on record'">0 patients</div>
+            </div>
+            <a class="btn btn-primary" th:href="@{/patients/new}">+ Admit new patient</a>
+        </div>
+
+        <div class="card" th:if="${#lists.isEmpty(patients)}">
+            <div class="empty-state">
+                No patients yet. Use "Admit new patient" to create the first record.
+            </div>
+        </div>
+
+        <div class="card" th:unless="${#lists.isEmpty(patients)}" style="padding: 0; overflow: hidden;">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>Patient</th>
+                    <th>Diagnosis</th>
+                    <th>Status</th>
+                    <th>Doctor</th>
+                    <th>Last visit</th>
+                    <th>Next appointment</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="patient : ${patients}">
+                    <td>
+                        <a th:href="@{'/patients/' + ${patient.id}}" class="patient-name" th:text="${patient.fullName}">Name</a>
+                        <div class="patient-sub" th:text="${patient.age} + ' yrs · ' + ${patient.sex.label}">Age</div>
+                    </td>
+                    <td th:text="${patient.diagnosis}">Diagnosis</td>
+                    <td>
+                        <span class="badge"
+                              th:classappend="${patient.status.name() == 'INPATIENT'} ? 'badge--inpatient' : 'badge--outpatient'"
+                              th:text="${patient.status.label}">Status</span>
+                    </td>
+                    <td th:text="${patient.doctor}">Doctor</td>
+                    <td th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : '—'}">—</td>
+                    <td th:text="${patient.nextAppointment != null ? #temporals.format(patient.nextAppointment, 'dd MMM yyyy') : '—'}">—</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+</body>
+</html>
