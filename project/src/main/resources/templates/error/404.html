@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Not found')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+    <main class="main">
+        <div class="card" style="max-width: 480px; margin-top: 60px; text-align: center;">
+            <h2 style="font-size: 40px; color: var(--border-strong);">404</h2>
+            <p th:text="${message} ?: 'The page you are looking for could not be found.'">Not found</p>
+            <a class="btn btn-primary" th:href="@{/patients}">Back to patient list</a>
+        </div>
+    </main>
+</div>
+</body>
+</html>
