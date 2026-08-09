@@ -1,67 +1,68 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('New history entry')}"></head>
+<head th:replace="~{fragments/head :: head('Add Event')}"></head>
 <body>
 <div class="app-shell">
     <div th:replace="~{fragments/nav :: nav('patients')}"></div>
 
-    <main class="main">
-        <div class="page-header">
-            <div>
-                <span class="page-eyebrow" th:text="${patient.fullName}">Patient</span>
-                <h1>New history entry</h1>
+    <!--TODO style auslagern in css-->
+    <div class="main-content">
+        <main class="form-page">
+            <div class="pr-topbar">
+                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link">← Back to Patient Record</a>
             </div>
-        </div>
 
-        <form method="post" th:action="@{'/patients/' + ${patient.id} + '/history'}" th:object="${historyEntryForm}">
-            <div class="card">
-                <div class="form-grid">
-                    <div class="form-field" th:classappend="${#fields.hasErrors('date')} ? 'has-error'">
-                        <label for="date">Date *</label>
-                        <input type="date" id="date" th:field="*{date}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('category')} ? 'has-error'">
-                        <label for="category">Category *</label>
-                        <select id="category" th:field="*{category}">
-                            <option value="">— Select —</option>
-                            <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.HistoryCategory).values()}"
-                                    th:value="${option}" th:text="${option.label}"></option>
-                        </select>
-                        <span class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
-                    </div>
+            <section class="form-hero">
+                <p class="eyebrow" th:text="${patient.fullName}">Patient</p>
+                <h1 class="pr-title">Add Timeline Event</h1>
+            </section>
 
-                    <div class="form-field form-grid--single" style="grid-column: 1 / -1;" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
-                        <label for="title">Title *</label>
-                        <input type="text" id="title" th:field="*{title}" placeholder="e.g. Follow-up consultation"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
-                    </div>
+            <form class="pr-form" method="post" th:action="@{'/patients/' + ${patient.id} + '/history'}" th:object="${historyEntryForm}">
+                <section class="form-section">
+                    <div class="form-grid3">
+                        <label class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'" style="grid-column: 1 / -1;">
+                            <span class="field-label">Event Name <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{title}" placeholder="e.g. Follow-up Visit"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
+                        </label>
 
-                    <div class="form-field" th:classappend="${#fields.hasErrors('doctor')} ? 'has-error'">
-                        <label for="doctor">Doctor</label>
-                        <input type="text" id="doctor" th:field="*{doctor}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('doctor')}" th:errors="*{doctor}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('department')} ? 'has-error'">
-                        <label for="department">Department</label>
-                        <input type="text" id="department" th:field="*{department}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('department')}" th:errors="*{department}"></span>
-                    </div>
+                        <label class="field" th:classappend="${#fields.hasErrors('date')} ? 'has-error'">
+                            <span class="field-label">Date <span class="required-mark">*</span></span>
+                            <input type="date" th:field="*{date}"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('category')} ? 'has-error'">
+                            <span class="field-label">Category <span class="required-mark">*</span></span>
+                            <select th:field="*{category}">
+                                <option value="">— Select —</option>
+                                <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.HistoryCategory).values()}" th:value="${option}" th:text="${option.label}"></option>
+                            </select>
+                            <span class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
+                        </label>
 
-                    <div class="form-field" style="grid-column: 1 / -1;" th:classappend="${#fields.hasErrors('description')} ? 'has-error'">
-                        <label for="description">Description</label>
-                        <textarea id="description" th:field="*{description}"></textarea>
-                        <span class="field-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></span>
+                        <label class="field">
+                            <span class="field-label">Doctor</span>
+                            <input type="text" th:field="*{doctor}" placeholder="e.g. Dr. Klein"/>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">Department</span>
+                            <input type="text" th:field="*{department}" placeholder="e.g. Cardiology"/>
+                        </label>
+
+                        <label class="field" style="grid-column: 1 / -1;">
+                            <span class="field-label">Note</span>
+                            <textarea th:field="*{description}" placeholder="Optional details about this event..." rows="3"></textarea>
+                        </label>
                     </div>
-                </div>
+                </section>
 
                 <div class="form-actions">
-                    <button type="submit" class="btn btn-primary">Add entry</button>
-                    <a class="btn btn-secondary" th:href="@{'/patients/' + ${patient.id}}">Cancel</a>
+                    <a th:href="@{'/patients/' + ${patient.id}}" class="cancel-button">Cancel</a>
+                    <button type="submit" class="submit-button">Save</button>
                 </div>
-            </div>
-        </form>
-    </main>
+            </form>
+        </main>
+    </div>
 </div>
 </body>
 </html>

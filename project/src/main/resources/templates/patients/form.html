@@ -1,205 +1,285 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(${isEdit} ? 'Edit patient' : 'New patient')}"></head>
+<head th:replace="~{fragments/head :: head(${isEdit} ? 'Edit Patient' : 'New Patient')}"></head>
 <body>
 <div class="app-shell">
-    <div th:replace="~{fragments/nav :: nav('new-patient')}"></div>
-
-    <main class="main">
-        <div class="page-header">
-            <div>
-                <span class="page-eyebrow" th:text="${isEdit} ? 'Edit record' : 'Admission'">Admission</span>
-                <h1 th:text="${isEdit} ? 'Edit patient' : 'Admit new patient'">New patient</h1>
-            </div>
-        </div>
-
-        <form method="post"
-              th:action="${isEdit} ? @{'/patients/' + ${patientId}} : @{/patients}"
-              th:object="${patientForm}">
-
-            <div class="card">
-                <h2>Basic information</h2>
-                <div class="form-grid">
-                    <div class="form-field" th:classappend="${#fields.hasErrors('firstName')} ? 'has-error'">
-                        <label for="firstName">First name *</label>
-                        <input type="text" id="firstName" th:field="*{firstName}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('lastName')} ? 'has-error'">
-                        <label for="lastName">Last name *</label>
-                        <input type="text" id="lastName" th:field="*{lastName}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
-                    </div>
-
-                    <div class="form-field" th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'has-error'">
-                        <label for="dateOfBirth">Date of birth *</label>
-                        <input type="date" id="dateOfBirth" th:field="*{dateOfBirth}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('sex')} ? 'has-error'">
-                        <label for="sex">Sex *</label>
-                        <select id="sex" th:field="*{sex}">
-                            <option value="">— Select —</option>
-                            <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.Sex).values()}"
-                                    th:value="${option}" th:text="${option.label}"></option>
-                        </select>
-                        <span class="field-error" th:if="${#fields.hasErrors('sex')}" th:errors="*{sex}"></span>
-                    </div>
-
-                    <div class="form-field" th:classappend="${#fields.hasErrors('diagnosis')} ? 'has-error'">
-                        <label for="diagnosis">Diagnosis *</label>
-                        <input type="text" id="diagnosis" th:field="*{diagnosis}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('diagnosis')}" th:errors="*{diagnosis}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('status')} ? 'has-error'">
-                        <label for="status">Status *</label>
-                        <select id="status" th:field="*{status}">
-                            <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.PatientStatus).values()}"
-                                    th:value="${option}" th:text="${option.label}"></option>
-                        </select>
-                        <span class="field-error" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></span>
-                    </div>
-
-                    <div class="form-field" th:classappend="${#fields.hasErrors('lastVisit')} ? 'has-error'">
-                        <label for="lastVisit">Last visit *</label>
-                        <input type="date" id="lastVisit" th:field="*{lastVisit}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('lastVisit')}" th:errors="*{lastVisit}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('nextAppointment')} ? 'has-error'">
-                        <label for="nextAppointment">Next appointment</label>
-                        <input type="date" id="nextAppointment" th:field="*{nextAppointment}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('nextAppointment')}" th:errors="*{nextAppointment}"></span>
-                    </div>
-
-                    <div class="form-field" th:classappend="${#fields.hasErrors('doctor')} ? 'has-error'">
-                        <label for="doctor">Attending doctor *</label>
-                        <input type="text" id="doctor" th:field="*{doctor}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('doctor')}" th:errors="*{doctor}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('ward')} ? 'has-error'">
-                        <label for="ward">Ward</label>
-                        <input type="text" id="ward" th:field="*{ward}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('ward')}" th:errors="*{ward}"></span>
-                    </div>
-                </div>
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+    <!--TODO style auslagern in css-->
+    <div class="main-content">
+        <main class="form-page">
+            <div class="pr-topbar">
+                <a th:href="@{/patients}" class="back-link">← Back to Patient Overview</a>
             </div>
 
-            <div class="card">
-                <h2>Address</h2>
-                <div class="form-grid">
-                    <div class="form-field" th:classappend="${#fields.hasErrors('addressStreet')} ? 'has-error'">
-                        <label for="addressStreet">Street</label>
-                        <input type="text" id="addressStreet" th:field="*{addressStreet}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('addressStreet')}" th:errors="*{addressStreet}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('addressZip')} ? 'has-error'">
-                        <label for="addressZip">Postal code</label>
-                        <input type="text" id="addressZip" th:field="*{addressZip}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('addressZip')}" th:errors="*{addressZip}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('addressCity')} ? 'has-error'">
-                        <label for="addressCity">City</label>
-                        <input type="text" id="addressCity" th:field="*{addressCity}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('addressCity')}" th:errors="*{addressCity}"></span>
-                    </div>
-                </div>
-            </div>
+            <section class="form-hero">
+                <p class="eyebrow" th:text="${isEdit} ? 'Edit Record' : 'Patient Management'">Patient Management</p>
+                <h1 class="pr-title" th:text="${isEdit} ? 'Edit Patient' : 'New Patient'">New Patient</h1>
+                <p class="pr-subtitle">Enter the patient's master data, contacts, and clinical baseline information.</p>
+            </section>
 
-            <div class="card">
-                <h2>Emergency contact</h2>
-                <div class="form-grid">
-                    <div class="form-field" th:classappend="${#fields.hasErrors('emergencyContactName')} ? 'has-error'">
-                        <label for="emergencyContactName">Name</label>
-                        <input type="text" id="emergencyContactName" th:field="*{emergencyContactName}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('emergencyContactName')}" th:errors="*{emergencyContactName}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('emergencyContactRelation')} ? 'has-error'">
-                        <label for="emergencyContactRelation">Relationship</label>
-                        <input type="text" id="emergencyContactRelation" th:field="*{emergencyContactRelation}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('emergencyContactRelation')}" th:errors="*{emergencyContactRelation}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'has-error'">
-                        <label for="emergencyContactPhone">Phone</label>
-                        <input type="text" id="emergencyContactPhone" th:field="*{emergencyContactPhone}" placeholder="+49 611 1234567"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}"></span>
-                    </div>
-                </div>
-            </div>
+            <form class="pr-form" method="post"
+                  th:action="${isEdit} ? @{'/patients/' + ${patientId}} : @{/patients}"
+                  th:object="${patientForm}">
 
-            <div class="card">
-                <h2>Insurance</h2>
-                <div class="form-grid">
-                    <div class="form-field" th:classappend="${#fields.hasErrors('insuranceProvider')} ? 'has-error'">
-                        <label for="insuranceProvider">Provider</label>
-                        <input type="text" id="insuranceProvider" th:field="*{insuranceProvider}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('insuranceProvider')}" th:errors="*{insuranceProvider}"></span>
-                    </div>
-                    <div class="form-field" th:classappend="${#fields.hasErrors('insurancePolicyNumber')} ? 'has-error'">
-                        <label for="insurancePolicyNumber">Policy number</label>
-                        <input type="text" id="insurancePolicyNumber" th:field="*{insurancePolicyNumber}"/>
-                        <span class="field-error" th:if="${#fields.hasErrors('insurancePolicyNumber')}" th:errors="*{insurancePolicyNumber}"></span>
-                    </div>
-                </div>
-            </div>
+                <section class="form-section">
+                    <h2 class="form-section-title">Basic Information</h2>
+                    <div class="form-grid3">
+                        <label class="field" th:classappend="${#fields.hasErrors('firstName')} ? 'has-error'">
+                            <span class="field-label">First Name <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{firstName}" placeholder="e.g. Anna"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}"></span>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('lastName')} ? 'has-error'">
+                            <span class="field-label">Last Name <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{lastName}" placeholder="e.g. Becker"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}"></span>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('dateOfBirth')} ? 'has-error'">
+                            <span class="field-label">Date of Birth <span class="required-mark">*</span></span>
+                            <input type="date" th:field="*{dateOfBirth}"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('dateOfBirth')}" th:errors="*{dateOfBirth}"></span>
+                        </label>
 
-            <div class="card">
-                <h2>Allergies</h2>
-                <div class="form-field">
-                    <label for="allergiesRaw">One allergy per line</label>
-                    <textarea id="allergiesRaw" th:field="*{allergiesRaw}" placeholder="Penicillin&#10;Latex"></textarea>
-                </div>
-            </div>
+                        <label class="field">
+                            <span class="field-label">Gender</span>
+                            <select th:field="*{sex}">
+                                <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.Sex).values()}" th:value="${option}" th:text="${option.label}"></option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">Status</span>
+                            <select th:field="*{status}">
+                                <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.PatientStatus).values()}" th:value="${option}" th:text="${option.label}"></option>
+                            </select>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('diagnosis')} ? 'has-error'">
+                            <span class="field-label">Diagnosis <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{diagnosis}" placeholder="e.g. Hypertension"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('diagnosis')}" th:errors="*{diagnosis}"></span>
+                        </label>
 
-            <div class="card">
-                <h2>Medications</h2>
-                <div class="dynamic-rows" id="medication-rows">
-                    <div class="dynamic-row" th:each="med, medStat : *{medications}" th:attr="data-index=${medStat.index}">
-                        <div class="form-field">
-                            <label>Medication name</label>
-                            <input type="text" th:field="*{medications[__${medStat.index}__].name}" placeholder="e.g. Ibuprofen"/>
-                            <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].name')}" th:errors="*{medications[__${medStat.index}__].name}"></span>
+                        <label class="field" th:classappend="${#fields.hasErrors('doctor')} ? 'has-error'">
+                            <span class="field-label">Attending Doctor <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{doctor}" placeholder="e.g. Dr. Klein"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('doctor')}" th:errors="*{doctor}"></span>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">Ward / Unit</span>
+                            <input type="text" th:field="*{ward}" placeholder="e.g. Ward 3"/>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('lastVisit')} ? 'has-error'">
+                            <span class="field-label">Last Visit <span class="required-mark">*</span></span>
+                            <input type="date" th:field="*{lastVisit}"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('lastVisit')}" th:errors="*{lastVisit}"></span>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('nextAppointment')} ? 'has-error'">
+                            <span class="field-label">Next Appointment</span>
+                            <input type="date" th:field="*{nextAppointment}"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('nextAppointment')}" th:errors="*{nextAppointment}"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2 class="form-section-title">Address</h2>
+                    <div class="form-grid3">
+                        <label class="field">
+                            <span class="field-label">Street</span>
+                            <input type="text" th:field="*{addressStreet}"/>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('addressZip')} ? 'has-error'">
+                            <span class="field-label">ZIP Code</span>
+                            <input type="text" th:field="*{addressZip}"/>
+                            <span class="field-error" th:if="${#fields.hasErrors('addressZip')}" th:errors="*{addressZip}"></span>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">City</span>
+                            <input type="text" th:field="*{addressCity}"/>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2 class="form-section-title">Emergency Contact</h2>
+                    <div class="form-grid3">
+                        <label class="field">
+                            <span class="field-label">Name</span>
+                            <input type="text" th:field="*{emergencyContactName}"/>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">Relation</span>
+                            <input type="text" th:field="*{emergencyContactRelation}" placeholder="e.g. Spouse"/>
+                        </label>
+                        <label class="field" th:classappend="${#fields.hasErrors('emergencyContactPhone')} ? 'has-error'">
+                            <span class="field-label">Phone</span>
+                            <input type="text" th:field="*{emergencyContactPhone}" placeholder="+49 ..."/>
+                            <span class="field-error" th:if="${#fields.hasErrors('emergencyContactPhone')}" th:errors="*{emergencyContactPhone}"></span>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2 class="form-section-title">Insurance</h2>
+                    <div class="form-grid3">
+                        <label class="field">
+                            <span class="field-label">Provider</span>
+                            <input type="text" th:field="*{insuranceProvider}"/>
+                        </label>
+                        <label class="field">
+                            <span class="field-label">Policy Number</span>
+                            <input type="text" th:field="*{insurancePolicyNumber}"/>
+                        </label>
+                    </div>
+                </section>
+
+                <section class="form-section">
+                    <h2 class="form-section-title">Allergies</h2>
+
+                    <div class="inline-add-row">
+                        <label class="field">
+                            <input type="text" id="allergyInput" placeholder="e.g. Penicillin"/>
+                        </label>
+                        <button type="button" class="add-button" id="addAllergyBtn">+ Add</button>
+                    </div>
+
+                    <ul class="tag-list" id="allergyTagList"></ul>
+                    <p class="empty-hint" id="allergyEmptyHint">No allergies added yet.</p>
+
+                    <!-- Tatsaechlich gebundenes Feld: ein Eintrag pro Zeile, wird per JS synchron gehalten -->
+                    <textarea th:field="*{allergiesRaw}" id="allergiesRaw" hidden></textarea>
+                </section>
+
+                <section class="form-section">
+                    <div class="form-section-header-row">
+                        <h2 class="form-section-title">Medications</h2>
+                        <button type="button" class="add-button" onclick="addMedicationRow()">+ Add Medication</button>
+                    </div>
+
+                    <p class="empty-hint" id="medicationEmptyHint" style="display:none;">No medications added yet.</p>
+
+                    <div class="medication-list" id="medication-rows">
+                        <div class="medication-row" th:each="med, medStat : *{medications}" th:attr="data-index=${medStat.index}">
+                            <label class="field">
+                                <input type="text" th:field="*{medications[__${medStat.index}__].name}" placeholder="Name (e.g. Metformin)"/>
+                                <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].name')}" th:errors="*{medications[__${medStat.index}__].name}"></span>
+                            </label>
+                            <label class="field">
+                                <input type="text" th:field="*{medications[__${medStat.index}__].dosage}" placeholder="Dosage (e.g. 1000 mg)"/>
+                                <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].dosage')}" th:errors="*{medications[__${medStat.index}__].dosage}"></span>
+                            </label>
+                            <label class="field">
+                                <input type="text" th:field="*{medications[__${medStat.index}__].schedule}" placeholder="Schedule (e.g. 2x daily)"/>
+                                <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].schedule')}" th:errors="*{medications[__${medStat.index}__].schedule}"></span>
+                            </label>
+                            <button type="button" class="row-remove-button" onclick="removeMedicationRow(this)" aria-label="Remove medication">x</button>
                         </div>
-                        <div class="form-field">
-                            <label>Dosage</label>
-                            <input type="text" th:field="*{medications[__${medStat.index}__].dosage}" placeholder="e.g. 400mg"/>
-                            <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].dosage')}" th:errors="*{medications[__${medStat.index}__].dosage}"></span>
-                        </div>
-                        <div class="form-field">
-                            <label>Schedule</label>
-                            <input type="text" th:field="*{medications[__${medStat.index}__].schedule}" placeholder="e.g. 2x daily"/>
-                            <span class="field-error" th:if="${#fields.hasErrors('medications[' + medStat.index + '].schedule')}" th:errors="*{medications[__${medStat.index}__].schedule}"></span>
-                        </div>
                     </div>
-                </div>
-                <button type="button" class="add-row-btn" onclick="addMedicationRow()" style="margin-top: 10px;">+ Add medication row</button>
-            </div>
+                </section>
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary" th:text="${isEdit} ? 'Save changes' : 'Admit patient'">Save</button>
-                <a class="btn btn-secondary"
-                   th:href="${isEdit} ? @{'/patients/' + ${patientId}} : @{/patients}">Cancel</a>
-            </div>
-        </form>
-    </main>
+                <div class="form-actions">
+                    <a th:href="${isEdit} ? @{'/patients/' + ${patientId}} : @{/patients}" class="cancel-button">Cancel</a>
+                    <button type="submit" class="submit-button" th:text="${isEdit} ? 'Save Changes' : 'Create Patient'">Create Patient</button>
+                </div>
+            </form>
+        </main>
+    </div>
 </div>
 
 <script th:inline="javascript">
-    function addMedicationRow() {
-        const container = document.getElementById('medication-rows');
-        const rows = container.querySelectorAll('.dynamic-row');
-        const template = rows[0].cloneNode(true);
-        const oldIndex = rows[rows.length - 1].getAttribute('data-index');
-        const newIndex = parseInt(oldIndex, 10) + 1;
+    // --- Allergies: JS-verwaltete Tag-Liste, synchronisiert mit dem versteckten
+    //     Textarea-Feld (allergiesRaw), das tatsaechlich an den Server gesendet wird.
+    (function () {
+        var hiddenField = document.getElementById('allergiesRaw');
+        var tagList = document.getElementById('allergyTagList');
+        var emptyHint = document.getElementById('allergyEmptyHint');
+        var input = document.getElementById('allergyInput');
+        var addBtn = document.getElementById('addAllergyBtn');
 
-        template.setAttribute('data-index', newIndex);
-        template.querySelectorAll('input').forEach(function (input) {
-            input.name = input.name.replace('medications[' + rows[0].getAttribute('data-index') + ']', 'medications[' + newIndex + ']');
-            input.removeAttribute('id');
+        function currentAllergies() {
+            return hiddenField.value.split('\n').map(function (s) { return s.trim(); }).filter(function (s) { return s.length > 0; });
+        }
+
+        function render() {
+            var allergies = currentAllergies();
+            tagList.innerHTML = '';
+            emptyHint.style.display = allergies.length === 0 ? 'block' : 'none';
+            allergies.forEach(function (allergy, index) {
+                var li = document.createElement('li');
+                li.className = 'tag';
+                li.textContent = allergy + ' ';
+                var removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'tag-remove';
+                removeBtn.setAttribute('aria-label', 'Remove ' + allergy);
+                removeBtn.textContent = 'x';
+                removeBtn.onclick = function () {
+                    var updated = currentAllergies();
+                    updated.splice(index, 1);
+                    hiddenField.value = updated.join('\n');
+                    render();
+                };
+                li.appendChild(removeBtn);
+                tagList.appendChild(li);
+            });
+        }
+
+        function addAllergy() {
+            var trimmed = input.value.trim();
+            if (!trimmed) return;
+            var updated = currentAllergies();
+            updated.push(trimmed);
+            hiddenField.value = updated.join('\n');
             input.value = '';
+            render();
+        }
+
+        addBtn.addEventListener('click', addAllergy);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                addAllergy();
+            }
         });
-        template.querySelectorAll('.field-error').forEach(function (el) { el.remove(); });
-        container.appendChild(template);
+
+        render();
+    })();
+
+    // --- Medications: Zeilen hinzufuegen/entfernen, Indizes nach jeder
+    //     Aenderung neu durchnummerieren, damit Spring die Liste sauber bindet.
+    function reindexMedicationRows() {
+        var rows = document.querySelectorAll('#medication-rows .medication-row');
+        rows.forEach(function (row, i) {
+            row.setAttribute('data-index', i);
+            row.querySelectorAll('input').forEach(function (input) {
+                input.name = input.name.replace(/medications\[\d+\]/, 'medications[' + i + ']');
+            });
+        });
+        document.getElementById('medicationEmptyHint').style.display = rows.length === 0 ? 'block' : 'none';
     }
+
+    var medicationRowTemplate =
+        '<div class="medication-row">' +
+        '<label class="field"><input type="text" name="medications[0].name" placeholder="Name (e.g. Metformin)"/></label>' +
+        '<label class="field"><input type="text" name="medications[0].dosage" placeholder="Dosage (e.g. 1000 mg)"/></label>' +
+        '<label class="field"><input type="text" name="medications[0].schedule" placeholder="Schedule (e.g. 2x daily)"/></label>' +
+        '<button type="button" class="row-remove-button" onclick="removeMedicationRow(this)" aria-label="Remove medication">x</button>' +
+        '</div>';
+
+    function addMedicationRow() {
+        var container = document.getElementById('medication-rows');
+        var wrapper = document.createElement('div');
+        wrapper.innerHTML = medicationRowTemplate;
+        container.appendChild(wrapper.firstElementChild);
+        reindexMedicationRows();
+    }
+
+    function removeMedicationRow(button) {
+        var row = button.closest('.medication-row');
+        row.parentElement.removeChild(row);
+        reindexMedicationRows();
+    }
+
+    reindexMedicationRows();
 </script>
 </body>
 </html>

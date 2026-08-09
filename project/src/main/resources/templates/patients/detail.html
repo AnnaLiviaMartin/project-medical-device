@@ -1,114 +1,194 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(${patient.fullName})}"></head>
+<head th:replace="~{fragments/head :: head(patient.fullName)}"></head>
 <body>
 <div class="app-shell">
     <div th:replace="~{fragments/nav :: nav('patients')}"></div>
 
-    <main class="main">
+    <div class="main-content">
         <div th:replace="~{fragments/flash :: flash}"></div>
 
-        <div class="page-header">
-            <div>
-                <span class="page-eyebrow" th:text="'Patient · #' + ${patient.id}">Patient</span>
-                <h1 th:text="${patient.fullName}">Patient name</h1>
-                <div class="page-header__meta"
-                     th:text="${patient.age} + ' yrs · ' + ${patient.sex.label} + ' · born ' + ${#temporals.format(patient.dateOfBirth, 'dd MMM yyyy')}">
-                    Meta
+        <main class="pr-page">
+            <div class="pr-topbar">
+                <a th:href="@{/patients}" class="back-link">← Back to Patient Overview</a>
+                <div class="header-actions">
+                    <a th:href="@{'/patients/' + ${patient.id} + '/edit'}" class="btn-secondary btn-sm">Edit</a>
+                    <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}"
+                          onsubmit="return confirm('Delete this patient and all history? This cannot be undone.');">
+                        <button type="submit" class="btn-danger-outline">Delete</button>
+                    </form>
                 </div>
             </div>
-            <div style="display:flex; gap:10px;">
-                <a class="btn btn-secondary" th:href="@{'/patients/' + ${patient.id} + '/edit'}">Edit</a>
-                <a class="btn btn-primary" th:href="@{'/patients/' + ${patient.id} + '/history/new'}">+ Add history entry</a>
-                <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}"
-                      onsubmit="return confirm('Delete this patient and all history? This cannot be undone.');">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
 
-        <div class="card">
-            <h2>Overview</h2>
-            <div class="info-grid">
-                <dl class="info-block">
-                    <dt>Diagnosis</dt>
-                    <dd th:text="${patient.diagnosis}">—</dd>
-                    <dt>Status</dt>
-                    <dd>
-                        <span class="badge"
-                              th:classappend="${patient.status.name() == 'INPATIENT'} ? 'badge--inpatient' : 'badge--outpatient'"
-                              th:text="${patient.status.label}">Status</span>
-                    </dd>
-                    <dt>Doctor</dt>
-                    <dd th:text="${patient.doctor}">—</dd>
-                    <dt>Ward</dt>
-                    <dd th:text="${#strings.isEmpty(patient.ward)} ? '—' : ${patient.ward}">—</dd>
-                </dl>
-                <dl class="info-block">
-                    <dt>Last visit</dt>
-                    <dd th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : '—'}">—</dd>
-                    <dt>Next appointment</dt>
-                    <dd th:text="${patient.nextAppointment != null ? #temporals.format(patient.nextAppointment, 'dd MMM yyyy') : '—'}">—</dd>
-                    <dt>Address</dt>
-                    <dd th:if="${#strings.isEmpty(patient.addressStreet) and #strings.isEmpty(patient.addressCity)}">—</dd>
-                    <dd th:unless="${#strings.isEmpty(patient.addressStreet) and #strings.isEmpty(patient.addressCity)}"
-                        th:text="${patient.addressStreet} + ', ' + ${patient.addressZip} + ' ' + ${patient.addressCity}">—</dd>
-                </dl>
-                <dl class="info-block">
-                    <dt>Emergency contact</dt>
-                    <dd th:if="${#strings.isEmpty(patient.emergencyContactName)}">—</dd>
-                    <dd th:unless="${#strings.isEmpty(patient.emergencyContactName)}"
-                        th:text="${patient.emergencyContactName} + ' (' + ${patient.emergencyContactRelation} + ')'">—</dd>
-                    <dd th:text="${patient.emergencyContactPhone}"></dd>
-                    <dt>Insurance</dt>
-                    <dd th:text="${#strings.isEmpty(patient.insuranceProvider)} ? '—' : ${patient.insuranceProvider}">—</dd>
-                    <dd th:text="${patient.insurancePolicyNumber}"></dd>
-                </dl>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2>Allergies &amp; medications</h2>
-            <div class="info-grid" style="grid-template-columns: 1fr 1fr;">
+            <section class="pr-hero">
                 <div>
-                    <div class="field-hint" style="margin-bottom:10px;">Allergies</div>
-                    <div class="tag-list" th:if="${not #lists.isEmpty(patient.allergies)}">
-                        <span class="tag" th:each="allergy : ${patient.allergies}" th:text="${allergy.name}">Allergy</span>
-                    </div>
-                    <div th:if="${#lists.isEmpty(patient.allergies)}" style="color: var(--ink-faint); font-size: 13px;">No known allergies.</div>
+                    <p class="eyebrow">Patient Record</p>
+                    <h1 class="pr-title" th:text="${patient.fullName}">Name</h1>
+                    <p class="pr-subtitle">Complete patient information, treatment history, medications, and scan access.</p>
                 </div>
-                <div>
-                    <div class="field-hint" style="margin-bottom:10px;">Medications</div>
-                    <div th:if="${not #lists.isEmpty(patient.medications)}">
-                        <div th:each="med : ${patient.medications}" style="margin-bottom:6px; font-size: 13.5px;">
-                            <strong th:text="${med.name}">Name</strong>
-                            <span style="color: var(--ink-muted);" th:text="' · ' + ${med.dosage} + ' · ' + ${med.schedule}"></span>
+                <span class="status-badge"
+                      th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-hero' : 'status-badge--inpatient-hero'"
+                      th:text="${patient.status.label}">Status</span>
+            </section>
+
+            <section class="pr-overview-grid">
+                <div class="pr-panel">
+                    <p class="section-label">Patient Details</p>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <span class="info-label">Patient ID</span>
+                            <strong class="info-value" th:text="'#' + ${patient.id}">#1</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Age</span>
+                            <strong class="info-value" th:text="${patient.age} + ' years'">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Gender</span>
+                            <strong class="info-value" th:text="${patient.sex.label}">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Diagnosis</span>
+                            <strong class="info-value" th:text="${patient.diagnosis}">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Doctor</span>
+                            <strong class="info-value" th:text="${patient.doctor}">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Ward / Unit</span>
+                            <strong class="info-value" th:text="${#strings.isEmpty(patient.ward)} ? '—' : ${patient.ward}">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Last Visit</span>
+                            <strong class="info-value" th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : '—'}">—</strong>
+                        </div>
+                        <div class="info-card">
+                            <span class="info-label">Next Appointment</span>
+                            <strong class="info-value" th:text="${patient.nextAppointment != null ? #temporals.format(patient.nextAppointment, 'dd MMM yyyy') : '—'}">—</strong>
                         </div>
                     </div>
-                    <div th:if="${#lists.isEmpty(patient.medications)}" style="color: var(--ink-faint); font-size: 13px;">No current medications.</div>
                 </div>
-            </div>
-        </div>
 
-        <div class="card">
-            <h2>History timeline</h2>
-            <div th:if="${#lists.isEmpty(historyEntries)}" class="empty-state">
-                No history entries yet.
-            </div>
-            <div class="timeline" th:unless="${#lists.isEmpty(historyEntries)}">
-                <div class="timeline-item" th:each="entry : ${historyEntries}">
-                    <div class="timeline-item__date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</div>
-                    <div class="timeline-item__title">
-                        <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" th:text="${entry.title}">Title</a>
-                        <span class="badge"
-                              th:class="'badge badge--category-' + ${#strings.toLowerCase(entry.category.name())}"
-                              th:text="${entry.category.label}">Category</span>
+                <div class="pr-panel">
+                    <p class="section-label">Address &amp; Contact</p>
+                    <div class="stack">
+                        <div class="info-row">
+                            <span class="info-row-label">Address</span>
+                            <span class="info-row-value" th:text="${patient.addressStreet} + ', ' + ${patient.addressZip} + ' ' + ${patient.addressCity}">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-row-label">Emergency Contact</span>
+                            <span class="info-row-value" th:text="${patient.emergencyContactName} + ' · ' + ${patient.emergencyContactRelation} + ' · ' + ${patient.emergencyContactPhone}">—</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-row-label">Insurance</span>
+                            <span class="info-row-value" th:text="${patient.insuranceProvider} + ' · ' + ${patient.insurancePolicyNumber}">—</span>
+                        </div>
                     </div>
-                    <div style="font-size: 13.5px; color: var(--ink-muted);" th:text="${entry.doctor} + (${#strings.isEmpty(entry.department)} ? '' : ' · ' + ${entry.department})">Doctor</div>
                 </div>
-            </div>
-        </div>
-    </main>
+            </section>
+
+            <section class="pr-content-grid">
+                <div class="pr-main-col">
+                    <div class="pr-panel">
+                        <div class="section-header">
+                            <div>
+                                <p class="section-label">Clinical History</p>
+                                <h2 class="section-title">Treatment Timeline</h2>
+                            </div>
+                            <div class="header-actions">
+                                <span class="count-badge" th:text="${#lists.size(historyEntries)} + ' entries'">0 entries</span>
+                                <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button">+ Add Event</a>
+                            </div>
+                        </div>
+
+                        <div class="timeline" th:unless="${#lists.isEmpty(historyEntries)}">
+                            <article class="timeline-item" th:each="entry : ${historyEntries}">
+                                <div class="timeline-rail">
+                                    <span class="timeline-dot"></span>
+                                    <span class="timeline-line"></span>
+                                </div>
+                                <div class="timeline-card">
+                                    <div class="timeline-header">
+                                        <div>
+                                            <p class="timeline-date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</p>
+                                            <h3 class="timeline-title">
+                                                <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" th:text="${entry.title}">Title</a>
+                                            </h3>
+                                        </div>
+                                        <div class="timeline-header-actions">
+                                            <span class="type-badge" th:text="${entry.category.label}">Category</span>
+                                        </div>
+                                    </div>
+
+                                    <p class="timeline-text" th:if="${not #strings.isEmpty(entry.description)}" th:text="${entry.description}">Description</p>
+
+                                    <div class="meta-row">
+                                        <div class="meta-chip">
+                                            <span class="meta-chip-label">Doctor</span>
+                                            <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.doctor)} ? '—' : ${entry.doctor}">—</span>
+                                        </div>
+                                        <div class="meta-chip">
+                                            <span class="meta-chip-label">Department</span>
+                                            <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.department)} ? '—' : ${entry.department}">—</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="scan-section">
+                                        <p class="scan-section-label">Linked Scans</p>
+                                        <p class="scan-empty" th:if="${entry.study == null or #lists.isEmpty(entry.study.xrayImages)}">
+                                            No scans are linked to this history entry.
+                                        </p>
+                                        <div class="scan-list" th:if="${entry.study != null and not #lists.isEmpty(entry.study.xrayImages)}">
+                                            <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" class="scan-card">
+                                                <div>
+                                                    <p class="scan-title" th:text="'Chest X-ray · ' + ${#lists.size(entry.study.xrayImages)} + ' image(s)'">Scan</p>
+                                                    <p class="scan-meta" th:text="'Uploaded ' + ${#temporals.format(entry.study.createdAt, 'dd MMM yyyy')}">Meta</p>
+                                                </div>
+                                                <span class="scan-link">Open Scan</span>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="attachment-section">
+                                        <div class="attachment-header">
+                                            <p class="scan-section-label">Attachments</p>
+                                            <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" class="attachment-upload-button">+ Manage</a>
+                                        </div>
+                                        <p class="attachment-empty" th:if="${#lists.isEmpty(entry.attachments)}">No attachments yet.</p>
+                                        <ul class="attachment-list" th:unless="${#lists.isEmpty(entry.attachments)}">
+                                            <li class="attachment-item" th:each="attachment : ${entry.attachments}">
+                                                <a th:href="@{'/media/' + ${attachment.storedPath}}" target="_blank" class="attachment-link" th:text="${attachment.originalFilename}">file</a>
+                                                <span class="attachment-meta" th:text="${#numbers.formatInteger(attachment.fileSize / 1024, 1)} + ' KB'">0 KB</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+
+                        <div class="pr-empty-state" th:if="${#lists.isEmpty(historyEntries)}">
+                            No history entries are available for this patient.
+                        </div>
+                    </div>
+                </div>
+
+                <aside class="pr-side-col">
+                    <div class="pr-panel">
+                        <p class="section-label">Current Medication</p>
+                        <div class="stack">
+                            <div class="list-card" th:each="med : ${patient.medications}">
+                                <strong class="list-card-title" th:text="${med.name}">Name</strong>
+                                <p class="list-card-text" th:text="${med.dosage} + ' · ' + ${med.schedule}">Dosage</p>
+                            </div>
+                            <p class="empty-hint" th:if="${#lists.isEmpty(patient.medications)}">No medications on record.</p>
+                        </div>
+                    </div>
+                </aside>
+            </section>
+        </main>
+    </div>
 </div>
 </body>
 </html>

@@ -6,8 +6,10 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -48,4 +50,11 @@ public class Prediction {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Transient
+    public List<Map.Entry<String, Double>> getScoresSortedDescending() {
+        return scores.entrySet().stream()
+                .sorted((a, b) -> b.getValue().compareTo(a.getValue()))
+                .collect(Collectors.toList());
+    }
 }
