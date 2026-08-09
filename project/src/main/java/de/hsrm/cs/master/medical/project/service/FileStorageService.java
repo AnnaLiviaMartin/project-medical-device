@@ -23,6 +23,10 @@ import java.util.UUID;
 @Service
 public class FileStorageService {
 
+    // TODO - Beim Löschen eines Patienten werden die zugehörigen Datenbank-Zeilen
+    //  vollständig kaskadiert entfernt, die physischen Dateien unter `./uploads/`
+    //  bleiben aktuell auf der Platte liegen
+
     private Path uploadRoot;
 
     @Value("${upload_dir}")
