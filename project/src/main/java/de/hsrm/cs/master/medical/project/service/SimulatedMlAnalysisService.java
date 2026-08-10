@@ -1,6 +1,8 @@
 package de.hsrm.cs.master.medical.project.service;
 
 import de.hsrm.cs.master.medical.project.domain.MlAnalysisResult;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -24,31 +26,30 @@ import java.util.Random;
  * "Aktivierung"), aber ohne jeden Bezug zu echten Modell-Gradienten.
  */
 @Service
+@ConditionalOnProperty(name = "ml.analysis.provider", havingValue = "simulated")
+@Slf4j
 public class SimulatedMlAnalysisService implements MlAnalysisService {
 
-    /** Klassen des NIH ChestX-ray14 Datensatzes, siehe machine_learning/constants.py im Ursprungsprojekt. */
+    /**
+     * Klassen des NIH ChestX-ray14 Datensatzes, siehe machine_learning/constants.py im Ursprungsprojekt.
+     */
     // TODO enums
     // TODO ersetzen mit echter Analyse
-    private static final List<String> PATHOLOGIES = List.of(
-            "Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass",
-            "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema",
-            "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia"
-    );
+    private static final List<String> PATHOLOGIES = List.of("Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia");
 
     private static final double THRESHOLD = 0.5;
     private static final int OVERLAY_SIZE = 320;
 
     @Override
     public MlAnalysisResult analyze(Path imagePath) {
+        log.info("Simulated ML-Analysis for image: {}", imagePath);
+
         long seed = seedFrom(imagePath);
         Random random = new Random(seed);
 
         Map<String, Double> scores = generateScores(random);
 
-        String bestPathology = scores.entrySet().stream()
-                .max(Map.Entry.comparingByValue())
-                .map(Map.Entry::getKey)
-                .orElse("No Finding");
+        String bestPathology = scores.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey).orElse("No Finding");
         double bestConfidence = scores.getOrDefault(bestPathology, 0.0);
         String label = bestConfidence >= THRESHOLD ? bestPathology : "No Finding";
 
@@ -160,16 +161,7 @@ public class SimulatedMlAnalysisService implements MlAnalysisService {
             float cy = size * (0.3f + random.nextFloat() * 0.4f);
             float radius = size * (0.18f + random.nextFloat() * 0.15f);
 
-            RadialGradientPaint paint = new RadialGradientPaint(
-                    new Point2D_Float(cx, cy),
-                    radius,
-                    new float[]{0f, 0.6f, 1f},
-                    new Color[]{
-                            new Color(255, 40, 20, 200),
-                            new Color(255, 140, 0, 120),
-                            new Color(20, 60, 200, 0)
-                    }
-            );
+            RadialGradientPaint paint = new RadialGradientPaint(new Point2D_Float(cx, cy), radius, new float[]{0f, 0.6f, 1f}, new Color[]{new Color(255, 40, 20, 200), new Color(255, 140, 0, 120), new Color(20, 60, 200, 0)});
             g.setPaint(paint);
             g.fillOval((int) (cx - radius), (int) (cy - radius), (int) (radius * 2), (int) (radius * 2));
         }
@@ -186,7 +178,9 @@ public class SimulatedMlAnalysisService implements MlAnalysisService {
         return scaled;
     }
 
-    /** Kleiner lokaler Alias, um keinen zusaetzlichen Import-Konflikt mit java.awt.Point zu erzeugen. */
+    /**
+     * Kleiner lokaler Alias, um keinen zusaetzlichen Import-Konflikt mit java.awt.Point zu erzeugen.
+     */
     private static class Point2D_Float extends java.awt.geom.Point2D.Float {
         Point2D_Float(float x, float y) {
             super(x, y);
