@@ -40,7 +40,7 @@
 
                         <div class="ov-list">
                             <a th:each="patient : ${patients}"
-                               th:href="@{/patients(q=${query}, status=${statusFilter}, selected=${patient.id})}"
+                               th:href="@{/patients/{id}(id=${patient.id})}"
                                class="ov-row"
                                th:classappend="${selectedPatient != null and selectedPatient.id == patient.id} ? ' is-active'">
                                 <div class="name-block">
