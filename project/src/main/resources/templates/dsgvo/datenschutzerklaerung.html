@@ -1,14 +1,22 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head('Datenschutzerklärung')}"></head>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Datenschutzerklaerung')}"></head>
 <body>
 <div class="app-shell">
-    <div th:replace="~{fragments/nav :: nav('impressum')}"></div>
-    <!--TODO stylen-->
-    <main class="main-content">
-        <div class="ov-header">
+    <div th:replace="~{fragments/nav :: nav('datenschutzerklaerung')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+        <main class="ov-page">
+            <section class="ov-header">
+                <div>
+                    <p class="eyebrow">Legal Information</p>
+                    <h1 class="ov-title">Datenschutzerklärung</h1>
+                    <p class="ov-subtitle">
+                        Angaben gemäß den gesetzlichen Informationspflichten.
+                    </p>
+                </div>
+            </section>
             <aside th:fragment="datenschutzerklaerung">
-                <h1>Datenschutz&shy;erkl&auml;rung</h1>
                 <h2>1. Datenschutz auf einen Blick</h2>
                 <h3>Allgemeine Hinweise</h3>
                 <p>Die folgenden Hinweise geben einen einfachen &Uuml;berblick dar&uuml;ber, was mit Ihren
@@ -203,8 +211,8 @@
                     Interesses der Europ&auml;ischen Union oder eines Mitgliedstaats verarbeitet werden.</p>
                 <p>Quelle: <a href="https://www.e-recht24.de">https://www.e-recht24.de</a></p>
             </aside>
-        </div>
-    </main>
+        </main>
+    </div>
 </div>
 
 </body>

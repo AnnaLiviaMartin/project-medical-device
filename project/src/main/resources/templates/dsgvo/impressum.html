@@ -1,27 +1,35 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/head :: head('Impressum')}"></head>
 <body>
 <div class="app-shell">
     <div th:replace="~{fragments/nav :: nav('impressum')}"></div>
-
-    <main class="main">
-        <div class="page-header">
+    <div class="main-content">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+        <main class="ov-page">
+            <section class="ov-header">
+                <div>
+                    <p class="eyebrow">Legal Information</p>
+                    <h1 class="ov-title">Impressum</h1>
+                    <p class="ov-subtitle">
+                        Angaben gemäß den gesetzlichen Informationspflichten.
+                    </p>
+                </div>
+            </section>
             <aside th:fragment="impressum">
-                <h1>Impressum</h1>
-
+                <h2>Personenangaben</h2>
                 <p>Anna-Livia Martin<br/>
                     Zur Knopsm&uuml;hle 19<br/>
                     64521 Gro&szlig;-Gerau</p>
-
+                </br>
                 <h2>Kontakt</h2>
-                <p>Telefon: &#91;Telefonnummer&#93;<br/>
+                <p>Telefon: 01512 3929411<br/>
                     E-Mail: anna-livia.martin@student.hs-rm.de</p>
 
                 <p>Quelle: <a href="https://www.e-recht24.de">https://www.e-recht24.de</a></p>
             </aside>
-        </div>
-    </main>
+        </main>
+    </div>
 </div>
 
 </body>
