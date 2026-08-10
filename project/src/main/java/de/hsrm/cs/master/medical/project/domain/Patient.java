@@ -97,6 +97,14 @@ public class Patient {
         return firstName + " " + lastName;
     }
 
+    public String getEmergencyContactInformation() {
+        return emergencyContactName + " (" + emergencyContactRelation + ", " + emergencyContactPhone + ")";
+    }
+
+    public String getFullSearchInformation() {
+        return getFullName() + " (" + this.id + " " + this.addressCity + " " + this.getEmergencyContactInformation() + ")";
+    }
+
     @Transient
     public int getAge() {
         if (dateOfBirth == null) {

@@ -12,6 +12,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/patients")
 public class PatientController {
@@ -23,8 +25,21 @@ public class PatientController {
     private HistoryEntryService historyEntryService;
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("patients", patientService.findAll());
+    public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, @RequestParam(required = false) Long selected, Model model) {
+        List<Patient> patients = patientService.findAll();
+
+        if (!q.isBlank()) {
+            patients = patientService.findAll().stream().filter(p -> p.getFullSearchInformation().toLowerCase().contains(q.toLowerCase())).toList();
+        }
+
+        if (!status.equals("All")) {
+            patients = patients.stream().filter(p -> p.getStatus().getLabel().equalsIgnoreCase(status)).toList();
+        }
+
+        model.addAttribute("patients", patients);
+        model.addAttribute("query", q);
+        model.addAttribute("statusFilter", status);
+
         return "patients/list";
     }
 
