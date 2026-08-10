@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/head :: head(patient.fullName)}"></head>
+<head th:replace="~{fragments/head :: head(${patient.lastName})}"></head>
 <body>
 <div class="app-shell">
     <div th:replace="~{fragments/nav :: nav('patients')}"></div>
