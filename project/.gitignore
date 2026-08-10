@@ -38,3 +38,4 @@ out/
 /medic.storage.uploads/*
 /medic-db.mv.db
 /medic-db.trace.db
+/medic-db.lock.db
