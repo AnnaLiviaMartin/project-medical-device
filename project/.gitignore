@@ -38,4 +38,11 @@ out/
 /medic.storage.uploads/*
 /medic-db.mv.db
 /medic-db.trace.db
-/medic-db.lock.db
+
+### ml-service (Python) ###
+ml-service/.venv/
+ml-service/__pycache__/
+ml-service/app/__pycache__/
+ml-service/machine_learning/checkpoints/*.pt
+ml-service/machine_learning/**/__pycache__/
+*.pyc
