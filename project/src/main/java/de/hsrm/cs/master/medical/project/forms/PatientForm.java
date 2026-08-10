@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class PatientForm {
 
     @NotNull(message = "Date of birth is required.")
     @Past(message = "Date of birth must be in the past.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateOfBirth;
 
     @NotNull(message = "Please select a sex.")
@@ -38,8 +40,10 @@ public class PatientForm {
     private PatientStatus status = PatientStatus.OUTPATIENT;
 
     @NotNull(message = "Last visit date is required.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate lastVisit;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate nextAppointment;
 
     @NotBlank(message = "Doctor is required.")

@@ -3,6 +3,7 @@ package de.hsrm.cs.master.medical.project.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class Patient {
     private String lastName;
 
     @Column(nullable = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate dateOfBirth;
 
     @Enumerated(EnumType.STRING)
@@ -40,8 +42,10 @@ public class Patient {
     @Column(nullable = false, length = 20)
     private PatientStatus status = PatientStatus.OUTPATIENT;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate lastVisit;
 
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate nextAppointment;
 
     @Column(nullable = false)

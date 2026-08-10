@@ -3,6 +3,7 @@ package de.hsrm.cs.master.medical.project.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class HistoryEntry {
     private Study study;
 
     @Column(nullable = false)
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate date;
 
     @Column(nullable = false, length = 255)

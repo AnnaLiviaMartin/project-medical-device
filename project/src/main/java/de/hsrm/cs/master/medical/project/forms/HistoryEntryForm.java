@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 
@@ -14,6 +15,7 @@ import java.time.LocalDate;
 public class HistoryEntryForm {
 
     @NotNull(message = "Date is required.")
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate date = LocalDate.now();
 
     @NotBlank(message = "Title is required.")
