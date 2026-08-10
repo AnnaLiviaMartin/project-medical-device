@@ -68,10 +68,17 @@
 
             <div th:if="${latestImage != null and latestImage.prediction != null}" class="analysis-shell" style="padding:0;">
                 <div class="image-pan-zoom">
+                    <div class="image-toggle-bar" th:if="${latestImage.prediction.label != 'No Finding'}">
+                        <button type="button" id="btnShowXray" class="image-toggle-btn is-active" onclick="setImageMode('xray')">Original X-ray</button>
+                        <button type="button" id="btnShowGradcam" class="image-toggle-btn" onclick="setImageMode('gradcam')">GradCAM - AI-Decision-Explanation</button>
+                    </div>
                     <div class="image-pan-zoom__viewport">
                         <img id="mainXrayImage" class="image-pan-zoom__image" th:src="@{'/media/' + ${latestImage.storedPath}}" alt="Chest X-ray"/>
                     </div>
                     <p class="image-pan-zoom__caption" th:text="'Uploaded ' + ${#temporals.format(latestImage.uploadedAt, 'dd MMM yyyy HH:mm')}">Uploaded</p>
+                    <p class="image-pan-zoom__mode-label" id="imageModeLabel" th:if="${latestImage.prediction.label != 'No Finding'}">
+                        Showing the original X-ray image.
+                    </p>
                 </div>
 
                 <div class="analysis-card">
@@ -108,6 +115,10 @@
 
                     <div>
                         <p class="section-label">Suggested Clinical Findings</p>
+                        <p class="findings-hint" th:if="${latestImage.prediction.label != 'No Finding'}">
+                            Each finding below has its own GradCAM heatmap. Select a finding, then use the
+                            toggle above the image to switch between the original X-ray and its GradCAM overlay.
+                        </p>
                         <div class="findings">
                             <button type="button"
                                     th:each="scoreEntry, stat : ${latestImage.prediction.scoresSortedDescending}"
@@ -115,13 +126,14 @@
                                     class="finding-card"
                                     th:classappend="${stat.index == 0} ? 'is-active'"
                                     th:attr="data-confidence=${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)},
+                                             data-pathology=${scoreEntry.key},
                                              data-image=${latestImage.prediction.gradCamPaths.get(scoreEntry.key) != null ? '/media/' + latestImage.prediction.gradCamPaths.get(scoreEntry.key) : '/media/' + latestImage.storedPath}"
                                     onclick="selectFinding(this)">
                                 <h3 class="finding-title" th:text="${scoreEntry.key}">Pathology</h3>
                                 <p class="finding-disease">
                                     <span class="finding-confidence" th:text="${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)} + '%'">0%</span>
                                 </p>
-                                <p class="finding-text">Illustrative overlay - simulated, not a real finding.</p>
+                                <p class="finding-text">Has its own GradCAM heatmap — select to view it.</p>
                             </button>
 
                             <div th:if="${latestImage.prediction.label == 'No Finding'}" class="finding-card is-active-ok">
@@ -145,6 +157,10 @@
 </div>
 
 <script>
+    var originalXrayPath = null;
+    var currentFinding = null; // { pathology, image }
+    var currentImageMode = 'xray';
+
     function selectFinding(button) {
         document.querySelectorAll('.finding-card').forEach(function (el) {
             el.classList.remove('is-active');
@@ -152,14 +168,60 @@
         button.classList.add('is-active');
 
         var confidence = button.getAttribute('data-confidence');
-        var image = button.getAttribute('data-image');
         if (confidence) {
             document.getElementById('confidenceValue').textContent = confidence;
         }
-        if (image) {
-            document.getElementById('mainXrayImage').src = image;
+
+        currentFinding = {
+            pathology: button.getAttribute('data-pathology'),
+            image: button.getAttribute('data-image')
+        };
+
+        // Auswahl eines Befunds zeigt direkt dessen GradCAM-Overlay.
+        setImageMode('gradcam');
+    }
+
+    function setImageMode(mode) {
+        var img = document.getElementById('mainXrayImage');
+        var label = document.getElementById('imageModeLabel');
+        var btnXray = document.getElementById('btnShowXray');
+        var btnGradcam = document.getElementById('btnShowGradcam');
+        if (!img) {
+            return;
+        }
+
+        currentImageMode = mode;
+        if (btnXray) btnXray.classList.toggle('is-active', mode === 'xray');
+        if (btnGradcam) btnGradcam.classList.toggle('is-active', mode === 'gradcam');
+
+        if (mode === 'xray') {
+            img.src = originalXrayPath;
+            if (label) label.textContent = 'Showing the original X-ray image.';
+        } else if (currentFinding) {
+            img.src = currentFinding.image;
+            if (label) label.textContent = 'Showing GradCAM heatmap for: ' + currentFinding.pathology;
+        } else {
+            img.src = originalXrayPath;
+            if (label) label.textContent = 'Select a finding below to view its GradCAM heatmap.';
         }
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var img = document.getElementById('mainXrayImage');
+        if (img) {
+            originalXrayPath = img.getAttribute('src');
+        }
+
+        var activeCard = document.querySelector('.finding-card.is-active');
+        if (activeCard) {
+            currentFinding = {
+                pathology: activeCard.getAttribute('data-pathology'),
+                image: activeCard.getAttribute('data-image')
+            };
+        }
+
+        setImageMode('xray');
+    });
 </script>
 </body>
 </html>
