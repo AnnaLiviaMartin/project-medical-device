@@ -25,7 +25,7 @@ public class PatientController {
     private HistoryEntryService historyEntryService;
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, @RequestParam(required = false) Long selected, Model model) {
+    public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, Model model) {
         List<Patient> patients = patientService.findAll();
 
         if (!q.isBlank()) {
