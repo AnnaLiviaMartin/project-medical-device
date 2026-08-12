@@ -40,6 +40,11 @@ dependencies {
 	testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
-tasks.named('test') {
-	useJUnitPlatform()
+task uebersetzungenToProperties(type: Exec) {
+	description = "Mit Python-Skript Uebersetzungen generieren."
+	commandLine = 'python uebersetzungen-to-properties.py'.split()
+}
+
+tasks.named('processResources'){
+	dependsOn("uebersetzungenToProperties")
 }
