@@ -25,7 +25,7 @@ public class PatientController {
     private HistoryEntryService historyEntryService;
 
     @GetMapping
-    public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, Model model) {
+    public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, @RequestParam(required = false) Long selectedPatientId, Model model) {
         List<Patient> patients = patientService.findAll();
 
         if (!q.isBlank()) {
@@ -39,6 +39,10 @@ public class PatientController {
         model.addAttribute("patients", patients);
         model.addAttribute("query", q);
         model.addAttribute("statusFilter", status);
+
+        if (selectedPatientId != null) {
+            model.addAttribute("selectedPatient", patientService.getOrThrow(selectedPatientId));
+        }
 
         return "patients/list";
     }

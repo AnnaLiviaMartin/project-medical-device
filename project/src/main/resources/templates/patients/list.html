@@ -41,7 +41,7 @@
 
                     <div class="ov-list">
                         <a th:each="patient : ${patients}"
-                           th:href="@{/patients/{id}(id=${patient.id})}"
+                           th:href="@{/patients(selectedPatientId=${patient.id},q=${query},status=${statusFilter})}"
                            class="ov-row">
                             <div class="name-block">
                                 <div class="name-row">
@@ -75,9 +75,65 @@
                         </div>
                     </div>
                 </div>
-            </section>
-        </main>
+
+                <aside>
+                    <div class="panel">
+                        <div th:if="${selectedPatient != null}">
+                            <div class="ov-detail-top">
+                                <div>
+                                    <p class="eyebrow">Selected Record</p>
+                                    <h2 class="ov-detail-name" th:text="${selectedPatient.fullName}">Name</h2>
+                                    <p class="subtitle-small"
+                                       th:text="'#' + ${selectedPatient.id} + ' · attending physician: ' + ${selectedPatient.doctor}">
+                                        Meta</p>
+                                </div>
+                                <span class="status-badge"
+                                      th:classappend="${selectedPatient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-list' : 'status-badge--inpatient-list'"
+                                      th:text="${selectedPatient.status.label}">Status</span>
+                            </div>
+
+                            <div class="ov-detail-grid">
+                                <div class="detail-card">
+                                    <span class="detail-label">Status</span>
+                                    <strong class="detail-value" th:text="${selectedPatient.status.label}">—</strong>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="detail-label">Last Visit</span>
+                                    <strong class="detail-value"
+                                            th:text="${selectedPatient.lastVisit != null ? #temporals.format(selectedPatient.lastVisit, 'dd MMM yyyy') : '—'}">—</strong>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="detail-label">Next Appointment</span>
+                                    <strong class="detail-value"
+                                            th:text="${selectedPatient.nextAppointment != null ? #temporals.format(selectedPatient.nextAppointment, 'dd MMM yyyy') : '—'}">—</strong>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="detail-label">Ward / Unit</span>
+                                    <strong class="detail-value"
+                                            th:text="${#strings.isEmpty(selectedPatient.ward)} ? '—' : ${selectedPatient.ward}">—</strong>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="detail-label">Address</span>
+                                    <strong class="detail-value"
+                                            th:text="${selectedPatient.addressStreet} + ', ' + ${selectedPatient.addressZip} + ' ' + ${selectedPatient.addressCity}">—</strong>
+                                </div>
+                                <div class="detail-card">
+                                    <span class="detail-label">Emergency Contact</span>
+                                    <strong class="detail-value"
+                                            th:text="${selectedPatient.emergencyContactName} + ' · ' + ${selectedPatient.emergencyContactRelation} + ' · ' + ${selectedPatient.emergencyContactPhone}">—</strong>
+                                </div>
+                            </div>
+
+                            <a th:href="@{'/patients/' + ${selectedPatient.id}}" class="btn-primary"
+                               style="width:100%;">Open
+                                Record</a>
+                        </div>
+
+                        <div class="empty-state" th:if="${selectedPatient == null}">
+                            Please select a person from the list.
+                        </div>
+                    </div>
+                </aside>
     </div>
-</div>
 </body>
 </html>
