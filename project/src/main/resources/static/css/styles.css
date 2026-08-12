@@ -569,12 +569,16 @@ a {
 /* ============================= Patient record (detail page) ============================= */
 
 .pr-page {
-    max-width: 1180px;
+    max-width: 1600px;
     margin: 0 auto;
     padding: var(--space-xl) var(--space-lg) 64px;
     display: flex;
     flex-direction: column;
     gap: var(--space-xl);
+}
+
+.pr-page-detail {
+    max-width: 55%;
 }
 
 .pr-topbar {
@@ -1207,7 +1211,6 @@ a {
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
     transition: border-color 0.15s ease;
-    font-family: var(--font-sans);
     width: 100%;
 }
 

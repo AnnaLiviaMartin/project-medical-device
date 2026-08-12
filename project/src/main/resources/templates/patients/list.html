@@ -18,7 +18,7 @@
                 <a href="#" th:href="@{/patients/new}" class="btn-primary">+ New Patient</a>
             </section>
 
-            <section>
+            <section class="ov-grid">
                 <div class="panel">
                     <form class="ov-toolbar" method="get" th:action="@{/patients}">
                         <input class="text-input" type="text" name="q" th:value="${query}"
