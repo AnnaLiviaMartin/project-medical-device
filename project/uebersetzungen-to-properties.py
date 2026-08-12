@@ -5,7 +5,7 @@ def getHeader(lines):
 # reads the translations into a dictionary
 def read_translations_csv(csv_file):
     translations = {}
-    with open(csv_file) as file:
+    with open(csv_file, encoding="utf-8") as file:
         lines = file.readlines()
         header = getHeader(lines)
         for line in lines[1:]:
@@ -25,14 +25,14 @@ def createsPopertyFiles(translations):
     trans = translations.items()
     # first file
     properties_file = f"./src/main/resources/messages.properties"
-    with open(properties_file, 'w') as file:
+    with open(properties_file, 'w', encoding="utf-8") as file:
         file.write(f"#Standardduebersetzung\n")
     # specific translations
     for ele in trans:
         language = ele[0]
         property_translation = ele[1]
         properties_file = f"./src/main/resources/messages_{language}.properties"
-        with open(properties_file, 'w') as file:
+        with open(properties_file, 'w', encoding="utf-8") as file:
             file.write(f"#Uebersetzungen für die Sprache {language}\n")
 
 # writes the translations into files
@@ -43,7 +43,7 @@ def generate_properties_files(translations):
         language = ele[0]
         property_translation = ele[1]
         properties_file = f"./src/main/resources/messages_{language}.properties"
-        with open(properties_file, "a") as file:
+        with open(properties_file, "a", encoding="utf-8") as file:
             for ele2 in property_translation:
                 for property_name, translation in ele2.items():
                     file.write(f"{property_name}={translation}\n")
@@ -52,7 +52,7 @@ def generate_default_properties_files(translations):
     properties_file = f"./src/main/resources/messages.properties"
     trans = list(translations.items())
     default_translations = trans[0][1]
-    with open(properties_file, "w") as file:
+    with open(properties_file, "w", encoding="utf-8") as file:
         file.write("# Standardübersetzung\n")
         for entry in default_translations:
             for property_name, translation in entry.items():
