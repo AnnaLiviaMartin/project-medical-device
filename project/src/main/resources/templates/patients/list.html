@@ -11,32 +11,35 @@
         <main class="pr-page">
             <section class="pr-hero">
                 <div>
-                    <p class="eyebrow">Patient Management</p>
-                    <h1 class="ov-title">Patient Overview</h1>
-                    <p class="ov-subtitle">Overview of master data, address information, and emergency contacts.</p>
+                    <p class="eyebrow" th:text="#{}">Patient Management</p>
+                    <h1 class="ov-title" th:text="#{}">Patient Overview</h1>
+                    <p class="ov-subtitle" th:text="#{}">Overview of master data, address information, and emergency
+                        contacts.</p>
                 </div>
-                <a href="#" th:href="@{/patients/new}" class="btn-primary">+ New Patient</a>
+                <a href="#" th:href="@{/patients/new}" class="btn-primary" th:text="#{}">+ New Patient</a>
             </section>
 
             <section class="ov-grid">
                 <div class="panel">
                     <form class="ov-toolbar" method="get" th:action="@{/patients}">
                         <input class="text-input" type="text" name="q" th:value="${query}"
-                               placeholder="Search by name, ID, city, or emergency contact"/>
+                               placeholder="Search by name, ID, city, or emergency contact" th:text="#{}"/>
                         <select class="select-input" name="status" onchange="this.form.submit()">
-                            <option value="All" th:selected="${statusFilter == 'All'}">All</option>
-                            <option value="INPATIENT" th:selected="${statusFilter == 'INPATIENT'}">Inpatient
+                            <option value="All" th:selected="${statusFilter == 'All'}" th:text="#{}">All</option>
+                            <option value="INPATIENT" th:selected="${statusFilter == 'INPATIENT'}" th:text="#{}">
+                                Inpatient
                             </option>
-                            <option value="OUTPATIENT" th:selected="${statusFilter == 'OUTPATIENT'}">Outpatient
+                            <option value="OUTPATIENT" th:selected="${statusFilter == 'OUTPATIENT'}" th:text="#{}">
+                                Outpatient
                             </option>
                         </select>
-                        <button class="btn-primary" type="submit">Search</button>
+                        <button class="btn-primary" type="submit" th:text="#{}">Search</button>
                     </form>
 
                     <div class="ov-table-header">
-                        <span>Patient</span>
-                        <span>Address</span>
-                        <span>Emergency Contact</span>
+                        <span th:text="#{}">Patient</span>
+                        <span th:text="#{}">Address</span>
+                        <span th:text="#{}">Emergency Contact</span>
                     </div>
 
                     <div class="ov-list">
@@ -47,30 +50,25 @@
                                 <div class="name-row">
                                     <strong class="patient-name" th:text="${patient.fullName}">Name</strong>
                                     <span class="id-badge" th:text="'#' + ${patient.id}">#1</span>
-                                    <span class="status-badge"
-                                          th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-list' : 'status-badge--inpatient-list'"
-                                          th:text="${patient.status.label}">Status</span>
+                                    <span class="status-badge" th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-list' : 'status-badge--inpatient-list'" th:text="${patient.status.label}">Status</span>
                                 </div>
-                                <span class="meta-text"
-                                      th:text="${patient.age} + ' years · ' + ${patient.sex.label}">Meta</span>
+                                <span class="meta-text" th:text="${patient.age} + ' years · ' + ${patient.sex.label}">Meta</span>
                             </div>
 
                             <div class="name-block">
                                 <strong class="patient-name"
                                         th:text="${#strings.isEmpty(patient.addressStreet)} ? '—' : ${patient.addressStreet}">Street</strong>
-                                <span class="meta-text"
-                                      th:text="${patient.addressZip} + ' ' + ${patient.addressCity}">Zip city</span>
+                                <span class="meta-text" th:text="${patient.addressZip} + ' ' + ${patient.addressCity}">Zip city</span>
                             </div>
 
                             <div class="name-block">
                                 <strong class="patient-name"
                                         th:text="${#strings.isEmpty(patient.emergencyContactName)} ? '—' : ${patient.emergencyContactName}">Contact</strong>
-                                <span class="meta-text"
-                                      th:text="${patient.emergencyContactRelation} + ' · ' + ${patient.emergencyContactPhone}">Relation</span>
+                                <span class="meta-text" th:text="${patient.emergencyContactRelation} + ' · ' + ${patient.emergencyContactPhone}">Relation</span>
                             </div>
                         </a>
 
-                        <div class="empty-state" th:if="${#lists.isEmpty(patients)}">
+                        <div class="empty-state" th:if="${#lists.isEmpty(patients)}" th:text="#{}">
                             No patients found for this search.
                         </div>
                     </div>
@@ -81,55 +79,49 @@
                         <div th:if="${selectedPatient != null}">
                             <div class="ov-detail-top">
                                 <div>
-                                    <p class="eyebrow">Selected Record</p>
+                                    <p class="eyebrow" th:text="#{}">Selected Record</p>
                                     <h2 class="ov-detail-name" th:text="${selectedPatient.fullName}">Name</h2>
-                                    <p class="subtitle-small"
-                                       th:text="'#' + ${selectedPatient.id} + ' · attending physician: ' + ${selectedPatient.doctor}">
-                                        Meta</p>
+                                    <p class="subtitle-small" th:text="'#' + ${selectedPatient.id} + ' · attending physician: ' + ${selectedPatient.doctor}">Meta</p>
                                 </div>
-                                <span class="status-badge"
-                                      th:classappend="${selectedPatient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-list' : 'status-badge--inpatient-list'"
-                                      th:text="${selectedPatient.status.label}">Status</span>
+                                <span class="status-badge" th:classappend="${selectedPatient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-list' : 'status-badge--inpatient-list'" th:text="${selectedPatient.status.label}">Status</span>
                             </div>
 
                             <div class="ov-detail-grid">
                                 <div class="detail-card">
-                                    <span class="detail-label">Status</span>
+                                    <span class="detail-label" th:text="#{}">Status</span>
                                     <strong class="detail-value" th:text="${selectedPatient.status.label}">—</strong>
                                 </div>
                                 <div class="detail-card">
-                                    <span class="detail-label">Last Visit</span>
+                                    <span class="detail-label" th:text="#{}">Last Visit</span>
                                     <strong class="detail-value"
                                             th:text="${selectedPatient.lastVisit != null ? #temporals.format(selectedPatient.lastVisit, 'dd MMM yyyy') : '—'}">—</strong>
                                 </div>
                                 <div class="detail-card">
-                                    <span class="detail-label">Next Appointment</span>
+                                    <span class="detail-label" th:text="#{}">Next Appointment</span>
                                     <strong class="detail-value"
                                             th:text="${selectedPatient.nextAppointment != null ? #temporals.format(selectedPatient.nextAppointment, 'dd MMM yyyy') : '—'}">—</strong>
                                 </div>
                                 <div class="detail-card">
-                                    <span class="detail-label">Ward / Unit</span>
+                                    <span class="detail-label" th:text="#{}">Ward / Unit</span>
                                     <strong class="detail-value"
                                             th:text="${#strings.isEmpty(selectedPatient.ward)} ? '—' : ${selectedPatient.ward}">—</strong>
                                 </div>
                                 <div class="detail-card">
-                                    <span class="detail-label">Address</span>
+                                    <span class="detail-label" th:text="#{}">Address</span>
                                     <strong class="detail-value"
                                             th:text="${selectedPatient.addressStreet} + ', ' + ${selectedPatient.addressZip} + ' ' + ${selectedPatient.addressCity}">—</strong>
                                 </div>
                                 <div class="detail-card">
-                                    <span class="detail-label">Emergency Contact</span>
+                                    <span class="detail-label" th:text="#{}">Emergency Contact</span>
                                     <strong class="detail-value"
                                             th:text="${selectedPatient.emergencyContactName} + ' · ' + ${selectedPatient.emergencyContactRelation} + ' · ' + ${selectedPatient.emergencyContactPhone}">—</strong>
                                 </div>
                             </div>
-
                             <a th:href="@{'/patients/' + ${selectedPatient.id}}" class="btn-primary"
-                               style="width:100%;">Open
-                                Record</a>
+                               style="width:100%;" th:text="#{}">Open Record</a>
                         </div>
 
-                        <div class="empty-state" th:if="${selectedPatient == null}">
+                        <div class="empty-state" th:if="${selectedPatient == null}" th:text="#{}">
                             Please select a person from the list.
                         </div>
                     </div>

@@ -7,7 +7,8 @@
     <nav class="side-menu__nav">
         <a th:href="@{/patients}"
            class="side-menu__item"
-           th:classappend="${active == 'patients'} ? 'is-active' : ''">
+           th:classappend="${active == 'patients'} ? 'is-active' : ''"
+           th:text="#{}">
             Patient Management
         </a>
     </nav>
@@ -15,11 +16,11 @@
     <div class="side-menu__bottom">
         <a th:href="@{/dsgvo/impressum}"
            class="side-menu__item">
-            <span>Impressum</span>
+            <span th:text="#{}">Impressum</span>
         </a>
         <a th:href="@{/dsgvo/datenschutzerklaerung}"
            class="side-menu__item">
-            <span>Datenschutzerklärung</span>
+            <span th:text="#{}">Datenschutzerklärung</span>
         </a>
     </div>
 </aside>

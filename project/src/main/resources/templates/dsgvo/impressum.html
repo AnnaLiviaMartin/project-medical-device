@@ -9,24 +9,24 @@
         <main class="ov-page">
             <section class="ov-header">
                 <div>
-                    <p class="eyebrow">Legal Information</p>
-                    <h1 class="ov-title">Impressum</h1>
-                    <p class="ov-subtitle">
+                    <p class="eyebrow" th:text="#{}">Legal Information</p>
+                    <h1 class="ov-title" th:text="#{}">Impressum</h1>
+                    <p class="ov-subtitle" th:text="#{}">
                         Angaben gemäß den gesetzlichen Informationspflichten.
                     </p>
                 </div>
             </section>
             <aside th:fragment="impressum">
-                <h2>Personenangaben</h2>
-                <p>Anna-Livia Martin<br/>
+                <h2 th:text="#{}">Personenangaben</h2>
+                <p th:text="#{}">Anna-Livia Martin<br/>
                     Zur Knopsm&uuml;hle 19<br/>
                     64521 Gro&szlig;-Gerau</p>
                 </br>
-                <h2>Kontakt</h2>
-                <p>Telefon: 01512 3929411<br/>
+                <h2 th:text="#{}">Kontakt</h2>
+                <p th:text="#{}">Telefon: 01512 3929411<br/>
                     E-Mail: anna-livia.martin@student.hs-rm.de</p>
 
-                <p>Quelle: <a href="https://www.e-recht24.de">https://www.e-recht24.de</a></p>
+                <p th:text="#{}">Quelle: <a href="https://www.e-recht24.de">https://www.e-recht24.de</a></p>
             </aside>
         </main>
     </div>

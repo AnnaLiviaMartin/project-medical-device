@@ -10,7 +10,7 @@
 
         <main class="pr-page pr-page-detail">
             <div class="pr-topbar">
-                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link">← Back to Patient Record</a>
+                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link" th:text="#{}">← Back to Patient Record</a>
             </div>
 
             <div class="pr-panel">
@@ -26,21 +26,21 @@
 
                 <div class="meta-row">
                     <div class="meta-chip">
-                        <span class="meta-chip-label">Doctor</span>
+                        <span class="meta-chip-label" th:text="#{}">Doctor</span>
                         <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.doctor)} ? '—' : ${entry.doctor}">—</span>
                     </div>
                     <div class="meta-chip">
-                        <span class="meta-chip-label">Department</span>
+                        <span class="meta-chip-label" th:text="#{}">Department</span>
                         <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.department)} ? '—' : ${entry.department}">—</span>
                     </div>
                 </div>
 
                 <div class="attachment-section">
                     <div class="attachment-header">
-                        <p class="scan-section-label">Attachments</p>
+                        <p class="scan-section-label" th:text="#{}">Attachments</p>
                         <div class="attachment-upload-choices">
-                            <button type="button" class="attachment-upload-button" onclick="document.getElementById('scanFileInput').click()">+ X-ray</button>
-                            <button type="button" class="attachment-upload-button" onclick="document.getElementById('documentFileInput').click()">+ Document/Image</button>
+                            <button type="button" class="attachment-upload-button" onclick="document.getElementById('scanFileInput').click()" th:text="#{}">+ X-ray</button>
+                            <button type="button" class="attachment-upload-button" onclick="document.getElementById('documentFileInput').click()" th:text="#{}">+ Document/Image</button>
                         </div>
                     </div>
 
@@ -51,7 +51,7 @@
                         <input type="file" id="documentFileInput" name="file" hidden onchange="this.form.submit()"/>
                     </form>
 
-                    <p class="attachment-empty" th:if="${#lists.isEmpty(attachments)}">No attachments yet.</p>
+                    <p class="attachment-empty" th:if="${#lists.isEmpty(attachments)}" th:text="#{}">No attachments yet.</p>
                     <ul class="attachment-list" th:unless="${#lists.isEmpty(attachments)}">
                         <li class="attachment-item" th:each="attachment : ${attachments}">
                             <a th:href="@{'/media/' + ${attachment.storedPath}}" target="_blank" class="attachment-link" th:text="${attachment.originalFilename}">file.pdf</a>
@@ -69,20 +69,20 @@
             <div th:if="${latestImage != null and latestImage.prediction != null}" class="analysis-shell" style="padding:0;">
                 <div class="image-pan-zoom">
                     <div class="image-toggle-bar" th:if="${latestImage.prediction.label != 'No Finding'}">
-                        <button type="button" id="btnShowXray" class="image-toggle-btn is-active" onclick="setImageMode('xray')">Original X-ray</button>
-                        <button type="button" id="btnShowGradcam" class="image-toggle-btn" onclick="setImageMode('gradcam')">GradCAM - AI-Decision-Explanation</button>
+                        <button type="button" id="btnShowXray" class="image-toggle-btn is-active" onclick="setImageMode('xray')" th:text="#{}">Original X-ray</button>
+                        <button type="button" id="btnShowGradcam" class="image-toggle-btn" onclick="setImageMode('gradcam')" th:text="#{}">GradCAM - AI-Decision-Explanation</button>
                     </div>
                     <div class="image-pan-zoom__viewport">
                         <img id="mainXrayImage" class="image-pan-zoom__image" th:src="@{'/media/' + ${latestImage.storedPath}}" alt="Chest X-ray"/>
                     </div>
                     <p class="image-pan-zoom__caption" th:text="'Uploaded ' + ${#temporals.format(latestImage.uploadedAt, 'dd MMM yyyy HH:mm')}">Uploaded</p>
-                    <p class="image-pan-zoom__mode-label" id="imageModeLabel" th:if="${latestImage.prediction.label != 'No Finding'}">
+                    <p class="image-pan-zoom__mode-label" id="imageModeLabel" th:if="${latestImage.prediction.label != 'No Finding'}" th:text="#{}">
                         Showing the original X-ray image.
                     </p>
                 </div>
 
                 <div class="analysis-card">
-                    <div class="analysis-disclaimer">
+                    <div class="analysis-disclaimer" th:text="#{}">
                         ⚠ Demo only: findings are generated by a simulated placeholder model, not a real
                         diagnostic AI. Do not use for actual clinical decisions.
                     </div>
@@ -90,23 +90,23 @@
                     <div class="analysis-card__header">
                         <div>
                             <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-                                <h2 class="analysis-card__title">AI Analysis Results</h2>
+                                <h2 class="analysis-card__title" th:text="#{}">AI Analysis Results</h2>
                                 <a th:href="@{'/patients/' + ${patient.id}}" class="type-badge" th:text="${patient.fullName}">Patient</a>
                             </div>
                         </div>
-                        <span class="analysis-card__engine">SIMULATED ENGINE</span>
+                        <span class="analysis-card__engine" th:text="#{}">SIMULATED ENGINE</span>
                     </div>
 
                     <div class="analysis-stats">
                         <div class="stat-box" th:classappend="${latestImage.prediction.label == 'No Finding'} ? 'stat-box--status-ok' : 'stat-box--status-danger'">
-                            <p th:class="${latestImage.prediction.label == 'No Finding'} ? 'stat-label-ok' : 'stat-label-danger'">STATUS</p>
+                            <p th:class="${latestImage.prediction.label == 'No Finding'} ? 'stat-label-ok' : 'stat-label-danger'" th:text="#{}">STATUS</p>
                             <div class="status-row">
                                 <span class="status-dot" th:classappend="${latestImage.prediction.label == 'No Finding'} ? ' status-dot--ok'"></span>
                                 <p th:class="${latestImage.prediction.label == 'No Finding'} ? 'status-text-ok' : 'status-text-danger'" th:text="${latestImage.prediction.label}">Label</p>
                             </div>
                         </div>
                         <div class="stat-box stat-box--confidence">
-                            <p class="stat-label-blue">CONFIDENCE</p>
+                            <p class="stat-label-blue" th:text="#{}">CONFIDENCE</p>
                             <p class="confidence-value">
                                 <span id="confidenceValue" th:text="${#numbers.formatDecimal(latestImage.prediction.confidence * 100, 1, 1)}">0.0</span> <span>%</span>
                             </p>
@@ -114,8 +114,8 @@
                     </div>
 
                     <div>
-                        <p class="section-label">Suggested Clinical Findings</p>
-                        <p class="findings-hint" th:if="${latestImage.prediction.label != 'No Finding'}">
+                        <p class="section-label" th:text="#{}">Suggested Clinical Findings</p>
+                        <p class="findings-hint" th:if="${latestImage.prediction.label != 'No Finding'}" th:text="#{}">
                             Each finding below has its own GradCAM heatmap. Select a finding, then use the
                             toggle above the image to switch between the original X-ray and its GradCAM overlay.
                         </p>
@@ -128,20 +128,21 @@
                                     th:attr="data-confidence=${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)},
                                              data-pathology=${scoreEntry.key},
                                              data-image=${latestImage.prediction.gradCamPaths.get(scoreEntry.key) != null ? '/media/' + latestImage.prediction.gradCamPaths.get(scoreEntry.key) : '/media/' + latestImage.storedPath}"
-                                    onclick="selectFinding(this)">
-                                <h3 class="finding-title" th:text="${scoreEntry.key}">Pathology</h3>
+                                    onclick="selectFinding(this)"
+                                    th:text="#{}">
+                                <h3 class="finding-title" th:text="${scoreEntry.key}" th:text="#{}">Pathology</h3>
                                 <p class="finding-disease">
                                     <span class="finding-confidence" th:text="${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)} + '%'">0%</span>
                                 </p>
-                                <p class="finding-text">Has its own GradCAM heatmap — select to view it.</p>
+                                <p th:text="#{}" class="finding-text">Has its own GradCAM heatmap — select to view it.</p>
                             </button>
 
                             <div th:if="${latestImage.prediction.label == 'No Finding'}" class="finding-card is-active-ok">
-                                <h3 class="finding-title">✓ No Finding</h3>
+                                <h3 class="finding-title" th:text="#{}">✓ No Finding</h3>
                                 <p class="finding-disease finding-disease--ok">
                                     <span class="finding-confidence--ok" th:text="${#numbers.formatDecimal(latestImage.prediction.confidence * 100, 1, 1)} + '%'">0%</span>
                                 </p>
-                                <p class="finding-text">No pathology score reached the detection threshold.</p>
+                                <p class="finding-text" th:text="#{}">No pathology score reached the detection threshold.</p>
                             </div>
                         </div>
                     </div>
@@ -149,8 +150,8 @@
             </div>
 
             <div class="pr-panel" th:if="${latestImage == null}">
-                <p class="scan-section-label">Chest X-ray Analysis</p>
-                <p class="attachment-empty">No X-ray uploaded for this entry yet. Use "+ X-ray" above to upload and analyze one.</p>
+                <p class="scan-section-label" th:text="#{}">Chest X-ray Analysis</p>
+                <p class="attachment-empty" th:text="#{}">No X-ray uploaded for this entry yet. Use "+ X-ray" above to upload and analyze one.</p>
             </div>
         </main>
     </div>

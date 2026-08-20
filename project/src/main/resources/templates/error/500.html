@@ -8,9 +8,9 @@
     <div class="main-content">
         <main class="pr-page">
             <div class="pr-panel error-page">
-                <h2 style="font-size: 40px; color: var(--color-danger); margin-bottom: 12px;">Error</h2>
+                <h2 style="font-size: 40px; color: var(--color-danger); margin-bottom: 12px;" th:text="#{}">Error</h2>
                 <p style="margin-bottom: 18px; color: var(--color-text-muted);" th:text="${message} ?: 'Something went wrong while processing your request.'">Error message</p>
-                <a class="btn-primary" th:href="@{/patients}">Back to Patient Overview</a>
+                <a class="btn-primary" th:href="@{/patients}" th:text="#{}">Back to Patient Overview</a>
             </div>
         </main>
     </div>
