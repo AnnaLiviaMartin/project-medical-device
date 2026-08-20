@@ -14,24 +14,24 @@ import java.time.LocalDate;
 @Getter
 public class HistoryEntryForm {
 
-    @NotNull(message = "Date is required.")
+    @NotNull(message = "{validation.history.date.notnull}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate date = LocalDate.now();
 
-    @NotBlank(message = "Title is required.")
-    @Size(max = 255, message = "Title may be at most 255 characters long.")
+    @NotBlank(message = "{validation.history.title.notblank}")
+    @Size(max = 255, message = "{validation.history.title.size}")
     private String title = "";
 
-    @NotNull(message = "Please select a category.")
+    @NotNull(message = "{validation.history.category.notnull}")
     private HistoryCategory category;
 
-    @Size(max = 4000, message = "Description may be at most 4000 characters long.")
+    @Size(max = 4000, message = "{validation.history.description.size}")
     private String description = "";
 
-    @Size(max = 150)
+    @Size(max = 150, message = "{validation.patient.doctor.size}")
     private String doctor = "";
 
-    @Size(max = 150)
+    @Size(max = 150, message = "{validation.patient.department.size}")
     private String department = "";
 
 }

@@ -10,21 +10,20 @@
 
         <main class="pr-page pr-page-detail">
             <div class="pr-topbar">
-                <a th:href="@{/patients}" class="back-link" th:text="#{}">← Back to Patient Overview</a>
+                <a th:href="@{/patients}" class="back-link" th:text="#{buttons.back}">← Back to Patient Overview</a>
                 <div class="header-actions">
-                    <a th:href="@{'/patients/' + ${patient.id} + '/edit'}" class="btn-secondary btn-sm" th:text="#{}">Edit</a>
-                    <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}"
-                          onsubmit="return confirm('Delete this patient and all history? This cannot be undone.');">
-                        <button type="submit" class="btn-danger-outline" th:text="#{}">Delete</button>
+                    <a th:href="@{'/patients/' + ${patient.id} + '/edit'}" class="btn-secondary btn-sm" th:text="#{buttons.edit}">Edit</a>
+                    <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}">
+                        <button type="submit" class="btn-danger-outline" th:text="#{buttons.delete}">Delete</button>
                     </form>
                 </div>
             </div>
 
             <section class="pr-hero">
                 <div>
-                    <p class="eyebrow" th:text="#{}">Patient Record</p>
+                    <p class="eyebrow" th:text="#{patients.detail.eyebrow}">Patient Record</p>
                     <h1 class="pr-title" th:text="${patient.fullName}">Name</h1>
-                    <p class="pr-subtitle" th:text="#{}">Complete patient information, treatment history, medications, and scan access.</p>
+                    <p class="pr-subtitle" th:text="#{patients.detail.subtitle}">Complete patient information, treatment history, medications, and scan access.</p>
                 </div>
                 <span class="status-badge"
                       th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-hero' : 'status-badge--inpatient-hero'"
@@ -33,56 +32,56 @@
 
             <section class="pr-overview-grid">
                 <div class="pr-panel">
-                    <p class="section-label" th:text="#{}">Patient Details</p>
+                    <p class="section-label" th:text="#{patients.detail.section.patientDetails}">Patient Details</p>
                     <div class="info-grid">
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Patient ID</span>
+                            <span class="info-label" th:text="#{patients.detail.patientId.label}">Patient ID</span>
                             <strong class="info-value" th:text="'#' + ${patient.id}">#1</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Age</span>
-                            <strong class="info-value" th:text="${patient.age} + ' years'">—</strong>
+                            <span class="info-label" th:text="#{patients.detail.age.label}">Age</span>
+                            <strong class="info-value" th:text="${patient.age} + #{patients.detail.age.suffix}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Gender</span>
+                            <span class="info-label" th:text="#{patients.gender}">Gender</span>
                             <strong class="info-value" th:text="${patient.sex.label}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Diagnosis</span>
+                            <span class="info-label" th:text="#{patients.diagnosis}">Diagnosis</span>
                             <strong class="info-value" th:text="${patient.diagnosis}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Doctor</span>
+                            <span class="info-label" th:text="#{patients.doctor}">Doctor</span>
                             <strong class="info-value" th:text="${patient.doctor}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Ward / Unit</span>
+                            <span class="info-label" th:text="#{patients.ward}">Ward / Unit</span>
                             <strong class="info-value" th:text="${#strings.isEmpty(patient.ward)} ? '—' : ${patient.ward}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Last Visit</span>
+                            <span class="info-label" th:text="#{patients.lastVisit}">Last Visit</span>
                             <strong class="info-value" th:text="${patient.lastVisit != null ? #temporals.format(patient.lastVisit, 'dd MMM yyyy') : '—'}">—</strong>
                         </div>
                         <div class="info-card">
-                            <span class="info-label" th:text="#{}">Next Appointment</span>
+                            <span class="info-label" th:text="#{patients.nextAppointment}">Next Appointment</span>
                             <strong class="info-value" th:text="${patient.nextAppointment != null ? #temporals.format(patient.nextAppointment, 'dd MMM yyyy') : '—'}">—</strong>
                         </div>
                     </div>
                 </div>
 
                 <div class="pr-panel">
-                    <p class="section-label" th:text="#{}">Address &amp; Contact</p>
+                    <p class="section-label" th:text="#{patients.detail.section.addressContact}">Address &amp; Contact</p>
                     <div class="stack">
                         <div class="info-row">
-                            <span class="info-row-label" th:text="#{}">Address</span>
+                            <span class="info-row-label" th:text="#{patients.address}">Address</span>
                             <span class="info-row-value" th:text="${patient.addressStreet} + ', ' + ${patient.addressZip} + ' ' + ${patient.addressCity}">—</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-row-label" th:text="#{}">Emergency Contact</span>
+                            <span class="info-row-label" th:text="#{patients.emergencyContact}">Emergency Contact</span>
                             <span class="info-row-value" th:text="${patient.emergencyContactName} + ' · ' + ${patient.emergencyContactRelation} + ' · ' + ${patient.emergencyContactPhone}">—</span>
                         </div>
                         <div class="info-row">
-                            <span class="info-row-label" th:text="#{}">Insurance</span>
+                            <span class="info-row-label" th:text="#{patients.insurance}">Insurance</span>
                             <span class="info-row-value" th:text="${patient.insuranceProvider} + ' · ' + ${patient.insurancePolicyNumber}">—</span>
                         </div>
                     </div>
@@ -94,12 +93,12 @@
                     <div class="pr-panel">
                         <div class="section-header">
                             <div>
-                                <p class="section-label" th:text="#{}">Clinical History</p>
-                                <h2 class="section-title" th:text="#{}">Treatment Timeline</h2>
+                                <p class="section-label" th:text="#{patients.detail.section.clinicalHistory}">Clinical History</p>
+                                <h2 class="section-title" th:text="#{patients.detail.treatmentTimeline.title}">Treatment Timeline</h2>
                             </div>
                             <div class="header-actions">
-                                <span class="count-badge" th:text="${#lists.size(historyEntries)} + ' entries'">0 entries</span>
-                                <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button" th:text="#{}">+ Add Event</a>
+                                <span class="count-badge" th:text="${#lists.size(historyEntries)} + ' ' + #{patients.detail.entriesCount.suffix}">0 entries</span>
+                                <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button" th:text="#{button.addEvent}">+ Add Event</a>
                             </div>
                         </div>
 
@@ -126,37 +125,37 @@
 
                                     <div class="meta-row">
                                         <div class="meta-chip">
-                                            <span class="meta-chip-label" th:text="#{}">Doctor</span>
+                                            <span class="meta-chip-label" th:text="#{patients.doctor}">Doctor</span>
                                             <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.doctor)} ? '—' : ${entry.doctor}">—</span>
                                         </div>
                                         <div class="meta-chip">
-                                            <span class="meta-chip-label" th:text="#{}">Department</span>
+                                            <span class="meta-chip-label" th:text="#{patients.department}">Department</span>
                                             <span class="meta-chip-value" th:text="${#strings.isEmpty(entry.department)} ? '—' : ${entry.department}">—</span>
                                         </div>
                                     </div>
 
                                     <div class="scan-section">
-                                        <p class="scan-section-label" th:text="#{}">Linked Scans</p>
-                                        <p class="scan-empty" th:if="${entry.study == null or #lists.isEmpty(entry.study.xrayImages)}" th:text="#{}">
+                                        <p class="scan-section-label" th:text="#{patients.detail.linkedScans.label}">Linked Scans</p>
+                                        <p class="scan-empty" th:if="${entry.study == null or #lists.isEmpty(entry.study.xrayImages)}" th:text="#{patients.detail.noLinkedScans}">
                                             No scans are linked to this history entry.
                                         </p>
                                         <div class="scan-list" th:if="${entry.study != null and not #lists.isEmpty(entry.study.xrayImages)}">
                                             <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" class="scan-card">
                                                 <div>
-                                                    <p class="scan-title" th:text="'Chest X-ray · ' + ${#lists.size(entry.study.xrayImages)} + ' image(s)'">Scan</p>
-                                                    <p class="scan-meta" th:text="'Uploaded ' + ${#temporals.format(entry.study.createdAt, 'dd MMM yyyy')}">Meta</p>
+                                                    <p class="scan-title" th:text=" #{patients.detail.scan.title} + ' · ' + ${#lists.size(entry.study.xrayImages)} + ' ' + #{patients.detail.scan.imageCountSuffix}">Scan</p>
+                                                    <p class="scan-meta" th:text="#{patients.detail.scan.uploadedPrefix} + ' ' + ${#temporals.format(entry.study.createdAt, 'dd MMM yyyy')}">Meta</p>
                                                 </div>
-                                                <span class="scan-link" th:text="#{}">Open Scan</span>
+                                                <span class="scan-link" th:text="#{patients.detail.scan.openLink}">Open Scan</span>
                                             </a>
                                         </div>
                                     </div>
 
                                     <div class="attachment-section">
                                         <div class="attachment-header">
-                                            <p class="scan-section-label" th:text="#{}">Attachments</p>
-                                            <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" class="attachment-upload-button" th:text="#{}">+ Manage</a>
+                                            <p class="scan-section-label" th:text="#{patients.attachments}">Attachments</p>
+                                            <a th:href="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id}}" class="attachment-upload-button" th:text="#{patients.detail.attachments.manageLink}">+ Manage</a>
                                         </div>
-                                        <p class="attachment-empty" th:if="${#lists.isEmpty(entry.attachments)}" th:text="#{}">No attachments yet.</p>
+                                        <p class="attachment-empty" th:if="${#lists.isEmpty(entry.attachments)}" th:text="#{patients.no.attachments}">No attachments yet.</p>
                                         <ul class="attachment-list" th:unless="${#lists.isEmpty(entry.attachments)}">
                                             <li class="attachment-item" th:each="attachment : ${entry.attachments}">
                                                 <a th:href="@{'/media/' + ${attachment.storedPath}}" target="_blank" class="attachment-link" th:text="${attachment.originalFilename}">file</a>
@@ -168,7 +167,7 @@
                             </article>
                         </div>
 
-                        <div class="pr-empty-state" th:if="${#lists.isEmpty(historyEntries)}" th:text="#{}">
+                        <div class="pr-empty-state" th:if="${#lists.isEmpty(historyEntries)}" th:text="#{patients.detail.noHistoryEntries}">
                             No history entries are available for this patient.
                         </div>
                     </div>
@@ -176,13 +175,13 @@
 
                 <aside class="pr-side-col">
                     <div class="pr-panel">
-                        <p class="section-label" th:text="#{}">Current Medication</p>
+                        <p class="section-label" th:text="#{patients.detail.medication.label}">Current Medication</p>
                         <div class="stack">
                             <div class="list-card" th:each="med : ${patient.medications}">
                                 <strong class="list-card-title" th:text="${med.name}">Name</strong>
                                 <p class="list-card-text" th:text="${med.dosage} + ' · ' + ${med.schedule}">Dosage</p>
                             </div>
-                            <p class="empty-hint" th:if="${#lists.isEmpty(patient.medications)}" th:text="#{}">No medications on record.</p>
+                            <p class="empty-hint" th:if="${#lists.isEmpty(patient.medications)}" th:text="#{patients.detail.medication.empty}">No medications on record.</p>
                         </div>
                     </div>
                 </aside>

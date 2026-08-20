@@ -9,58 +9,58 @@
     <div class="main-content">
         <main class="form-page">
             <div class="pr-topbar">
-                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link" th:text="#{}">← Back to Patient Record</a>
+                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link" th:text="#{buttons.back.patients}">← Back to Patient Record</a>
             </div>
 
             <section class="form-hero">
-                <p class="eyebrow" th:text="${patient.fullName}" th:text="#{}">Patient</p>
-                <h1 class="pr-title" th:text="#{}">Add Timeline Event</h1>
+                <p class="eyebrow" th:text="${patient.fullName}" >Patient</p>
+                <h1 class="pr-title" th:text="#{history.form.title}">Add Timeline Event</h1>
             </section>
 
             <form class="pr-form" method="post" th:action="@{'/patients/' + ${patient.id} + '/history'}" th:object="${historyEntryForm}">
                 <section class="form-section">
                     <div class="form-grid3">
                         <label class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'" style="grid-column: 1 / -1;">
-                            <span class="field-label" th:text="#{}">Event Name <span class="required-mark">*</span></span>
-                            <input type="text" th:field="*{title}" placeholder="e.g. Follow-up Visit"/>
+                            <span class="field-label" th:text="#{history.form.eventName.label}">Event Name <span class="required-mark">*</span></span>
+                            <input type="text" th:field="*{title}" th:placeholder="#{history.form.eventName.placeholder}"/>
                             <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
                         </label>
 
                         <label class="field" th:classappend="${#fields.hasErrors('date')} ? 'has-error'">
-                            <span class="field-label" th:text="#{}">Date
+                            <span class="field-label" th:text="#{history.form.date.label}">Date
                                 <span class="required-mark">*</span>
                             </span>
                             <input type="date" th:field="*{date}"/>
                             <span class="field-error" th:if="${#fields.hasErrors('date')}" th:errors="*{date}"></span>
                         </label>
                         <label class="field" th:classappend="${#fields.hasErrors('category')} ? 'has-error'">
-                            <span class="field-label" th:text="#{}">Category <span class="required-mark">*</span></span>
+                            <span class="field-label" th:text="#{history.form.category.label}">Category <span class="required-mark">*</span></span>
                             <select th:field="*{category}">
-                                <option value="">— Select —</option>
+                                <option value="" th:text="#{history.form.category.placeholder}">— Select —</option>
                                 <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.HistoryCategory).values()}" th:value="${option}" th:text="${option.label}"></option>
                             </select>
                             <span class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
                         </label>
 
                         <label class="field">
-                            <span class="field-label" th:text="#{}">Doctor</span>
-                            <input type="text" th:field="*{doctor}" placeholder="e.g. Dr. Klein"/>
+                            <span class="field-label" th:text="#{patients.doctor}">Doctor</span>
+                            <input type="text" th:field="*{doctor}" th:placeholder="#{patients.form.diagnosis.placeholder}"/>
                         </label>
                         <label class="field">
-                            <span class="field-label" th:text="#{}">Department</span>
-                            <input type="text" th:field="*{department}" placeholder="e.g. Cardiology"/>
+                            <span class="field-label" th:text="#{patients.department}">Department</span>
+                            <input type="text" th:field="*{department}" th:placeholder="#{history.form.department.placeholder}"/>
                         </label>
 
                         <label class="field" style="grid-column: 1 / -1;">
-                            <span class="field-label" th:text="#{}">Note</span>
-                            <textarea th:field="*{description}" placeholder="Optional details about this event..." rows="3"></textarea>
+                            <span class="field-label" th:text="#{history.form.note.label}">Note</span>
+                            <textarea th:field="*{description}" th:placeholder="#{history.form.note.placeholder}" rows="3"></textarea>
                         </label>
                     </div>
                 </section>
 
                 <div class="form-actions">
-                    <a th:href="@{'/patients/' + ${patient.id}}" class="cancel-button" th:text="#{}">Cancel</a>
-                    <button type="submit" class="submit-button" th:text="#{}">Save</button>
+                    <a th:href="@{'/patients/' + ${patient.id}}" class="cancel-button" th:text="#{buttons.cancel}">Cancel</a>
+                    <button type="submit" class="submit-button" th:text="#{buttons.save}">Save</button>
                 </div>
             </form>
         </main>

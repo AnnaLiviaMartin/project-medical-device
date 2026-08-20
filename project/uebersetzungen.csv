@@ -5,41 +5,46 @@ nav.patientManagement;Patientenverwaltung;Patient Management;Patiëntenbeheer
 nav.impressum;Impressum;Imprint;Colofon
 nav.datenschutzerklaerung;Datenschutzerklärung;Privacy Policy;Privacyverklaring
 
+# Allgemein
+buttons.back.patients;← Zurück zur Patientenakte;← Back to Patient Record;← TODO
+patients.doctor;Arzt;Doctor;Arts
+patients.department;Abteilung;Department;Afdeling
+patients.attachments;Anhänge;Attachments;Bijlagen
+patients.no.attachments;Noch keine Anhänge.;No attachments yet.;Nog geen bijlagen.
+patients.pathology;TODO;Pathology;TODO
+buttons.cancel;Abbrechen;Cancel;Annuleren
+buttons.save;Speichern;Save;Opslaan
+buttons.back;← Zurück zur Patientenübersicht;← Back to Patient Overview;← Terug naar patiëntenoverzicht
+buttons.edit;Bearbeiten;Edit;Bewerken
+buttons.delete;Löschen;Delete;Verwijderen
+patients.lastVisit;Letzter Besuch;Last Visit;Laatste bezoek
+patients.nextAppointment;Nächster Termin;Next Appointment;Volgende afspraak
+patients.address;Adresse;Address;Adres
+patients.emergencyContact;Notfallkontakt;Emergency Contact;Noodcontact
+patients.insurance;Versicherung;Insurance;Verzekering
+button.addEvent;+ Ereignis hinzufügen;+ Add Event;+ Gebeurtenis toevoegen
+patients.status;Status;Status;Status
+patients.diagnosis;Diagnose;Diagnosis;Diagnose
+patients.ward;Station / Abteilung;Ward / Unit;Afdeling / Unit
+
 # Patientenliste
-patients.list.headTitle;Patientenübersicht;Patient Overview;Patiëntenoverzicht
-patients.list.eyebrow;Patientenverwaltung;Patient Management;Patiëntenbeheer
-patients.list.title;Patientenübersicht;Patient Overview;Patiëntenoverzicht
+patients.list.overview;Patientenübersicht;Patient Overview;Patiëntenoverzicht
 patients.list.subtitle;Übersicht über Stammdaten, Adressinformationen und Notfallkontakte.;Overview of master data, address information, and emergency contacts.;Overzicht van stamgegevens, adresinformatie en noodcontacten.
-patients.list.newButton;+ Neuer Patient;+ New Patient;+ Nieuwe patiënt
 patients.list.search.placeholder;Suche nach Name, ID, Stadt oder Notfallkontakt;Search by name, ID, city, or emergency contact;Zoeken op naam, ID, plaats of noodcontact
 patients.list.filter.all;Alle;All;Alle
 patients.list.filter.inpatient;Stationär;Inpatient;Klinisch (opgenomen)
 patients.list.filter.outpatient;Ambulant;Outpatient;Poliklinisch
 patients.list.searchButton;Suchen;Search;Zoeken
 patients.list.header.patient;Patient;Patient;Patiënt
-patients.list.header.address;Adresse;Address;Adres
-patients.list.header.emergencyContact;Notfallkontakt;Emergency Contact;Noodcontact
-patients.list.meta.years;Jahre;years;jaar
 patients.list.empty;Für diese Suche wurden keine Patienten gefunden.;No patients found for this search.;Geen patiënten gevonden voor deze zoekopdracht.
 patients.list.detail.eyebrow;Ausgewählter Datensatz;Selected Record;Geselecteerd dossier
-patients.list.detail.meta.attendingPhysician;behandelnder Arzt:;attending physician:;behandelend arts:
-patients.list.detail.status;Status;Status;Status
-patients.list.detail.lastVisit;Letzter Besuch;Last Visit;Laatste bezoek
-patients.list.detail.nextAppointment;Nächster Termin;Next Appointment;Volgende afspraak
-patients.list.detail.wardUnit;Station / Abteilung;Ward / Unit;Afdeling / Unit
-patients.list.detail.address;Adresse;Address;Adres
-patients.list.detail.emergencyContact;Notfallkontakt;Emergency Contact;Noodcontact
 patients.list.detail.openRecord;Datensatz öffnen;Open Record;Dossier openen
 patients.list.noSelection;Bitte wählen Sie eine Person aus der Liste aus.;Please select a person from the list.;Selecteer een persoon uit de lijst.
 
 # Patienten form
-patients.form.backLink;← Zurück zur Patientenübersicht;← Back to Patient Overview;← Terug naar patiëntenoverzicht
 patients.form.eyebrow.edit;Datensatz bearbeiten;Edit Record;Dossier bewerken
-patients.form.eyebrow.new;Patientenverwaltung;Patient Management;Patiëntenbeheer
-patients.form.headTitle.edit;Patient bearbeiten;Edit Patient;Patiënt bewerken
-patients.form.headTitle.new;Neuer Patient;New Patient;Nieuwe patiënt
-patients.form.title.edit;Patient bearbeiten;Edit Patient;Patiënt bewerken
-patients.form.title.new;Neuer Patient;New Patient;Nieuwe patiënt
+patients.form.edit;Patient bearbeiten;Edit Patient;Patiënt bewerken
+patients.form.new;Neuer Patient;New Patient;Nieuwe patiënt
 patients.form.subtitle;Erfassen Sie die Stammdaten, Kontakte und klinischen Basisinformationen des Patienten.;Enter the patient's master data, contacts, and clinical baseline information.;Voer de stamgegevens, contactpersonen en klinische basisinformatie van de patiënt in.
 patients.form.section.basicInformation;Grunddaten;Basic Information;Basisgegevens
 patients.form.firstName.label;Vorname;First Name;Voornaam
@@ -47,115 +52,73 @@ patients.form.firstName.placeholder;z. B. Anna;e.g. Anna;bijv. Anna
 patients.form.lastName.label;Nachname;Last Name;Achternaam
 patients.form.lastName.placeholder;z. B. Becker;e.g. Becker;bijv. Becker
 patients.form.dateOfBirth.label;Geburtsdatum;Date of Birth;Geboortedatum
-patients.form.gender.label;Geschlecht;Gender;Geslacht
-patients.form.status.label;Status;Status;Status
-patients.form.diagnosis.label;Diagnose;Diagnosis;Diagnose
 patients.form.diagnosis.placeholder;z. B. Bluthochdruck;e.g. Hypertension;bijv. Hypertensie
 patients.form.doctor.label;Behandelnder Arzt;Attending Doctor;Behandelend arts
-patients.form.doctor.placeholder;z. B. Dr. Klein;e.g. Dr. Klein;bijv. Dr. Klein
-patients.form.ward.label;Station / Abteilung;Ward / Unit;Afdeling / Unit
 patients.form.ward.placeholder;z. B. Station 3;e.g. Ward 3;bijv. Afdeling 3
-patients.form.lastVisit.label;Letzter Besuch;Last Visit;Laatste bezoek
-patients.form.nextAppointment.label;Nächster Termin;Next Appointment;Volgende afspraak
-patients.form.section.address;Adresse;Address;Adres
 patients.form.addressStreet.label;Straße;Street;Straat
 patients.form.addressZip.label;Postleitzahl;ZIP Code;Postcode
 patients.form.addressCity.label;Stadt;City;Plaats
-patients.form.section.emergencyContact;Notfallkontakt;Emergency Contact;Noodcontact
 patients.form.emergencyContactName.label;Name;Name;Naam
 patients.form.emergencyContactRelation.label;Beziehung;Relation;Relatie
 patients.form.emergencyContactRelation.placeholder;z. B. Ehepartner;e.g. Spouse;bijv. Echtgenoot/echtgenote
 patients.form.emergencyContactPhone.label;Telefon;Phone;Telefoon
 patients.form.emergencyContactPhone.placeholder;+49 ...;+49 ...;+49 ...
-patients.form.section.insurance;Versicherung;Insurance;Verzekering
 patients.form.insuranceProvider.label;Versicherungsträger;Provider;Verzekeraar
 patients.form.insurancePolicyNumber.label;Versicherungsnummer;Policy Number;Polisnummer
 patients.form.section.allergies;Allergien;Allergies;Allergieën
 patients.form.allergyInput.placeholder;z. B. Penicillin;e.g. Penicillin;bijv. Penicilline
 patients.form.addAllergyButton;+ Hinzufügen;+ Add;+ Toevoegen
 patients.form.allergies.empty;Noch keine Allergien hinzugefügt.;No allergies added yet.;Nog geen allergieën toegevoegd.
-patients.form.allergy.removeAriaLabel;{0} entfernen;Remove {0};{0} verwijderen
 patients.form.section.medications;Medikamente;Medications;Medicatie
 patients.form.addMedicationButton;+ Medikament hinzufügen;+ Add Medication;+ Medicatie toevoegen
 patients.form.medications.empty;Noch keine Medikamente hinzugefügt.;No medications added yet.;Nog geen medicatie toegevoegd.
 patients.form.medication.name.placeholder;Name (z. B. Metformin);Name (e.g. Metformin);Naam (bijv. Metformine)
 patients.form.medication.dosage.placeholder;Dosierung (z. B. 1000 mg);Dosage (e.g. 1000 mg);Dosering (bijv. 1000 mg)
 patients.form.medication.schedule.placeholder;Einnahmeschema (z. B. 2x täglich);Schedule (e.g. 2x daily);Schema (bijv. 2x per dag)
-patients.form.medication.removeAriaLabel;Medikament entfernen;Remove medication;Medicatie verwijderen
-patients.form.cancelButton;Abbrechen;Cancel;Annuleren
-patients.form.submitButton.save;Änderungen speichern;Save Changes;Wijzigingen opslaan
+patients.form.medication.removeAriaLabel;x;x;x
 patients.form.submitButton.create;Patient anlegen;Create Patient;Patiënt aanmaken
 
 # Patienten detail
-patients.detail.backLink;← Zurück zur Patientenübersicht;← Back to Patient Overview;← Terug naar patiëntenoverzicht
-patients.detail.editButton;Bearbeiten;Edit;Bewerken
-patients.detail.deleteButton;Löschen;Delete;Verwijderen
-patients.detail.deleteConfirm;Diesen Patienten und die gesamte Historie löschen? Dies kann nicht rückgängig gemacht werden.;Delete this patient and all history? This cannot be undone.;Deze patiënt en de volledige geschiedenis verwijderen? Dit kan niet ongedaan worden gemaakt.
 patients.detail.eyebrow;Patientenakte;Patient Record;Patiëntendossier
 patients.detail.subtitle;Vollständige Patienteninformationen, Behandlungshistorie, Medikamente und Zugriff auf Scans.;Complete patient information, treatment history, medications, and scan access.;Volledige patiëntinformatie, behandelgeschiedenis, medicatie en toegang tot scans.
 patients.detail.section.patientDetails;Patientendetails;Patient Details;Patiëntgegevens
 patients.detail.patientId.label;Patienten-ID;Patient ID;Patiënt-ID
 patients.detail.age.label;Alter;Age;Leeftijd
-patients.detail.age.suffix;Jahre;years;jaar
-patients.detail.gender.label;Geschlecht;Gender;Geslacht
-patients.detail.diagnosis.label;Diagnose;Diagnosis;Diagnose
-patients.detail.doctor.label;Arzt;Doctor;Arts
-patients.detail.ward.label;Station / Abteilung;Ward / Unit;Afdeling / Unit
-patients.detail.lastVisit.label;Letzter Besuch;Last Visit;Laatste bezoek
-patients.detail.nextAppointment.label;Nächster Termin;Next Appointment;Volgende afspraak
+patients.detail.age.suffix;Jahre;years;TODO
+patients.gender;Geschlecht;Gender;Geslacht
 patients.detail.section.addressContact;Adresse & Kontakt;Address & Contact;Adres & contact
-patients.detail.address.label;Adresse;Address;Adres
-patients.detail.emergencyContact.label;Notfallkontakt;Emergency Contact;Noodcontact
-patients.detail.insurance.label;Versicherung;Insurance;Verzekering
 patients.detail.section.clinicalHistory;Klinische Historie;Clinical History;Klinische geschiedenis
 patients.detail.treatmentTimeline.title;Behandlungsverlauf;Treatment Timeline;Behandeltijdlijn
-patients.detail.entriesCount.suffix;Einträge;entries;items
-patients.detail.addEventButton;+ Ereignis hinzufügen;+ Add Event;+ Gebeurtenis toevoegen
 patients.detail.linkedScans.label;Verknüpfte Scans;Linked Scans;Gekoppelde scans
 patients.detail.noLinkedScans;Diesem Verlaufseintrag sind keine Scans zugeordnet.;No scans are linked to this history entry.;Aan dit geschiedenisitem zijn geen scans gekoppeld.
 patients.detail.scan.title;Röntgenaufnahme Thorax;Chest X-ray;Röntgenfoto thorax
 patients.detail.scan.imageCountSuffix;Bild(er);image(s);afbeelding(en)
 patients.detail.scan.uploadedPrefix;Hochgeladen;Uploaded;Geüpload
 patients.detail.scan.openLink;Scan öffnen;Open Scan;Scan openen
-patients.detail.attachments.label;Anhänge;Attachments;Bijlagen
 patients.detail.attachments.manageLink;+ Verwalten;+ Manage;+ Beheren
-patients.detail.attachments.empty;Noch keine Anhänge.;No attachments yet.;Nog geen bijlagen.
 patients.detail.noHistoryEntries;Für diesen Patienten sind keine Verlaufseinträge vorhanden.;No history entries are available for this patient.;Er zijn geen geschiedenisitems beschikbaar voor deze patiënt.
 patients.detail.medication.label;Aktuelle Medikation;Current Medication;Huidige medicatie
 patients.detail.medication.empty;Keine Medikamente erfasst.;No medications on record.;Geen medicatie geregistreerd.
-patients.detail.doctor.chipLabel;Arzt;Doctor;Arts
-patients.detail.department.chipLabel;Abteilung;Department;Afdeling
+patients.list.detail.meta.attendingPhysician;behandelnder Arzt:;attending physician:;behandelend arts:
+patients.form.medication.name.placeholder;Name (z. B. Metformin);Name (e.g. Metformin);Naam (bijv. Metformine)
+patients.form.medication.dosage.placeholder;Dosierung (z. B. 1000 mg);Dosage (e.g. 1000 mg);Dosering (bijv. 1000 mg)
+patients.form.medication.schedule.placeholder;Einnahmeschema (z. B. 2x täglich);Schedule (e.g. 2x daily);Schema (bijv. 2x per dag)
+patients.detail.entriesCount.suffix;Einträge;entries;items
 
 # History form
-history.form.headTitle;Ereignis hinzufügen;Add Event;Gebeurtenis toevoegen
-history.form.backLink;← Zurück zur Patientenakte;← Back to Patient Record;← Terug naar patiëntendossier
 history.form.title;Verlaufsereignis hinzufügen;Add Timeline Event;Tijdlijngebeurtenis toevoegen
 history.form.eventName.label;Ereignisname;Event Name;Naam gebeurtenis
 history.form.eventName.placeholder;z. B. Kontrolltermin;e.g. Follow-up Visit;bijv. Vervolgbezoek
 history.form.date.label;Datum;Date;Datum
 history.form.category.label;Kategorie;Category;Categorie
-history.form.category.placeholder;— Auswählen —;— Select —;— Selecteer —
-history.form.doctor.label;Arzt;Doctor;Arts
-history.form.doctor.placeholder;z. B. Dr. Klein;e.g. Dr. Klein;bijv. Dr. Klein
-history.form.department.label;Abteilung;Department;Afdeling
 history.form.department.placeholder;z. B. Kardiologie;e.g. Cardiology;bijv. Cardiologie
 history.form.note.label;Notiz;Note;Notitie
 history.form.note.placeholder;Optionale Details zu diesem Ereignis...;Optional details about this event...;Optionele details over deze gebeurtenis...
-history.form.cancelButton;Abbrechen;Cancel;Annuleren
-history.form.saveButton;Speichern;Save;Opslaan
-history.detail.backLink;← Zurück zur Patientenakte;← Back to Patient Record;← Terug naar patiëntendossier
-history.detail.doctor.label;Arzt;Doctor;Arts
-history.detail.department.label;Abteilung;Department;Afdeling
-history.detail.attachments.label;Anhänge;Attachments;Bijlagen
 history.detail.uploadXrayButton;+ Röntgenbild;+ X-ray;+ Röntgenfoto
 history.detail.uploadDocumentButton;+ Dokument/Bild;+ Document/Image;+ Document/afbeelding
-history.detail.attachments.empty;Noch keine Anhänge.;No attachments yet.;Nog geen bijlagen.
-history.detail.attachment.removeConfirm;Diesen Anhang entfernen?;Remove this attachment?;Deze bijlage verwijderen?
-history.detail.attachment.removeAriaLabel;Entfernen: {0};Remove: {0};Verwijderen: {0}
 history.detail.disclaimer;⚠ Nur Demo: Befunde werden von einem simulierten Platzhaltermodell erzeugt, keiner echten diagnostischen KI. Nicht für tatsächliche klinische Entscheidungen verwenden.;⚠ Demo only: findings are generated by a simulated placeholder model, not a real diagnostic AI. Do not use for actual clinical decisions.;⚠ Alleen demo: bevindingen worden gegenereerd door een gesimuleerd placeholder-model, geen echte diagnostische AI. Niet gebruiken voor daadwerkelijke klinische beslissingen.
 history.detail.analysis.title;KI-Analyseergebnisse;AI Analysis Results;AI-analyseresultaten
 history.detail.analysis.engineLabel;SIMULIERTE ENGINE;SIMULATED ENGINE;GESIMULEERDE ENGINE
-history.detail.analysis.statusLabel;STATUS;STATUS;STATUS
 history.detail.analysis.confidenceLabel;KONFIDENZ;CONFIDENCE;BETROUWBAARHEID
 history.detail.findings.label;Vorgeschlagene klinische Befunde;Suggested Clinical Findings;Voorgestelde klinische bevindingen
 history.detail.findings.hint;Jeder Befund unten hat seine eigene GradCAM-Heatmap. Wählen Sie einen Befund aus und nutzen Sie den Umschalter über dem Bild, um zwischen dem Original-Röntgenbild und dem GradCAM-Overlay zu wechseln.;Each finding below has its own GradCAM heatmap. Select a finding, then use the toggle above the image to switch between the original X-ray and its GradCAM overlay.;Elke bevinding hieronder heeft een eigen GradCAM-heatmap. Selecteer een bevinding en gebruik de schakelaar boven de afbeelding om te wisselen tussen de originele röntgenfoto en de GradCAM-overlay.
@@ -164,32 +127,28 @@ history.detail.findings.noFinding;✓ Kein Befund;✓ No Finding;✓ Geen bevind
 history.detail.findings.noFindingHint;Kein Pathologie-Score hat den Erkennungsschwellenwert erreicht.;No pathology score reached the detection threshold.;Geen enkele pathologiescore heeft de detectiedrempel bereikt.
 history.detail.image.originalXrayButton;Original-Röntgenbild;Original X-ray;Originele röntgenfoto
 history.detail.image.gradcamButton;GradCAM – KI-Entscheidungserklärung;GradCAM - AI-Decision-Explanation;GradCAM - AI-beslissingsuitleg
-history.detail.image.alt;Röntgenaufnahme Thorax;Chest X-ray;Röntgenfoto thorax
 history.detail.image.uploadedPrefix;Hochgeladen;Uploaded;Geüpload
 history.detail.image.mode.original;Zeigt das Original-Röntgenbild.;Showing the original X-ray image.;Toont de originele röntgenfoto.
-history.detail.image.mode.gradcam;Zeigt GradCAM-Heatmap für:;Showing GradCAM heatmap for:;Toont GradCAM-heatmap voor:
-history.detail.image.mode.selectPrompt;Wählen Sie unten einen Befund aus, um dessen GradCAM-Heatmap anzuzeigen.;Select a finding below to view its GradCAM heatmap.;Selecteer hieronder een bevinding om de GradCAM-heatmap te bekijken.
 history.detail.noXray.label;Röntgenanalyse Thorax;Chest X-ray Analysis;Röntgenanalyse thorax
 history.detail.noXray.hint;"Für diesen Eintrag wurde noch kein Röntgenbild hochgeladen. Verwenden Sie oben ""+ Röntgenbild"", um eines hochzuladen und zu analysieren.";"No X-ray uploaded for this entry yet. Use ""+ X-ray"" above to upload and analyze one.";"Voor dit item is nog geen röntgenfoto geüpload. Gebruik hierboven ""+ Röntgenfoto"" om er een te uploaden en te analyseren."
+history.form.category.placeholder;— Auswählen —;— Select —;— Selecteer —
 
 # Fehler
 error404.headTitle;Nicht gefunden;Not found;Niet gevonden
-error404.code;404;404;404
 error404.message;Die gesuchte Seite konnte nicht gefunden werden.;The page you are looking for could not be found.;De pagina die u zoekt kon niet worden gevonden.
-error404.backButton;Zurück zur Patientenübersicht;Back to Patient Overview;Terug naar patiëntenoverzicht
 error500.headTitle;Es ist ein Fehler aufgetreten;Something went wrong;Er is iets misgegaan
 error500.title;Fehler;Error;Fout
 error500.message;Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten.;Something went wrong while processing your request.;Er is iets misgegaan bij het verwerken van uw verzoek.
-error500.backButton;Zurück zur Patientenübersicht;Back to Patient Overview;Terug naar patiëntenoverzicht
-error.generic.headTitle;Fehler;Error;Fout
-error.generic.title;Fehler;Error;Fout
 error.generic.message;Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten.;Something went wrong while processing your request.;Er is iets misgegaan bij het verwerken van uw verzoek.
-error.generic.backButton;Zurück zur Patientenliste;Back to patient list;Terug naar patiëntenlijst
 
 # DSGVO
 dsgvo.title;Rechtliche Hinweise;Legal Information;Juridische informatie
 dsgvo.subtitle;Angaben gemäß den gesetzlichen Informationspflichten.;Information according to legal disclosure requirements.;Gegevens conform de wettelijke informatieplicht.
 dsgvo.impressum.title;Impressum;Imprint;Colofon
+dsgvo.impressum.person;Personenangaben;TODO;TODO
+dsgvo.impressum.contact;Kontakt;TODO;TODO
+dsgvo.impressum.mobile;Telefon: 01512 3929411;TODO;TODO
+dsgvo.impressum.mail;E-Mail: anna-livia.martin@student.hs-rm.de;TODO;TODO
 dsgvo.datenschutz.title;Datenschutzerklaerung;Data Protection Declaration;Privacyverklaring
 dsgvo.datenschutz.subtitle.one;1. Datenschutz auf einen Blick; TODO;TODO
 dsgvo.datenschutz.common;Allgemeine Hinweise;TODO;TODO
@@ -221,9 +180,7 @@ dsgvo.datenschutz.dataprotection.interet;Wir weisen darauf hin, dass die Datenü
 dsgvo.datenschutz.dataprotection.persondata.title;Hinweis zur verantwortlichen Stelle;TODO;TODO
 dsgvo.datenschutz.dataprotection;Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:;TODO;TODO
 dsgvo.datenschutz.dataprotection.me;Anna-Livia Martin \n Zur Knopsmühle 19 \n 64521, Groß-Gerau;TODO;TODO
-dsgvo.datenschutz.dataprotection.mobile.title;Telefon: ;TODO;TODO
 dsgvo.datenschutz.dataprotection.mobile.title.person;Telefonnummer der verantwortlichen Stelle;TODO;TODO
-dsgvo.datenschutz.dataprotection.mail.title;E-Mail: ;TODO;TODO
 dsgvo.datenschutz.dataprotection.mail.title.person;E-Mail-Adresse der verantwortlichen Stelle;TODO;TODO
 dsgvo.datenschutz.dataprotection.person.info;Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.&nbsp;B. Namen, E-Mail-Adressen o. &Auml;.) entscheidet.;TODO;TODO
 dsgvo.datenschutz.dataprotection.storage;Speicherdauer;TODO;TODO
@@ -252,18 +209,6 @@ dsgvo.datenschutz.questions.usage.part.details.four;Wenn Sie einen Widerspruch n
 dsgvo.datenschutz.questions.usage.part.details.five;Wenn Sie die Verarbeitung Ihrer personenbezogenen Daten eingeschränkt haben, dürfen diese Daten &ndash; von ihrer Speicherung abgesehen &ndash; nur mit Ihrer Einwilligung oder zur Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen oder zum Schutz der Rechte einer anderen natürlichen oder juristischen Person oder aus Gründen eines wichtigen öffentlichen Interesses der Europäischen Union oder eines Mitgliedstaats verarbeitet werden.;TODO;TODO
 dsgvo.datenschutz.source;Quelle:;TODO;TODO
 
-# Enums
-enum.sex.male;Männlich;Male;Man
-enum.sex.female;Weiblich;Female;Vrouw
-enum.sex.diverse;Divers;Diverse;Divers
-enum.patientStatus.outpatient;Ambulant;Outpatient;Poliklinisch
-enum.patientStatus.inpatient;Stationär;Inpatient;Klinisch (opgenomen)
-enum.historyCategory.visit;Besuch;Visit;Bezoek
-enum.historyCategory.procedure;Eingriff;Procedure;Ingreep
-enum.historyCategory.finding;Befund;Finding;Bevinding
-enum.historyCategory.medication;Medikation;Medication;Medicatie
-enum.historyCategory.followUp;Nachsorge;Follow-up;Vervolgafspraak
-
 # Validation
 validation.patient.firstName.notblank;Vorname ist erforderlich.;First name is required.;Voornaam is verplicht.
 validation.patient.firstName.size;Der Vorname darf höchstens 100 Zeichen lang sein.;First name may be at most 100 characters long.;Voornaam mag maximaal 100 tekens lang zijn.
@@ -278,44 +223,21 @@ validation.patient.status.notnull;Bitte wählen Sie einen Status aus.;Please sel
 validation.patient.lastVisit.notnull;Das Datum des letzten Besuchs ist erforderlich.;Last visit date is required.;Datum van laatste bezoek is verplicht.
 validation.patient.doctor.notblank;Arzt ist erforderlich.;Doctor is required.;Arts is verplicht.
 validation.patient.doctor.size;Der Arztname darf höchstens 150 Zeichen lang sein.;Doctor may be at most 150 characters long.;Naam van de arts mag maximaal 150 tekens lang zijn.
+validation.patient.department.size;Der TODO darf höchstens 150 Zeichen lang sein.;Department may be at most 150 characters long.;TODO van de arts mag maximaal 150 tekens lang zijn.
 validation.patient.ward.size;Die Station darf höchstens 150 Zeichen lang sein.;Ward may be at most 150 characters long.;Afdeling mag maximaal 150 tekens lang zijn.
 validation.patient.addressZip.size;Die Postleitzahl darf höchstens 20 Zeichen lang sein.;Postal code may be at most 20 characters long.;Postcode mag maximaal 20 tekens lang zijn.
 validation.patient.emergencyContactPhone.pattern;Bitte geben Sie eine gültige Telefonnummer ein.;Please enter a valid phone number.;Voer een geldig telefoonnummer in.
-validation.patient.nextAppointment.beforeLastVisit;Der nächste Termin darf nicht vor dem letzten Besuch liegen.;Next appointment cannot be before the last visit.;De volgende afspraak kan niet vóór het laatste bezoek liggen.
 validation.history.date.notnull;Datum ist erforderlich.;Date is required.;Datum is verplicht.
 validation.history.title.notblank;Titel ist erforderlich.;Title is required.;Titel is verplicht.
-validation.history.title.size;Der Titel darf höchstens 255 Zeichen lang sein.;Title may be at most 255 characters long.;Titel mag maximaal 255 tekens lang zijn.
+validation.history.address.size;Die Adresse darf höchstens 255 Zeichen lang sein.;Address may be at most 255 characters long.;Adres mag maximaal 255 tekens lang zijn.
 validation.history.category.notnull;Bitte wählen Sie eine Kategorie aus.;Please select a category.;Selecteer een categorie.
 validation.history.description.size;Die Beschreibung darf höchstens 4000 Zeichen lang sein.;Description may be at most 4000 characters long.;Beschrijving mag maximaal 4000 tekens lang zijn.
 validation.medication.name.size;Der Medikamentenname darf höchstens 150 Zeichen lang sein.;Medication name may be at most 150 characters long.;Naam van het medicijn mag maximaal 150 tekens lang zijn.
 validation.medication.dosage.size;Die Dosierung darf höchstens 50 Zeichen lang sein.;Dosage may be at most 50 characters long.;Dosering mag maximaal 50 tekens lang zijn.
 validation.medication.schedule.size;Das Einnahmeschema darf höchstens 100 Zeichen lang sein.;Schedule may be at most 100 characters long.;Schema mag maximaal 100 tekens lang zijn.
-
-# Fehlerbeschreibungen
-error.upload.maxSizeExceeded;Die hochgeladene Datei ist zu groß. Die maximale Größe beträgt 20 MB.;The uploaded file is too large. The maximum size is 20 MB.;Het geüploade bestand is te groot. De maximale grootte is 20 MB.
-error.patient.notFound;Kein Patient mit der ID {0} gefunden.;No patient found with ID {0}.;Geen patiënt gevonden met ID {0}.
-error.historyEntry.notFound;Kein Verlaufseintrag mit der ID {0} gefunden.;No history entry found with ID {0}.;Geen geschiedenisitem gevonden met ID {0}.
-error.historyEntry.notFoundForPatient;Kein Verlaufseintrag mit der ID {0} für diesen Patienten gefunden.;No history entry found with ID {0} for this patient.;Geen geschiedenisitem gevonden met ID {0} voor deze patiënt.
-error.attachment.notFound;Kein Anhang mit der ID {0} gefunden.;No attachment found with ID {0}.;Geen bijlage gevonden met ID {0}.
-error.attachment.notFoundForEntry;Kein Anhang mit der ID {0} für diesen Verlaufseintrag gefunden.;No attachment found with ID {0} for this history entry.;Geen bijlage gevonden met ID {0} voor dit geschiedenisitem.
-error.xrayImage.notFound;Kein Röntgenbild mit der ID {0} gefunden.;No X-ray image found with ID {0}.;Geen röntgenfoto gevonden met ID {0}.
-error.upload.noFileSubmitted;Es wurde keine Datei übermittelt.;No file was submitted.;Er is geen bestand ingediend.
-error.upload.unsupportedFileType;Nicht unterstützter Dateityp. Bitte laden Sie ein PNG- oder JPEG-Bild hoch (DICOM-Konvertierung wird in dieser Version nicht unterstützt).;Unsupported file type. Please upload a PNG or JPEG image (DICOM conversion is not supported in this version).;Niet-ondersteund bestandstype. Upload een PNG- of JPEG-afbeelding (DICOM-conversie wordt in deze versie niet ondersteund).
-error.upload.directoryInit;Das Upload-Verzeichnis konnte nicht initialisiert werden: {0};Could not initialize upload directory: {0};Kon de uploadmap niet initialiseren: {0}
-error.upload.fileSaveFailed;Datei konnte nicht gespeichert werden: {0};File could not be saved: {0};Bestand kon niet worden opgeslagen: {0}
-error.upload.generatedImageSaveFailed;Das generierte Bild konnte nicht gespeichert werden.;Generated image could not be saved.;Het gegenereerde beeld kon niet worden opgeslagen.
-error.upload.fileDeleteFailed;Datei konnte nicht gelöscht werden: {0};File could not be deleted: {0};Bestand kon niet worden verwijderd: {0}
-error.analysis.failed;Analyse fehlgeschlagen: {0};Analysis failed: {0};Analyse mislukt: {0}
-error.mlService.unreachable;ML-Inferenz-Service nicht erreichbar oder Analyse fehlgeschlagen (ist der Service unter ml.service.url gestartet?): {0};ML inference service unreachable or analysis failed (is the service running at ml.service.url?): {0};ML-inferentieservice niet bereikbaar of analyse mislukt (draait de service op ml.service.url?): {0}
-error.mlService.responseUnparsable;Antwort des ML-Service konnte nicht verarbeitet werden: {0};The ML service response could not be processed: {0};Het antwoord van de ML-service kon niet worden verwerkt: {0}
-error.attachment.selectFileBeforeUpload;Bitte wählen Sie vor dem Hochladen eine Datei aus.;Please choose a file before uploading.;Kies een bestand voordat u het uploadt.
-error.scan.selectFileBeforeUpload;Bitte wählen Sie vor dem Hochladen ein Röntgenbild aus.;Please choose an X-ray image before uploading.;Kies een röntgenfoto voordat u deze uploadt.
-
-# Erfolg
-success.patient.created;Patient „{0}“ wurde erfolgreich angelegt.;"Patient ""{0}"" was created successfully.";Patiënt '{0}' is succesvol aangemaakt.
-success.patient.updated;Patient „{0}“ wurde erfolgreich aktualisiert.;"Patient ""{0}"" was updated successfully.";Patiënt '{0}' is succesvol bijgewerkt.
-success.patient.deleted;Patient „{0}“ wurde gelöscht.;"Patient ""{0}"" was deleted.";Patiënt '{0}' is verwijderd.
-success.historyEntry.created;Verlaufseintrag „{0}“ wurde hinzugefügt.;"History entry ""{0}"" was added.";Geschiedenisitem '{0}' is toegevoegd.
-success.attachment.uploaded;Anhang erfolgreich hochgeladen.;Attachment uploaded successfully.;Bijlage succesvol geüpload.
-success.attachment.deleted;Anhang gelöscht.;Attachment deleted.;Bijlage verwijderd.
-success.scan.uploaded;Röntgenbild hochgeladen und analysiert (simulierte Analyse, siehe Hinweis auf der Ergebniskarte).;X-ray uploaded and analyzed (simulated analysis, see notice on the results card).;Röntgenfoto geüpload en geanalyseerd (gesimuleerde analyse, zie melding op de resultatenkaart).
+validation.patient.addressCity.size;Die Stadt darf höchstens 150 Zeichen lang sein.;City may be at most 150 characters long.;Stad mag maximaal 150 tekens lang zijn.
+validation.patient.emergencyContactName.size;Der Name des Notfallkontakts darf höchstens 150 Zeichen lang sein.;Emergency contact name may be at most 150 characters long.;Naam van de contactpersoon voor noodgevallen mag maximaal 150 tekens lang zijn.
+validation.patient.emergencyContactRelation.size;Die Beziehung zum Notfallkontakt darf höchstens 100 Zeichen lang sein.;Emergency contact relation may be at most 100 characters long.;Relatie tot de contactpersoon voor noodgevallen mag maximaal 100 tekens lang zijn.
+validation.patient.insuranceProvider.size;Der Name des Versicherungsanbieters darf höchstens 150 Zeichen lang sein.;Insurance provider may be at most 150 characters long.;Naam van de verzekeraar mag maximaal 150 tekens lang zijn.
+validation.patient.insurancePolicyNumber.size;Die Versicherungsnummer darf höchstens 100 Zeichen lang sein.;Insurance policy number may be at most 100 characters long.;Verzekeringsnummer mag maximaal 100 tekens lang zijn.
+validation.history.title.size;Der Titel darf höchstens 255 Zeichen lang sein.;Title may be at most 255 characters long.;Titel mag maximaal 255 tekens lang zijn.

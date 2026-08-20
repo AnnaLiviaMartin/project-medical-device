@@ -8,19 +8,22 @@
         <a th:href="@{/patients}"
            class="side-menu__item"
            th:classappend="${active == 'patients'} ? 'is-active' : ''"
-           th:text="#{}">
+           th:text="#{nav.patientManagement}">
             Patient Management
         </a>
+        <a th:href="@{?sprache=de}">Deutsch</a>
+        <a th:href="@{?sprache=en}">Englisch</a>
+        <a th:href="@{?sprache=nl}">Niederländisch</a>
     </nav>
 
     <div class="side-menu__bottom">
         <a th:href="@{/dsgvo/impressum}"
            class="side-menu__item">
-            <span th:text="#{}">Impressum</span>
+            <span th:text="#{nav.impressum}">Impressum</span>
         </a>
         <a th:href="@{/dsgvo/datenschutzerklaerung}"
            class="side-menu__item">
-            <span th:text="#{}">Datenschutzerklärung</span>
+            <span th:text="#{nav.datenschutzerklaerung}">Datenschutzerklärung</span>
         </a>
     </div>
 </aside>

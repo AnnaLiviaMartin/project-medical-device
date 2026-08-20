@@ -8,13 +8,13 @@ import lombok.Setter;
 @Getter
 public class MedicationForm {
 
-    @Size(max = 150, message = "Medication name may be at most 150 characters long.")
+    @Size(max = 150, message = "{validation.medication.name.size}")
     private String name = "";
 
-    @Size(max = 50, message = "Dosage may be at most 50 characters long.")
+    @Size(max = 50, message = "{validation.medication.dosage.size}")
     private String dosage = "";
 
-    @Size(max = 100, message = "Schedule may be at most 100 characters long.")
+    @Size(max = 100, message = "{validation.medication.schedule.size}")
     private String schedule = "";
 
     public boolean isBlank() {
