@@ -27,7 +27,7 @@
                 </div>
                 <span class="status-badge"
                       th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-hero' : 'status-badge--inpatient-hero'"
-                      th:text="${patient.status.label}">Status</span>
+                      th:text="${patient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
             </section>
 
             <section class="pr-overview-grid">

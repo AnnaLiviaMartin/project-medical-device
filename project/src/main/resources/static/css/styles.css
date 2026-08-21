@@ -176,10 +176,15 @@ a {
 .side-menu__language {
     padding: var(--space-md);
     border-top: 1px solid var(--color-border);
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .side-menu__section-label {
     display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: break-word;
     margin-bottom: var(--space-sm);
     font-size: 0.7rem;
     font-weight: 700;
@@ -715,10 +720,11 @@ a {
 
 .section-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     margin-bottom: var(--space-lg);
     gap: var(--space-md);
+    flex-wrap: wrap;
 }
 
 .section-header .section-label {
@@ -845,6 +851,7 @@ a {
     display: flex;
     align-items: center;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 /* Timeline */
@@ -1021,10 +1028,12 @@ a {
 }
 
 .scan-link {
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
     font-size: 0.8125rem;
     font-weight: 700;
     color: var(--color-primary);
+    overflow-wrap: anywhere;
 }
 
 .pr-empty-state {
