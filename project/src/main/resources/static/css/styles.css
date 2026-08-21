@@ -1568,13 +1568,17 @@ a {
     grid-template-columns: 1fr 1fr;
     gap: var(--space-md);
     margin-bottom: 22px;
+    align-items: stretch;
 }
 
 .stat-box {
     min-height: 110px;
     border-radius: 14px;
     padding: 14px;
+    display: flex;
+    flex-direction: column;
 }
+
 
 .stat-box--status-danger {
     background: var(--color-danger-soft);
@@ -1615,14 +1619,14 @@ a {
 
 .status-row {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: var(--space-sm);
+    margin-top: auto;
 }
 
 .status-dot {
     width: 8px;
     height: 8px;
-    margin-top: 6px;
     border-radius: var(--radius-pill);
     background: #ef4444;
     flex-shrink: 0;
@@ -1645,8 +1649,8 @@ a {
 }
 
 .confidence-value {
+    margin-top: auto;
     font-size: 44px;
-    line-height: 1;
     font-weight: 800;
     color: var(--color-primary-dark);
 }
