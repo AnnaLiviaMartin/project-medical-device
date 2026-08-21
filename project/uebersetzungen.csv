@@ -4,6 +4,7 @@ propertyname;de;en;nl
 nav.patientManagement;Patientenverwaltung;Patient Management;Patiëntenbeheer
 nav.impressum;Impressum;Imprint;Colofon
 nav.datenschutzerklaerung;Datenschutzerklärung;Privacy Policy;Privacyverklaring
+nav.language;Sprache;Language;Taal
 
 # Allgemein
 buttons.back.patients;← Zurück zur Patientenakte;← Back to Patient Record;← Terug naar patiëntendossier

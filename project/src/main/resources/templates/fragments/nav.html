@@ -5,15 +5,40 @@
     <div class="side-menu__logo">ALM-DR-AI</div>
 
     <nav class="side-menu__nav">
+        <div class="side-menu__language">
+            <span class="side-menu__section-label" th:text="#{nav.language}">
+                Sprache
+            </span>
+            <div class="language-switcher">
+                <a th:href="@{?sprache=de}"
+                   class="language-switcher__item"
+                   th:classappend="${#locale.language == 'de'} ? 'is-active' : ''"
+                   title="Deutsch"
+                   aria-label="Deutsch">
+                    🇩🇪
+                </a>
+                <a th:href="@{?sprache=en}"
+                   class="language-switcher__item"
+                   th:classappend="${#locale.language == 'en'} ? 'is-active' : ''"
+                   title="English"
+                   aria-label="English">
+                    🇬🇧
+                </a>
+                <a th:href="@{?sprache=nl}"
+                   class="language-switcher__item"
+                   th:classappend="${#locale.language == 'nl'} ? 'is-active' : ''"
+                   title="Nederlands"
+                   aria-label="Nederlands">
+                    🇳🇱
+                </a>
+            </div>
+        </div>
         <a th:href="@{/patients}"
            class="side-menu__item"
            th:classappend="${active == 'patients'} ? 'is-active' : ''"
            th:text="#{nav.patientManagement}">
             Patient Management
         </a>
-        <a th:href="@{?sprache=de}">Deutsch</a>
-        <a th:href="@{?sprache=en}">Englisch</a>
-        <a th:href="@{?sprache=nl}">Niederländisch</a>
     </nav>
 
     <div class="side-menu__bottom">
