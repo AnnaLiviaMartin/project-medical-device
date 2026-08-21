@@ -5,6 +5,7 @@ import de.hsrm.cs.master.medical.project.exception.FileStorageException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.awt.image.BufferedImage;
@@ -18,12 +19,11 @@ import java.util.UUID;
 @Transactional
 public class ImagingService {
 
+    protected static final List<String> ALLOWED_EXTENSIONS = List.of(".png", ".jpg", ".jpeg", ".dcm");
     // TODO auslagern in application.properties
     // TODO clean up methods
     private static final String XRAY_SUBDIR = "xray_images";
     private static final String GRADCAM_SUBDIR = "gradcam";
-    private static final List<String> ALLOWED_EXTENSIONS = List.of(".png", ".jpg", ".jpeg");
-
     @Autowired
     private XRayImageService xRayImageService;
 
@@ -42,6 +42,9 @@ public class ImagingService {
     @Autowired
     private StudyService studyService;
 
+    @Autowired
+    private ImageConversionService imageConversionService;
+
     public void assertSupportedImageType(MultipartFile file) {
         String name = file.getOriginalFilename() == null ? "" : file.getOriginalFilename().toLowerCase(Locale.ROOT);
         boolean allowed = ALLOWED_EXTENSIONS.stream().anyMatch(name::endsWith);
@@ -50,11 +53,11 @@ public class ImagingService {
         }
     }
 
-    /**
-     * Laedt ein Roentgenbild fuer einen Historieneintrag hoch und stoesst direkt die (simulierte) Analyse an.
-     */
     public void uploadScan(Long patientId, Long entryId, MultipartFile file) {
         assertSupportedImageType(file);
+
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename() == null ? "file" : file.getOriginalFilename());
+        byte[] pngBytes = imageConversionService.convertToPng(file);
 
         HistoryEntry entry = historyEntryService.getOrThrowForPatient(patientId, entryId);
 
@@ -67,7 +70,7 @@ public class ImagingService {
             historyEntryService.save(entry);
         }
 
-        String storedPath = fileStorageService.store(file, XRAY_SUBDIR);
+        String storedPath = fileStorageService.store(pngBytes, XRAY_SUBDIR, originalFilename);
 
         XRayImage image = new XRayImage();
         image.setStudy(study);

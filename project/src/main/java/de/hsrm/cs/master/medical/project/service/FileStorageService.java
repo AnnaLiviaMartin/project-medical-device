@@ -51,9 +51,7 @@ public class FileStorageService {
             throw new FileStorageException("No file was submitted.");
         }
 
-        String originalFilename = StringUtils.cleanPath(
-                file.getOriginalFilename() == null ? "file" : file.getOriginalFilename()
-        );
+        String originalFilename = StringUtils.cleanPath(file.getOriginalFilename() == null ? "file" : file.getOriginalFilename());
         String extension = "";
         int dotIndex = originalFilename.lastIndexOf('.');
         if (dotIndex >= 0) {
@@ -71,6 +69,31 @@ public class FileStorageService {
             return subdir + "/" + storedName;
         } catch (IOException e) {
             throw new FileStorageException("File could not be saved: " + originalFilename, e);
+        }
+    }
+
+    public String store(byte[] file, String subdir, String filename) {
+        if (file == null || file.length == 0) {
+            throw new FileStorageException("No file data was submitted.");
+        }
+
+        String extension = "";
+        int dotIndex = filename.lastIndexOf('.');
+        if (dotIndex >= 0) {
+            extension = filename.substring(dotIndex);
+        }
+
+        String storedName = UUID.randomUUID() + extension + ".png";
+
+        try {
+            init();
+            Path targetDir = uploadRoot.resolve(subdir).normalize();
+            Files.createDirectories(targetDir);
+            Path targetPath = targetDir.resolve(storedName);
+            Files.write(targetPath, file);
+            return subdir + "/" + storedName;
+        } catch (IOException e) {
+            throw new FileStorageException("PNG file could not be saved.", e);
         }
     }
 
