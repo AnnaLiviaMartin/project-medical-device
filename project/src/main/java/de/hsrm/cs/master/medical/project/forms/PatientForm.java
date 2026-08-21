@@ -17,11 +17,11 @@ import java.util.stream.Collectors;
 public class PatientForm {
 
     @NotBlank(message = "{validation.patient.firstName.notblank}")
-    @Size(max = 100, message = "{validation.patient.firstName.size")
+    @Size(max = 100, message = "{validation.patient.firstName.size}")
     private String firstName = "";
 
     @NotBlank(message = "{validation.patient.lastName.notblank}")
-    @Size(max = 100, message = "{validation.patient.lastName.size")
+    @Size(max = 100, message = "{validation.patient.lastName.size}")
     private String lastName = "";
 
     @NotNull(message = "{validation.patient.dateOfBirth.notnull}")
