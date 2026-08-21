@@ -76,7 +76,7 @@ public class ImageConversionService {
             throw new FileStorageException("Uploaded JPEG could not be decoded.");
         }
 
-        BufferedImage rgbImage = toRgb(image);
+        BufferedImage rgbImage = convertTo1024Rgb(image);
         return encodePng(rgbImage);
     }
 
@@ -89,13 +89,12 @@ public class ImageConversionService {
             throw new FileStorageException("DICOM does not contain a readable image.");
         }
 
-        BufferedImage rgbImage = toRgb(image);
+        BufferedImage rgbImage = convertTo1024Rgb(image);
         return encodePng(rgbImage);
     }
 
     private BufferedImage readDicomImage(byte[] bytes) throws IOException {
-        try (InputStream inputStream = new ByteArrayInputStream(bytes);
-             ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream)) {
+        try (InputStream inputStream = new ByteArrayInputStream(bytes); ImageInputStream imageInputStream = ImageIO.createImageInputStream(inputStream)) {
 
             if (imageInputStream == null) {
                 throw new IOException("Could not create DICOM ImageInputStream.");
@@ -118,19 +117,6 @@ public class ImageConversionService {
         }
     }
 
-    private BufferedImage toRgb(BufferedImage source) {
-        BufferedImage rgb = new BufferedImage(source.getWidth(), source.getHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = rgb.createGraphics();
-
-        try {
-            graphics.drawImage(source, 0, 0, null);
-        } finally {
-            graphics.dispose();
-        }
-
-        return rgb;
-    }
-
     private byte[] encodePng(BufferedImage image) throws IOException {
         ByteArrayOutputStream output = new ByteArrayOutputStream();
 
@@ -149,5 +135,22 @@ public class ImageConversionService {
         if (image == null) {
             throw new FileStorageException("Uploaded PNG could not be decoded.");
         }
+    }
+
+    private BufferedImage convertTo1024Rgb(BufferedImage source) {
+        final int size = 1024;
+
+        BufferedImage target = new BufferedImage(size, size, BufferedImage.TYPE_BYTE_INDEXED);
+        Graphics2D graphics = target.createGraphics();
+
+        try {
+            graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+            graphics.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            graphics.drawImage(source, 0, 0, size, size, null);
+        } finally {
+            graphics.dispose();
+        }
+
+        return target;
     }
 }
