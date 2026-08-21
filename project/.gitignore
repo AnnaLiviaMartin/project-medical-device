@@ -53,5 +53,4 @@ ml-service/machine_learning/**/__pycache__/
 /src/main/resources/messages_de.properties
 /src/main/resources/messages_en.properties
 /src/main/resources/messages_nl.properties
-/data/database.mv.db
-/data/uploads/xray_images/*
+/data/*
