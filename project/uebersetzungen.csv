@@ -123,7 +123,6 @@ history.detail.analysis.engineLabel;SIMULIERTE ENGINE;SIMULATED ENGINE;GESIMULEE
 history.detail.analysis.confidenceLabel;KONFIDENZ;CONFIDENCE;BETROUWBAARHEID
 history.detail.findings.label;Vorgeschlagene klinische Befunde;Suggested Clinical Findings;Voorgestelde klinische bevindingen
 history.detail.findings.hint;Jeder Befund unten hat seine eigene GradCAM-Heatmap. Wählen Sie einen Befund aus und nutzen Sie den Umschalter über dem Bild, um zwischen dem Original-Röntgenbild und dem GradCAM-Overlay zu wechseln.;Each finding below has its own GradCAM heatmap. Select a finding, then use the toggle above the image to switch between the original X-ray and its GradCAM overlay.;Elke bevinding hieronder heeft een eigen GradCAM-heatmap. Selecteer een bevinding en gebruik de schakelaar boven de afbeelding om te wisselen tussen de originele röntgenfoto en de GradCAM-overlay.
-history.detail.findings.hasOwnHeatmap;Hat eine eigene GradCAM-Heatmap — zum Anzeigen auswählen.;Has its own GradCAM heatmap — select to view it.;Heeft een eigen GradCAM-heatmap — selecteer om te bekijken.
 history.detail.findings.noFinding;✓ Kein Befund;✓ No Finding;✓ Geen bevinding
 history.detail.findings.noFindingHint;Kein Pathologie-Score hat den Erkennungsschwellenwert erreicht.;No pathology score reached the detection threshold.;Geen enkele pathologiescore heeft de detectiedrempel bereikt.
 history.detail.image.originalXrayButton;Original-Röntgenbild;Original X-ray;Originele röntgenfoto
