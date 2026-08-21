@@ -155,7 +155,7 @@
                         <button type="button" class="add-button" onclick="addMedicationRow()" th:text="#{patients.form.addMedicationButton}">+ Add Medication</button>
                     </div>
 
-                    <p class="empty-hint" id="medicationEmptyHint" style="display:none;" th:text="#{patients.form.medications.empty}">No medications added yet.</p>
+                    <p class="empty-hint" id="medicationEmptyHint" th:text="#{patients.form.medications.empty}">No medications added yet.</p>
 
                     <div class="medication-list" id="medication-rows">
                         <div class="medication-row" th:each="med, medStat : *{medications}" th:attr="data-index=${medStat.index}">

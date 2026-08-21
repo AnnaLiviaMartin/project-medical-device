@@ -10,8 +10,6 @@ import java.io.File;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    // TODO anderswo hin?
-
     @Value("${upload_dir}")
     private String path = "";
 

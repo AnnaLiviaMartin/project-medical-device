@@ -4,8 +4,8 @@ import de.hsrm.cs.master.medical.project.domain.Patient;
 import de.hsrm.cs.master.medical.project.domain.PatientStatus;
 import de.hsrm.cs.master.medical.project.domain.Sex;
 import de.hsrm.cs.master.medical.project.exception.ResourceNotFoundException;
-import de.hsrm.cs.master.medical.project.forms.MedicationForm;
 import de.hsrm.cs.master.medical.project.forms.PatientForm;
+import de.hsrm.cs.master.medical.project.mapper.PatientMapper;
 import de.hsrm.cs.master.medical.project.repository.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +30,9 @@ class PatientServiceTest {
 
     @Mock
     private PatientRepository patientRepository;
+
+    @Mock
+    private PatientMapper mapper;
 
     @InjectMocks
     private PatientService patientService;
@@ -73,43 +76,7 @@ class PatientServiceTest {
     void getOrThrow_throwsResourceNotFoundException_whenMissing() {
         when(patientRepository.findById(42L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> patientService.getOrThrow(42L))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("42");
-    }
-
-    @Test
-    void create_mapsFormFieldsOntoNewPatient_andSaves() {
-        PatientForm form = validForm();
-        form.setAllergiesRaw("Penicillin\n  \nLatex\n");
-
-        MedicationForm med = new MedicationForm();
-        med.setName(" Metformin ");
-        med.setDosage(" 1000 mg ");
-        med.setSchedule(" 2x daily ");
-        MedicationForm blankRow = new MedicationForm(); // simulates the leftover "+ Add" row
-        form.setMedications(List.of(med, blankRow));
-
-        when(patientRepository.save(any(Patient.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        Patient saved = patientService.create(form);
-
-        assertThat(saved.getFirstName()).isEqualTo("Anna");
-        assertThat(saved.getLastName()).isEqualTo("Becker");
-        assertThat(saved.getDiagnosis()).isEqualTo("Hypertension");
-        assertThat(saved.getStatus()).isEqualTo(PatientStatus.OUTPATIENT);
-
-        // Allergies: trimmed, blank lines dropped
-        assertThat(saved.getAllergies()).extracting("name").containsExactly("Penicillin", "Latex");
-        assertThat(saved.getAllergies()).allMatch(a -> a.getPatient() == saved);
-
-        // Medications: blank row filtered out, values trimmed
-        assertThat(saved.getMedications()).hasSize(1);
-        assertThat(saved.getMedications().get(0).getName()).isEqualTo("Metformin");
-        assertThat(saved.getMedications().get(0).getDosage()).isEqualTo("1000 mg");
-        assertThat(saved.getMedications().get(0).getSchedule()).isEqualTo("2x daily");
-
-        verify(patientRepository).save(saved);
+        assertThatThrownBy(() -> patientService.getOrThrow(42L)).isInstanceOf(ResourceNotFoundException.class).hasMessageContaining("42");
     }
 
     @Test
@@ -129,17 +96,18 @@ class PatientServiceTest {
     }
 
     @Test
-    void update_loadsExistingPatient_appliesFormAndSaves() {
+    void update_loadsExistingPatient_mapsAndSaves() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(existingPatient));
         when(patientRepository.save(any(Patient.class))).thenAnswer(inv -> inv.getArgument(0));
 
         PatientForm form = validForm();
-        form.setDiagnosis("Updated diagnosis");
 
         Patient updated = patientService.update(1L, form);
 
         assertThat(updated).isSameAs(existingPatient);
-        assertThat(updated.getDiagnosis()).isEqualTo("Updated diagnosis");
+
+        verify(patientRepository).findById(1L);
+        verify(mapper).updatePatient(form, existingPatient);
         verify(patientRepository).save(existingPatient);
     }
 
@@ -148,8 +116,7 @@ class PatientServiceTest {
         when(patientRepository.findById(99L)).thenReturn(Optional.empty());
         PatientForm form = validForm();
 
-        assertThatThrownBy(() -> patientService.update(99L, form))
-                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> patientService.update(99L, form)).isInstanceOf(ResourceNotFoundException.class);
 
         verify(patientRepository, never()).save(any());
     }
@@ -169,25 +136,9 @@ class PatientServiceTest {
     void delete_throwsResourceNotFoundException_whenPatientMissing() {
         when(patientRepository.findById(7L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> patientService.delete(7L))
-                .isInstanceOf(ResourceNotFoundException.class);
+        assertThatThrownBy(() -> patientService.delete(7L)).isInstanceOf(ResourceNotFoundException.class);
 
         verify(patientRepository, never()).delete(any());
-    }
-
-    @Test
-    void toForm_prefillsFormFromExistingPatient_andAddsEmptyMedicationRow_whenNoneExist() {
-        existingPatient.getAllergies().clear();
-        existingPatient.getMedications().clear();
-
-        PatientForm form = patientService.toForm(existingPatient);
-
-        assertThat(form.getFirstName()).isEqualTo("Anna");
-        assertThat(form.getLastName()).isEqualTo("Becker");
-        assertThat(form.getSex()).isEqualTo(Sex.FEMALE);
-        // No medications on record -> the edit form still needs one empty row for the "+" UI
-        assertThat(form.getMedications()).hasSize(1);
-        assertThat(form.getMedications().get(0).isBlank()).isTrue();
     }
 
     private PatientForm validForm() {

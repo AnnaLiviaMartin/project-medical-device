@@ -19,6 +19,9 @@ services:
 
       # Bilder
       UPLOAD_DIR: /data/uploads
+      ATTACHMENT_SUBDIR: attachments
+      XRAY_SUBDIR : xray_images
+      GRADCAM_SUBDIR : gradcam
 
       # ML
       ML_ANALYSIS_PROVIDER: rest

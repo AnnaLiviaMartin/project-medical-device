@@ -3,6 +3,7 @@ package de.hsrm.cs.master.medical.project.service;
 import de.hsrm.cs.master.medical.project.domain.*;
 import de.hsrm.cs.master.medical.project.exception.FileStorageException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -20,10 +21,13 @@ import java.util.UUID;
 public class ImagingService {
 
     protected static final List<String> ALLOWED_EXTENSIONS = List.of(".png", ".jpg", ".jpeg", ".dcm");
-    // TODO auslagern in application.properties
-    // TODO clean up methods
-    private static final String XRAY_SUBDIR = "xray_images";
-    private static final String GRADCAM_SUBDIR = "gradcam";
+
+    @Value("${xray_subdir}")
+    private String XRAY_SUBDIR;
+
+    @Value("${gradcam_subdir}")
+    private String GRADCAM_SUBDIR;
+
     @Autowired
     private XRayImageService xRayImageService;
 

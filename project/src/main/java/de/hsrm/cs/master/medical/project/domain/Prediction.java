@@ -31,7 +31,6 @@ public class Prediction {
     @Column(nullable = false)
     private double confidence;
 
-    // TODO evtl auslagern in application.properties? Oder doch über python erhalten??
     @Column(nullable = false)
     private double threshold;
 

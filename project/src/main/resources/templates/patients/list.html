@@ -116,8 +116,7 @@
                                             th:text="${selectedPatient.emergencyContactName} + ' · ' + ${selectedPatient.emergencyContactRelation} + ' · ' + ${selectedPatient.emergencyContactPhone}">—</strong>
                                 </div>
                             </div>
-                            <a th:href="@{'/patients/' + ${selectedPatient.id}}" class="btn-primary"
-                               style="width:100%;" th:text="#{patients.list.detail.openRecord}">Open Record</a>
+                            <a th:href="@{'/patients/' + ${selectedPatient.id}}" class="btn-primary btn-primary_full" th:text="#{patients.list.detail.openRecord}">Open Record</a>
                         </div>
 
                         <div class="empty-state" th:if="${selectedPatient == null}" th:text="#{patients.list.noSelection}">

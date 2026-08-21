@@ -40,8 +40,6 @@ import java.util.Map;
 @Slf4j
 public class RestMlAnalysisService implements MlAnalysisService {
 
-    // TODO Code kürzen
-
     private final RestClient restClient;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -75,25 +73,35 @@ public class RestMlAnalysisService implements MlAnalysisService {
         try {
             JsonNode root = objectMapper.readTree(rawJson);
 
-            String label = root.path("label").asText();
+            String label = root.path("label").asString();
             double confidence = root.path("confidence").asDouble();
             double threshold = root.path("threshold").asDouble();
-
-            Map<String, Double> scores = new LinkedHashMap<>();
-            for (Map.Entry<String, JsonNode> entry : root.path("scores").properties()) {
-                scores.put(entry.getKey(), entry.getValue().asDouble());
-            }
-
-            Map<String, BufferedImage> overlays = new LinkedHashMap<>();
-            for (Map.Entry<String, JsonNode> entry : root.path("gradcam_images").properties()) {
-                byte[] pngBytes = Base64.getDecoder().decode(entry.getValue().asText());
-                BufferedImage image = ImageIO.read(new ByteArrayInputStream(pngBytes));
-                overlays.put(entry.getKey(), image);
-            }
+            Map<String, Double> scores = getScores(root);
+            Map<String, BufferedImage> overlays = getOverlays(root);
 
             return new MlAnalysisResult(label, confidence, threshold, scores, overlays);
         } catch (IOException ex) {
             throw new FileStorageException("Antwort des ML-Service konnte nicht verarbeitet werden: " + ex.getMessage(), ex);
         }
+    }
+
+    private Map<String, Double> getScores (JsonNode root) {
+        Map<String, Double> scores = new LinkedHashMap<>();
+        for (Map.Entry<String, JsonNode> entry : root.path("scores").properties()) {
+            scores.put(entry.getKey(), entry.getValue().asDouble());
+        }
+
+        return scores;
+    }
+
+    private Map<String, BufferedImage> getOverlays (JsonNode root) throws IOException {
+        Map<String, BufferedImage> overlays = new LinkedHashMap<>();
+        for (Map.Entry<String, JsonNode> entry : root.path("gradcam_images").properties()) {
+            byte[] pngBytes = Base64.getDecoder().decode(entry.getValue().asText());
+            BufferedImage image = ImageIO.read(new ByteArrayInputStream(pngBytes));
+            overlays.put(entry.getKey(), image);
+        }
+
+        return overlays;
     }
 }

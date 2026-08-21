@@ -3,6 +3,8 @@ package de.hsrm.cs.master.medical.project.controller;
 import de.hsrm.cs.master.medical.project.domain.Patient;
 import de.hsrm.cs.master.medical.project.domain.PatientStatus;
 import de.hsrm.cs.master.medical.project.domain.Sex;
+import de.hsrm.cs.master.medical.project.forms.PatientForm;
+import de.hsrm.cs.master.medical.project.mapper.PatientMapper;
 import de.hsrm.cs.master.medical.project.service.HistoryEntryService;
 import de.hsrm.cs.master.medical.project.service.PatientService;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +31,9 @@ class PatientControllerTest {
 
     @Mock
     private PatientService patientService;
+
+    @Mock
+    private PatientMapper mapper;
 
     @Mock
     private HistoryEntryService historyEntryService;
@@ -172,7 +177,7 @@ class PatientControllerTest {
     void editForm_prefillsFormFromExistingPatient() throws Exception {
         Patient anna = patient(1L, "Anna", "Becker", PatientStatus.OUTPATIENT);
         when(patientService.getOrThrow(1L)).thenReturn(anna);
-        when(patientService.toForm(anna)).thenReturn(new de.hsrm.cs.master.medical.project.forms.PatientForm());
+        when(mapper.toForm(anna)).thenReturn(new PatientForm());
 
         mockMvc.perform(get("/patients/1/edit"))
                 .andExpect(status().isOk())

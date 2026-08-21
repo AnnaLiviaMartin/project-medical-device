@@ -4,6 +4,7 @@ import de.hsrm.cs.master.medical.project.domain.*;
 import de.hsrm.cs.master.medical.project.exception.ResourceNotFoundException;
 import de.hsrm.cs.master.medical.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,9 +15,8 @@ import java.util.List;
 @Transactional
 public class AttachmentService {
 
-    // TODO use Interface
-    // TODO auslagern in application.properties
-    private static final String SUBDIR = "attachments";
+    @Value("${attachment_subdir}")
+    private String SUBDIR;
 
     @Autowired
     private AttachmentRepository attachmentRepository;

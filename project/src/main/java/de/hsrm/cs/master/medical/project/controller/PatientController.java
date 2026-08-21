@@ -2,6 +2,7 @@ package de.hsrm.cs.master.medical.project.controller;
 
 import de.hsrm.cs.master.medical.project.domain.Patient;
 import de.hsrm.cs.master.medical.project.forms.PatientForm;
+import de.hsrm.cs.master.medical.project.mapper.PatientMapper;
 import de.hsrm.cs.master.medical.project.service.HistoryEntryService;
 import de.hsrm.cs.master.medical.project.service.PatientService;
 import jakarta.validation.Valid;
@@ -23,6 +24,9 @@ public class PatientController {
 
     @Autowired
     private HistoryEntryService historyEntryService;
+
+    @Autowired
+    private PatientMapper mapper;
 
     @GetMapping
     public String list(@RequestParam(defaultValue = "") String q, @RequestParam(defaultValue = "All") String status, @RequestParam(required = false) Long selectedPatientId, Model model) {
@@ -81,7 +85,7 @@ public class PatientController {
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
         Patient patient = patientService.getOrThrow(id);
-        model.addAttribute("patientForm", patientService.toForm(patient));
+        model.addAttribute("patientForm", mapper.toForm(patient));
         model.addAttribute("patientId", id);
         model.addAttribute("isEdit", true);
         return "patients/form";

@@ -8,8 +8,8 @@
     <div class="main-content">
         <main class="pr-page">
             <div class="pr-panel error-page">
-                <h2 style="font-size: 40px; color: var(--color-text-faint); margin-bottom: 12px;">404</h2>
-                <p style="margin-bottom: 18px; color: var(--color-text-muted);" th:text="#{error404.message}">Not found</p>
+                <h2 class="error-subtitle">404</h2>
+                <p class="error-info" th:text="#{error404.message}">Not found</p>
                 <a class="btn-primary" th:href="@{/patients}"  th:text="#{buttons.back}">Back to Patient Overview</a>
             </div>
         </main>

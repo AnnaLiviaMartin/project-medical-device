@@ -27,6 +27,7 @@ button.addEvent;+ Ereignis hinzufügen;+ Add Event;+ Gebeurtenis toevoegen
 patients.status;Status;Status;Status
 patients.diagnosis;Diagnose;Diagnosis;Diagnose
 patients.ward;Station / Abteilung;Ward / Unit;Afdeling / Unit
+error.generic.title;Fehler;Error;Fout
 
 # Patientenliste
 patients.list.overview;Patientenübersicht;Patient Overview;Patiëntenoverzicht
@@ -137,7 +138,6 @@ history.form.category.placeholder;— Auswählen —;— Select —;— Selectee
 error404.headTitle;Nicht gefunden;Not found;Niet gevonden
 error404.message;Die gesuchte Seite konnte nicht gefunden werden.;The page you are looking for could not be found.;De pagina die u zoekt kon niet worden gevonden.
 error500.headTitle;Es ist ein Fehler aufgetreten;Something went wrong;Er is iets misgegaan
-error500.title;Fehler;Error;Fout
 error500.message;Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten.;Something went wrong while processing your request.;Er is iets misgegaan bij het verwerken van uw verzoek.
 error.generic.message;Bei der Verarbeitung Ihrer Anfrage ist ein Fehler aufgetreten.;Something went wrong while processing your request.;Er is iets misgegaan bij het verwerken van uw verzoek.
 

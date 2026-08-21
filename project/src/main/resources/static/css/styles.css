@@ -174,9 +174,10 @@ a {
 }
 
 .side-menu__language {
-    padding: var(--space-md);
+    padding: var(--space-md) var(--space-md) var(--space-md) 0;
     border-top: 1px solid var(--color-border);
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
 }
 
@@ -246,6 +247,10 @@ a {
     cursor: pointer;
     box-shadow: var(--shadow-md);
     transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+}
+
+.btn-primary_full {
+    width: 100%;
 }
 
 .btn-primary:hover {
@@ -659,6 +664,11 @@ a {
     color: var(--color-text-dark);
     letter-spacing: -0.01em;
     margin-top: 4px;
+}
+
+.pr-title_timeline {
+    font-size: 1.5rem;
+    margin-top: 2px;
 }
 
 .pr-subtitle {
@@ -1443,7 +1453,7 @@ a {
 /* ============================= Analysis / scan viewer ============================= */
 
 .analysis-shell {
-    padding: 24px;
+    padding: 0;
     display: flex;
     gap: 24px;
     align-items: stretch;
@@ -1550,6 +1560,13 @@ a {
     justify-content: space-between;
     gap: var(--space-md);
     margin-bottom: 20px;
+}
+
+.analysis-card__header-div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .analysis-card__title {
@@ -1756,4 +1773,20 @@ a {
     max-width: 480px;
     margin: 60px auto;
     text-align: center;
+}
+
+.card {
+    max-width: 480px;
+    margin-top: 60px;
+    text-align: center;
+}
+
+.error-subtitle {
+    font-size: 40px;
+    color: var(--color-danger);
+}
+
+.error-info {
+    margin-bottom: 18px;
+    color: var(--color-text-muted);
 }

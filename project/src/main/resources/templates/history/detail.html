@@ -18,7 +18,7 @@
                 <div class="timeline-header">
                     <div>
                         <p class="timeline-date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</p>
-                        <h1 class="pr-title" style="font-size:1.5rem; margin-top:2px;" th:text="${entry.title}">
+                        <h1 class="pr-title" class="pr-title_timeline" th:text="${entry.title}">
                             Title</h1>
                     </div>
                     <span class="type-badge" th:text="${entry.category.label}">Category</span>
@@ -84,8 +84,7 @@
                 </div>
             </div>
 
-            <div th:if="${latestImage != null and latestImage.prediction != null}" class="analysis-shell"
-                 style="padding:0;">
+            <div th:if="${latestImage != null and latestImage.prediction != null}" class="analysis-shell">
                 <div class="image-pan-zoom">
                     <div class="image-toggle-bar" th:if="${latestImage.prediction.label != 'No Finding'}">
                         <button type="button" id="btnShowXray" class="image-toggle-btn is-active"
@@ -120,7 +119,7 @@
 
                     <div class="analysis-card__header">
                         <div>
-                            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                            <div class="analysis-card__header-div">
                                 <h2 class="analysis-card__title" th:text="#{history.detail.analysis.title}">AI Analysis
                                     Results</h2>
                                 <a th:href="@{'/patients/' + ${patient.id}}" class="type-badge"

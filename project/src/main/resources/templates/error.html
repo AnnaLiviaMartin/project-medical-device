@@ -5,8 +5,8 @@
 <div class="app-shell">
     <div th:replace="~{fragments/nav :: nav('patients')}"></div>
     <main class="main">
-        <div class="card" style="max-width: 480px; margin-top: 60px; text-align: center;">
-            <h2 style="font-size: 40px; color: var(--color-danger);" th:text="#{error.generic.title}">Error</h2>
+        <div class="card">
+            <h2 class="error-subtitle" th:text="#{error.generic.title}">Error</h2>
             <p th:text="#{error.generic.message}">Error message</p>
             <a class="btn btn-primary" th:href="@{/patients}" th:text="#{}">Back to patient list</a>
         </div>

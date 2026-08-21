@@ -20,7 +20,7 @@
             <form class="pr-form" method="post" th:action="@{'/patients/' + ${patient.id} + '/history'}" th:object="${historyEntryForm}">
                 <section class="form-section">
                     <div class="form-grid3">
-                        <label class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'" style="grid-column: 1 / -1;">
+                        <label class="field" th:classappend="${#fields.hasErrors('title')} ? 'has-error'">
                             <span class="field-label" th:text="#{history.form.eventName.label}">Event Name <span class="required-mark">*</span></span>
                             <input type="text" th:field="*{title}" th:placeholder="#{history.form.eventName.placeholder}"/>
                             <span class="field-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></span>
@@ -51,7 +51,7 @@
                             <input type="text" th:field="*{department}" th:placeholder="#{history.form.department.placeholder}"/>
                         </label>
 
-                        <label class="field" style="grid-column: 1 / -1;">
+                        <label class="field">
                             <span class="field-label" th:text="#{history.form.note.label}">Note</span>
                             <textarea th:field="*{description}" th:placeholder="#{history.form.note.placeholder}" rows="3"></textarea>
                         </label>

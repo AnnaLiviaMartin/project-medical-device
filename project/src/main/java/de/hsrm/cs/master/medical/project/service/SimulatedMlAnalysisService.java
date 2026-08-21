@@ -30,13 +30,7 @@ import java.util.Random;
 @Slf4j
 public class SimulatedMlAnalysisService implements MlAnalysisService {
 
-    /**
-     * Klassen des NIH ChestX-ray14 Datensatzes, siehe machine_learning/constants.py im Ursprungsprojekt.
-     */
-    // TODO enums
-    // TODO ersetzen mit echter Analyse
     private static final List<String> PATHOLOGIES = List.of("Atelectasis", "Cardiomegaly", "Effusion", "Infiltration", "Mass", "Nodule", "Pneumonia", "Pneumothorax", "Consolidation", "Edema", "Emphysema", "Fibrosis", "Pleural Thickening", "Hernia");
-
     private static final double THRESHOLD = 0.5;
     private static final int OVERLAY_SIZE = 320;
 
