@@ -29,3 +29,18 @@ Die Schnittstelle `MlAnalysisService` ist austauschbar gehalten, umschaltbar üb
 ## Produktivbetrieb
 
 Für den Wechsel von H2 auf Postgres/MySQL: den passenden JDBC-Treiber in die `pom.xml` aufnehmen und `spring.datasource.*` in `application.properties` (oder per Umgebungsvariable) anpassen — der Rest der Anwendung bleibt unverändert, da ausschließlich über Spring Data JPA zugegriffen wird.
+
+## Tests
+
+Für Spring Boot:
+
+```bash
+./gradlew test
+```
+
+Für FastAPI:
+```bash
+source .venv/bin/activate
+pip install -r .\requirements-test.txt
+pytest
+```

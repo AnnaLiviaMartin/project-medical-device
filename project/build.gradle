@@ -48,3 +48,7 @@ task uebersetzungenToProperties(type: Exec) {
 tasks.named('processResources'){
 	dependsOn("uebersetzungenToProperties")
 }
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
