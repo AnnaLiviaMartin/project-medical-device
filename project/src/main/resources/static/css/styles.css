@@ -1328,7 +1328,6 @@ a {
     align-items: start;
 }
 
-/* TODO required anzeigen*/
 .required-mark {
     color: var(--color-danger);
 }
