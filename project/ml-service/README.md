@@ -1,4 +1,4 @@
-# MedIC ML Inference Service
+# Projekt: Inference Service
 
 Kleiner FastAPI-Wrapper um das urspruengliche PyTorch/DenseNet-Modell samt Grad-CAM (`ml/services.py` aus dem alten Django-Backend). Wird vom Spring-Boot-Backend ueber `RestMlAnalysisService` per REST aufgerufen, siehe `MlAnalysisService`-Interface dort.
 

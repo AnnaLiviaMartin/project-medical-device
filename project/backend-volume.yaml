@@ -1,0 +1,12 @@
+properties:
+  template:
+    volumes:
+      - name: medic-data
+        storageType: AzureFile
+        storageName: medic-data-storage
+    containers:
+      - image: medicstudyacr1948125042.azurecr.io/medic-backend:latest
+        name: medic-backend
+        volumeMounts:
+          - volumeName: medic-data
+            mountPath: /data

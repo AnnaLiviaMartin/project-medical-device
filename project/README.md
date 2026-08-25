@@ -1,6 +1,6 @@
-# MedIC Chart — Spring Boot + Thymeleaf
+# Projekt: Spring Boot + Thymeleaf
 
-Diese Anwendung ist die neu gedachte Architektur des urspruenglichen Projekts: statt eines Django-REST-Backends (drei Apps: `patients`, `imaging`, `ml`) mit separatem Next.js-Frontend ist alles jetzt **ein einziger Spring-Boot-Monolith**, der seine Oberflaeche direkt serverseitig mit **Thymeleaf** rendert. Jede Nutzereingabe (neuer Patient, Historieneintrag, Datei-Upload laeuft durch **Jakarta Bean Validation** und wird bei Fehlern mit feldgenauen Meldungen direkt im Formular angezeigt.
+Diese Anwendung ist die Implementierung des Projekts als **ein einziger Spring-Boot-Monolith**, der seine Oberflaeche direkt serverseitig mit **Thymeleaf** rendert. Jede Nutzereingabe laeuft durch **Jakarta Bean Validation** und wird bei Fehlern mit feldgenauen Meldungen direkt im Formular angezeigt.
 
 ## Los geht's
 
