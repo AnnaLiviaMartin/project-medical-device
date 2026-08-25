@@ -18,7 +18,7 @@
                 <div class="timeline-header">
                     <div>
                         <p class="timeline-date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</p>
-                        <h1 class="pr-title" class="pr-title_timeline" th:text="${entry.title}">
+                        <h1 class="pr-title pr-title_timeline" th:text="${entry.title}">
                             Title</h1>
                     </div>
                     <span class="type-badge" th:text="${entry.category.label}">Category</span>
