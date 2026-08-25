@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(#{error500.headTitle})}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+    <div class="main-content">
+        <main class="pr-page">
+            <div class="pr-panel error-page">
+                <h2 style="font-size: 40px; color: var(--color-danger); margin-bottom: 12px;" th:text="#{error.generic}">Error</h2>
+                <p style="margin-bottom: 18px; color: var(--color-text-muted);" th:text="#{error500.message}">Error message</p>
+                <a class="btn-primary" th:href="@{/patients}" th:text="#{buttons.back}">Back to Patient Overview</a>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

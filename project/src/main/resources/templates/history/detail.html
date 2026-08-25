@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head(${entry.title})}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('patients')}"></div>
+
+    <div class="main-content">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+
+        <main class="pr-page pr-page-detail">
+            <div class="pr-topbar">
+                <a th:href="@{'/patients/' + ${patient.id}}" class="back-link" th:text="#{buttons.back.patients}">← Back
+                    to Patient Record</a>
+            </div>
+
+            <div class="pr-panel">
+                <div class="timeline-header">
+                    <div>
+                        <p class="timeline-date" th:text="${#temporals.format(entry.date, 'dd MMM yyyy')}">Date</p>
+                        <h1 class="pr-title pr-title_timeline" th:text="${entry.title}">
+                            Title</h1>
+                    </div>
+                    <span class="status-badge" th:text="${entry.category.label}">Category</span>
+                </div>
+
+                <p class="timeline-text" th:if="${not #strings.isEmpty(entry.description)}"
+                   th:text="${entry.description}">Description</p>
+
+                <div class="meta-row">
+                    <div class="meta-chip">
+                        <span class="meta-chip-label" th:text="#{patients.doctor}">Doctor</span>
+                        <span class="meta-chip-value"
+                              th:text="${#strings.isEmpty(entry.doctor)} ? '—' : ${entry.doctor}">—</span>
+                    </div>
+                    <div class="meta-chip">
+                        <span class="meta-chip-label" th:text="#{patients.department}">Department</span>
+                        <span class="meta-chip-value"
+                              th:text="${#strings.isEmpty(entry.department)} ? '—' : ${entry.department}">—</span>
+                    </div>
+                </div>
+
+                <div class="attachment-section">
+                    <div class="attachment-header">
+                        <p class="scan-section-label" th:text="#{patients.attachments}">Attachments</p>
+                        <div class="attachment-upload-choices">
+                            <button type="button" class="attachment-upload-button"
+                                    onclick="document.getElementById('scanFileInput').click()"
+                                    th:text="#{history.detail.uploadXrayButton}">+ X-ray
+                            </button>
+                            <button type="button" class="attachment-upload-button"
+                                    onclick="document.getElementById('documentFileInput').click()"
+                                    th:text="#{history.detail.uploadDocumentButton}">+ Document/Image
+                            </button>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data"
+                          th:action="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id} + '/scans'}">
+                        <input type="file" id="scanFileInput" name="file" accept="image/png, image/jpeg" hidden
+                               onchange="this.form.submit()"/>
+                    </form>
+                    <form method="post" enctype="multipart/form-data"
+                          th:action="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id} + '/attachments'}">
+                        <input type="file" id="documentFileInput" name="file" hidden onchange="this.form.submit()"/>
+                    </form>
+
+                    <p class="attachment-empty" th:if="${#lists.isEmpty(attachments)}"
+                       th:text="#{patients.no.attachments}">No attachments yet.</p>
+                    <ul class="attachment-list" th:unless="${#lists.isEmpty(attachments)}">
+                        <li class="attachment-item" th:each="attachment : ${attachments}">
+                            <a th:href="@{'/media/' + ${attachment.storedPath}}" target="_blank" class="attachment-link"
+                               th:text="${attachment.originalFilename}">file.pdf</a>
+                            <span class="attachment-meta"
+                                  th:text="${#numbers.formatInteger(attachment.fileSize / 1024, 1)} + ' KB'">0 KB</span>
+                            <form method="post"
+                                  th:action="@{'/patients/' + ${patient.id} + '/history/' + ${entry.id} + '/attachments/' + ${attachment.id} + '/delete'}">
+                                <button type="submit" class="attachment-delete-button"
+                                        th:attr="aria-label='Remove: ' + ${attachment.originalFilename}">x
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div th:if="${xrayImage != null and xrayImage.prediction != null}" class="analysis-shell">
+                <div class="image-pan-zoom">
+                    <div class="image-toggle-bar" th:if="${xrayImage.prediction.label != 'No Finding'}">
+                        <button type="button" id="btnShowXray" class="image-toggle-btn is-active"
+                                onclick="setImageMode('xray')" th:text="#{history.detail.image.originalXrayButton}">
+                            Original X-ray
+                        </button>
+                        <button type="button" id="btnShowGradcam" class="image-toggle-btn"
+                                onclick="setImageMode('gradcam')" th:text="#{history.detail.image.gradcamButton}">
+                            GradCAM - AI-Decision-Explanation
+                        </button>
+                    </div>
+                    <div class="image-pan-zoom__viewport">
+                        <img id="mainXrayImage" class="image-pan-zoom__image"
+                             th:src="@{'/media/' + ${xrayImage.storedPath}}" alt="Chest X-ray"/>
+                    </div>
+                    <p class="image-pan-zoom__caption"
+                       th:text="#{history.detail.image.uploadedPrefix} + ' ' + ${#temporals.format(xrayImage.uploadedAt, 'dd MMM yyyy HH:mm')}">
+                        Uploaded</p>
+                    <p class="image-pan-zoom__mode-label" id="imageModeLabel"
+                       th:if="${xrayImage.prediction.label != 'No Finding'}"
+                       th:text="#{history.detail.image.mode.original}">
+                        Showing the original X-ray image.
+                    </p>
+                </div>
+
+                <div class="analysis-card">
+                    <div class="analysis-disclaimer" th:text="#{history.detail.disclaimer}"
+                         th:if="${@environment.getProperty('ml.analysis.provider') != 'rest'}">
+                        ⚠ Demo only: findings are generated by a simulated placeholder model, not a real
+                        diagnostic AI. Do not use for actual clinical decisions.
+                    </div>
+
+                    <div class="analysis-card__header">
+                        <div>
+                            <div class="analysis-card__header-div">
+                                <h2 class="analysis-card__title" th:text="#{history.detail.analysis.title}">AI Analysis
+                                    Results</h2>
+                                <a th:href="@{'/patients/' + ${patient.id}}" class="status-badge"
+                                   th:text="${patient.fullName}">Patient</a>
+                            </div>
+                        </div>
+                        <span class="analysis-card__engine" th:text="#{history.detail.analysis.engineLabel}"
+                              th:if="${@environment.getProperty('ml.analysis.provider') != 'rest'}">SIMULATED ENGINE</span>
+                    </div>
+
+                    <div class="analysis-stats">
+                        <div class="stat-box"
+                             th:classappend="${xrayImage.prediction.label == 'No Finding'} ? 'stat-box--status-ok' : 'stat-box--status-danger'">
+                            <p th:class="${xrayImage.prediction.label == 'No Finding'} ? 'stat-label-ok' : 'stat-label-danger'"
+                               th:text="#{patients.status}">STATUS</p>
+                            <div class="status-row">
+                                <span class="status-dot"
+                                      th:classappend="${xrayImage.prediction.label == 'No Finding'} ? ' status-dot--ok'"></span>
+                                <p th:class="${xrayImage.prediction.label == 'No Finding'} ? 'status-text-ok' : 'status-text-danger'"
+                                   th:text="${xrayImage.prediction.label}">Label</p>
+                            </div>
+                        </div>
+                        <div class="stat-box stat-box--confidence">
+                            <p class="stat-label-blue" th:text="#{history.detail.analysis.confidenceLabel}">
+                                CONFIDENCE</p>
+                            <p class="confidence-value">
+                                <span id="confidenceValue"
+                                      th:text="${#numbers.formatDecimal(xrayImage.prediction.confidence * 100, 1, 1)}">0.0</span>
+                                <span>%</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <p class="section-label" th:text="#{history.detail.findings.label}">Suggested Clinical
+                            Findings</p>
+                        <p class="findings-hint" th:if="${xrayImage.prediction.label != 'No Finding'}"
+                           th:text="#{history.detail.findings.hint}">
+                            Each finding below has its own GradCAM heatmap. Select a finding, then use the
+                            toggle above the image to switch between the original X-ray and its GradCAM overlay.
+                        </p>
+                        <div class="findings">
+                            <button type="button"
+                                    th:each="scoreEntry, stat : ${xrayImage.prediction.scoresSortedDescending}"
+                                    th:if="${scoreEntry.value >= xrayImage.prediction.threshold}"
+                                    class="finding-card"
+                                    th:classappend="${stat.index == 0} ? 'is-active'"
+                                    th:attr="data-confidence=${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)},
+                                             data-pathology=${scoreEntry.key},
+                                             data-image=${xrayImage.prediction.gradCamPaths.get(scoreEntry.key) != null ? '/media/' + xrayImage.prediction.gradCamPaths.get(scoreEntry.key) : '/media/' + xrayImage.storedPath}"
+                                    onclick="selectFinding(this)">
+                                <h3 class="finding-title" th:text="${scoreEntry.key}">Pathology</h3>
+                                <p class="finding-disease">
+                                    <span class="finding-confidence"
+                                          th:text="${#numbers.formatDecimal(scoreEntry.value * 100, 1, 1)} + '%'">0%</span>
+                                </p>
+                            </button>
+
+                            <div th:if="${xrayImage.prediction.label == 'No Finding'}"
+                                 class="finding-card is-active-ok">
+                                <h3 class="finding-title" th:text="#{history.detail.findings.noFinding}">✓ No
+                                    Finding</h3>
+                                <p class="finding-disease finding-disease--ok">
+                                    <span class="finding-confidence--ok"
+                                          th:text="${#numbers.formatDecimal(xrayImage.prediction.confidence * 100, 1, 1)} + '%'">0%</span>
+                                </p>
+                                <p class="finding-text" th:text="#{history.detail.findings.noFindingHint}">No pathology
+                                    score reached the detection threshold.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+    var originalXrayPath = null;
+    var currentFinding = null; // { pathology, image }
+    var currentImageMode = 'xray';
+
+    function selectFinding(button) {
+        document.querySelectorAll('.finding-card').forEach(function (el) {
+            el.classList.remove('is-active');
+        });
+        button.classList.add('is-active');
+
+        var confidence = button.getAttribute('data-confidence');
+        if (confidence) {
+            document.getElementById('confidenceValue').textContent = confidence;
+        }
+
+        currentFinding = {
+            pathology: button.getAttribute('data-pathology'),
+            image: button.getAttribute('data-image')
+        };
+
+        // Auswahl eines Befunds zeigt direkt dessen GradCAM-Overlay.
+        setImageMode('gradcam');
+    }
+
+    function setImageMode(mode) {
+        var img = document.getElementById('mainXrayImage');
+        var label = document.getElementById('imageModeLabel');
+        var btnXray = document.getElementById('btnShowXray');
+        var btnGradcam = document.getElementById('btnShowGradcam');
+        if (!img) {
+            return;
+        }
+
+        currentImageMode = mode;
+        if (btnXray) btnXray.classList.toggle('is-active', mode === 'xray');
+        if (btnGradcam) btnGradcam.classList.toggle('is-active', mode === 'gradcam');
+
+        if (mode === 'xray') {
+            img.src = originalXrayPath;
+            if (label) label.textContent = 'Showing the original X-ray image.';
+        } else if (currentFinding) {
+            img.src = currentFinding.image;
+            if (label) label.textContent = 'Showing GradCAM heatmap for: ' + currentFinding.pathology;
+        } else {
+            img.src = originalXrayPath;
+            if (label) label.textContent = 'Select a finding below to view its GradCAM heatmap.';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var img = document.getElementById('mainXrayImage');
+        if (img) {
+            originalXrayPath = img.getAttribute('src');
+        }
+
+        var activeCard = document.querySelector('.finding-card.is-active');
+        if (activeCard) {
+            currentFinding = {
+                pathology: activeCard.getAttribute('data-pathology'),
+                image: activeCard.getAttribute('data-image')
+            };
+        }
+
+        setImageMode('xray');
+    });
+</script>
+</body>
+</html>

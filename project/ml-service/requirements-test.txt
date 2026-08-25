@@ -1,0 +1,15 @@
+# Needed for tests/test_main.py (FastAPI endpoint tests - no real model involved):
+fastapi
+httpx2
+pytest
+pytest-mock
+python-multipart   # required by FastAPI/Starlette to parse multipart file uploads
+pillow
+
+# Additionally needed for tests/test_inference.py:
+torch
+torchvision
+numpy
+pandas
+scikit-learn
+pathlib

@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="de" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/head :: head('Impressum')}"></head>
+<body>
+<div class="app-shell">
+    <div th:replace="~{fragments/nav :: nav('impressum')}"></div>
+    <div class="main-content">
+        <div th:replace="~{fragments/flash :: flash}"></div>
+        <main class="ov-page">
+            <section class="ov-header">
+                <div>
+                    <p class="eyebrow" th:text="#{dsgvo.title}">Legal Information</p>
+                    <h1 class="ov-title" th:text="#{dsgvo.impressum.title}">Impressum</h1>
+                    <p class="ov-subtitle" th:text="#{dsgvo.subtitle}">
+                        Angaben gemäß den gesetzlichen Informationspflichten.
+                    </p>
+                </div>
+            </section>
+            <aside th:fragment="impressum">
+                <h2 th:text="#{dsgvo.impressum.person}">Personenangaben</h2>
+                <p th:text="#{dsgvo.datenschutz.dataprotection.me}">Anna-Livia Martin<br/>
+                    Zur Knopsm&uuml;hle 19<br/>
+                    64521 Gro&szlig;-Gerau</p>
+                <h2 th:text="#{dsgvo.impressum.contact}">Kontakt</h2>
+                <p th:text="#{dsgvo.impressum.mobile}">Telefon: 01512 3929411<br/>
+                <p th:text="#{dsgvo.impressum.mail}"> E-Mail: anna-livia.martin@student.hs-rm.de</p>
+                <p th:text="#{dsgvo.datenschutz.source}">Quelle: <a href="https://www.e-recht24.de">https://www.e-recht24.de</a></p>
+            </aside>
+        </main>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,72 @@
+services:
+
+  spring:
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: medic-springboot
+
+    ports:
+      - "8080:8080"
+
+    environment:
+      # Spring Boot -> FastAPI
+      ML_SERVICE_URL: http://fastapi:8000
+
+      # H2
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/h2/database
+
+      # Bilder
+      UPLOAD_DIR: /data/uploads
+      ATTACHMENT_SUBDIR: attachments
+      XRAY_SUBDIR : xray_images
+      GRADCAM_SUBDIR : gradcam
+
+      # ML
+      ML_ANALYSIS_PROVIDER: rest
+      ML_SERVICE_TIMEOUT_SECONDS: 60
+
+    volumes:
+      # H2-Daten persistent speichern
+      - h2-data:/data/h2
+
+      # Hochgeladene Bilder persistent speichern
+      - uploads:/data/uploads
+
+    depends_on:
+      fastapi:
+        condition: service_healthy
+
+
+  fastapi:
+    build:
+      context: ./ml-service
+      dockerfile: Dockerfile
+
+    container_name: medic-fastapi
+
+    expose:
+      - "8000"
+
+    environment:
+      ML_MODEL_PATH: /app/machine_learning/checkpoints/best_model.pt
+      ML_THRESHOLD: "0.7"
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 3
+
+
+volumes:
+  h2-data:
+  uploads:

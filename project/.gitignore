@@ -1,0 +1,56 @@
+
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+/medic.storage.uploads/*
+/medic-db.mv.db
+/medic-db.trace.db
+/medic-db.lock.db
+
+### ml-service (Python) ###
+ml-service/.venv/
+ml-service/__pycache__/
+ml-service/app/__pycache__/
+ml-service/machine_learning/checkpoints/*.pt
+ml-service/machine_learning/**/__pycache__/
+*.pyc
+
+# Internationalisierung
+/src/main/resources/messages.properties
+/src/main/resources/messages_de.properties
+/src/main/resources/messages_en.properties
+/src/main/resources/messages_nl.properties
+/data/*

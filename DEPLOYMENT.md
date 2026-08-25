@@ -1,231 +1,176 @@
 # Deployment auf Azure (Student-Tarif)
 
-Diese Anleitung deployed Backend (Django + ML-Modell) und Frontend (Next.js)
-als zwei separate **Azure Container Apps**. Der Consumption-Plan skaliert
-bei Inaktivität auf **0 Instanzen** herunter - bei 4 Zugriffen/Tag zahlst
-du damit nur fuer die paar Sekunden tatsaechlicher Rechenzeit statt fuer
-einen 24/7 laufenden Server.
+Diese Anleitung deployed **zwei Azure Container Apps**:
 
-## 1. Lokal testen (empfohlen, bevor es nach Azure geht)
+- **`medic-backend`**: Spring-Boot-App (Java 21), rendert die komplette Oberfläche selbst über Thymeleaf. Da Thymeleaf serverseitig rendert, spricht der Browser ausschließlich mit `medic-backend`, nicht direkt mit dem ML-Service.
+- **`medic-ml-service`**: FastAPI + PyTorch/DenseNet-Modell. Wird ausschließlich vom Spring-Backend serverseitig aufgerufen (`RestMlAnalysisService`) - braucht daher nur **internen** Zugriff innerhalb der Container Apps Environment, keine öffentliche URL.
+
+Der Consumption-Plan skaliert bei Inaktivität auf **0 Instanzen** herunter - bei seltenen Zugriffen zahlst du damit nur für die paar Sekunden tatsächlicher Rechenzeit statt für einen 24/7 laufenden Server. Der erste Request nach einer Ruhephase braucht dafür ein paar Sekunden länger (Cold Start).
+
+## 1. Lokal dockern
 
 ```bash
+cd projekt
+./gradlew clean build
 docker compose up --build
 ```
 
-- Frontend: http://localhost:3000
-- Backend: http://localhost:8000/api/...
+- App (inkl. UI): http://localhost:8080
+- H2-Konsole: http://localhost:8080/h2-console
+- ML-Service (intern, nur zum Debuggen direkt ansprechbar): http://localhost:8000/health
 
-Wenn das lokal laeuft, funktioniert es strukturell auch in Azure - Docker
-ist hier die Abstraktionsebene, die "auf meinem Rechner" und "in Azure"
-identisch macht.
+Wichtig: Der Gradle-Build (`./gradlew clean build`) muss **vor** dem Docker-Build laufen, weil das root-`Dockerfile` das fertige JAR aus `build/libs/*.jar` kopiert.
 
 ---
 
 ## 2. Azure CLI vorbereiten
 
 ```bash
-az login
+az login --use-device-code
 az account show   # pruefen, dass die Student-Subscription aktiv ist
 
-RESOURCE_GROUP="medic-study-rg"
+RESOURCE_GROUP="medic-study-samd"
 LOCATION="germanywestcentral"
-ACR_NAME="medicstudyacr$RANDOM"   # muss global eindeutig sein
+ACR_NAME="medicstudyacr$RANDOM"
 
 az group create --name $RESOURCE_GROUP --location $LOCATION
-
-windows:
-$RESOURCE_GROUP = "medic-study-rg"
-$LOCATION = "germanywestcentral"
-$ACR_NAME = "medicstudyacr$((Get-Random))"
-
 ```
 
 ---
 
 ## 3. Container Registry anlegen und Images bauen
 
-`az acr build` baut die Images direkt in Azure (kein lokales Docker-Setup
-mit ausreichend Ressourcen noetig, funktioniert auch von einem schwaecheren
-Laptop aus).
+Zuerst muss der Provider registriert werden:
 
 ```bash
-az account show
 az provider register --namespace Microsoft.ContainerRegistry --wait
-az provider show --namespace Microsoft.ContainerRegistry --query registrationState -o tsv
-
 az acr create --resource-group $RESOURCE_GROUP --name $ACR_NAME --sku Basic
-
-# Backend-Image bauen (Context = Projekt-Root, siehe backend/Dockerfile)
-#if:
-az acr build --registry $ACR_NAME --image medic-backend:latest --file backend/Dockerfile .
-#alt:
-docker build -t medic-backend -f backend/Dockerfile .
-az acr login --name $ACR_NAME
-docker tag medic-backend:latest $ACR_NAME.azurecr.io/medic-backend:latest
-docker tag medic-backend:latest medicstudyacr1288038825.azurecr.io/medic-backend:latest
-docker push $ACR_NAME.azurecr.io/medic-backend:latest
-docker push medicstudyacr1288038825.azurecr.io/medic-backend:latest
 ```
 
-Das Frontend-Image bauen wir bewusst **erst in Schritt 6**, nachdem das
-Backend deployed ist - `NEXT_PUBLIC_API_URL` wird beim Build fest ins
-Next.js-Bundle eingebacken und wir brauchen dafuer die endgueltige
-Backend-URL.
+Dann das lokale Docker laufen lassen und dieses anschließen pushen:
+
+```bash
+docker build -t medic-backend -f Dockerfile .
+docker build -t medic-ml-service -f ml-service/Dockerfile ml-service
+
+az acr login --name $ACR_NAME
+
+docker tag medic-backend:latest $ACR_NAME.azurecr.io/medic-backend:latest
+docker tag medic-ml-service:latest $ACR_NAME.azurecr.io/medic-ml-service:latest
+docker push $ACR_NAME.azurecr.io/medic-backend:latest
+docker push $ACR_NAME.azurecr.io/medic-ml-service:latest
+```
 
 ---
 
 ## 4. Container Apps Environment + persistenten Speicher anlegen
 
-SQLite-Datei und hochgeladene Bilder (Roentgenbilder, Grad-CAM-Overlays)
-muessen einen Container-Neustart ueberleben. Dafuer mounten wir einen
-Azure Files Share.
+Die H2-Datenbankdatei und hochgeladene Bilder müssen einen Container-Neustart überleben. Dafür mounten wir einen Azure Files Share **nur ins Backend** - der ML-Service ist zustandslos.
 
 ```bash
-STORAGE_ACCOUNT="medicstudystorage$RANDOM"
-$STORAGE_ACCOUNT="medicdata$((Get-Random))"
+STORAGE_ACCOUNT="medicdata$RANDOM"
 FILE_SHARE="medic-data"
 
-#$STORAGE_ACCOUNT = "medicstudystorage$((Get-Random))"
-#$FILE_SHARE = "medic-data"
-
 az provider register --namespace Microsoft.Storage --wait
+az provider register --namespace Microsoft.OperationalInsights --wait
 
 az storage account create --resource-group $RESOURCE_GROUP --name $STORAGE_ACCOUNT --location $LOCATION --sku Standard_LRS
 
 STORAGE_KEY=$(az storage account keys list --resource-group $RESOURCE_GROUP --account-name $STORAGE_ACCOUNT --query "[0].value" -o tsv)
-#alt:
-$STORAGE_KEY = az storage account keys list `
-  --resource-group $RESOURCE_GROUP `
-  --account-name $STORAGE_ACCOUNT `
-  --query "[0].value" `
-  -o tsv
 
 az storage share-rm create --resource-group $RESOURCE_GROUP --storage-account $STORAGE_ACCOUNT --name $FILE_SHARE --quota 5
-
 az containerapp env create --resource-group $RESOURCE_GROUP --name medic-env --location $LOCATION
-
-az provider register -n Microsoft.OperationalInsights --wait
-
 az containerapp env storage set --resource-group $RESOURCE_GROUP --name medic-env --storage-name medic-data-storage --azure-file-account-name $STORAGE_ACCOUNT --azure-file-account-key $STORAGE_KEY --azure-file-share-name $FILE_SHARE --access-mode ReadWrite
 ```
 
 ---
 
-## 5. Backend deployen
+## 5. ML-Service deployen (zuerst, weil intern - Backend braucht dessen URL)
 
-Wichtige Punkte bei diesem Setup:
+Wichtige Punkte:
 
-- **`--min-replicas 0`**: skaliert bei Inaktivitaet komplett runter (spart Credits).
-- **`--max-replicas 1`**: bewusst auf 1 begrenzt. SQLite vertraegt keine
-  parallelen Schreibzugriffe aus mehreren Instanzen, und jede zusaetzliche
-  Instanz wuerde das ML-Modell erneut in den Speicher laden.
-- **CPU/Memory**: 1 vCPU / 2 GiB als Startwert - PyTorch + Modell brauchen
-  spuerbar mehr RAM als eine "normale" Django-App. Bei Bedarf mit
-  `az containerapp update` nachjustieren.
+- **`--ingress internal`**: keine öffentliche URL, nur innerhalb der Container Apps Environment erreichbar - der Browser soll diesen Service nie direkt ansprechen können.
+- **`--min-replicas 0` / `--max-replicas 1`**: spart Credits bei Inaktivität; 1 Replica reicht, das Modell muss nicht mehrfach im Speicher gehalten werden.
 
 ```bash
 ACR_LOGIN_SERVER=$(az acr show --name $ACR_NAME --query loginServer -o tsv)
-# $ACR_LOGIN_SERVER = az acr show `
-  --name $ACR_NAME `
-  --query loginServer `
-  -o tsv
-
-#az acr update `
-  --name $ACR_NAME `
-  --admin-enabled true
-# Adding registry password as a secret with name "medicstudyacr1288038825azurecrio-medicstudyacr1288038825"
-
-az containerapp create --resource-group $RESOURCE_GROUP --name medic-backend --environment medic-env --image "$ACR_LOGIN_SERVER/medic-backend:latest" --registry-server $ACR_LOGIN_SERVER --target-port 8000 --ingress external --min-replicas 0 --max-replicas 1 --cpu 1.0 --memory 2.0Gi --env-vars DJANGO_SECRET_KEY=secretref:django-secret-key DJANGO_DEBUG=False DJANGO_ALLOWED_HOSTS=placeholder DJANGO_CORS_ALLOWED_ORIGINS=placeholder DJANGO_DB_PATH=/data/db.sqlite3 DJANGO_MEDIA_ROOT=/data/media --secrets django-secret-key="$(python -c 'import secrets; print(secrets.token_urlsafe(50))')"
-
-# Persistenten Storage einhaengen (aktuell nur per update-Befehl moeglich)
-az containerapp update `
-  --resource-group $RESOURCE_GROUP `
-  --name medic-backend `
-  --yaml .\backend-volume.yaml
+$ACR_LOGIN_SERVER = az acr show --name $ACR_NAME --query loginServer -o tsv
 ```
 
-Backend-URL ermitteln (wird gleich fuer CORS und das Frontend-Build gebraucht):
+Dann sich mit dem Account Username und Passwort holen:
+
+```bash
+az acr update --name $ACR_NAME --admin-enabled true
+$ACR_USERNAME = az acr credential show --name $ACR_NAME --query username -o tsv
+$ACR_PASSWORD = az acr credential show --name $ACR_NAME --query "passwords[0].value" -o tsv
+```
+
+Und dann die Container-App erstellen:
+
+```bash
+az containerapp create  --resource-group $RESOURCE_GROUP  --name medic-ml-service  --environment medic-env --image "$ACR_LOGIN_SERVER/medic-ml-service:latest" --registry-server $ACR_LOGIN_SERVER --target-port 8000 --ingress internal --min-replicas 0 --max-replicas 1 --cpu 1.5 --memory 3.0Gi --env-vars ML_MODEL_PATH=/app/machine_learning/checkpoints/best_model.pt ML_THRESHOLD=0.7
+```
+
+Interne URL ermitteln (wird für `ML_SERVICE_URL` im Backend benötigt):
+
+```bash
+ML_SERVICE_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-ml-service --query properties.configuration.ingress.fqdn -o tsv)
+$ML_SERVICE_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-ml-service --query properties.configuration.ingress.fqdn -o tsv)
+
+echo "https://$ML_SERVICE_URL"
+# https://medic-ml-service.internal.wittyglacier-cf4c034a.germanywestcentral.azurecontainerapps.io
+```
+
+---
+
+## 6. Backend deployen
+
+Wichtige Punkte:
+
+- **`--min-replicas 0`**: skaliert bei Inaktivität komplett runter.
+- **`--max-replicas 1`**: bewusst auf 1 begrenzt - H2 (Datei-DB) verträgt keine parallelen Schreibzugriffe aus mehreren Instanzen.
+- **`ML_ANALYSIS_PROVIDER=rest`**: schaltet von der eingebauten `simulated`- Analyse (Default, keine externe Abhängigkeit) auf den echten Aufruf des
+  ML-Service um.
+- Storage wird erst per `az containerapp update --yaml` eingehängt (aktuell bei `containerapp create` mit Volume-Mounts über die CLI nicht direkt möglich).
+
+```bash
+az containerapp create  --resource-group $RESOURCE_GROUP  --name medic-backend --environment medic-env  --image "$ACR_LOGIN_SERVER/medic-backend:latest"  --registry-server $ACR_LOGIN_SERVER --target-port 8080  --ingress external  --min-replicas 0 --max-replicas 1 --cpu 1.0  --memory 2.0Gi  --env-vars SPRING_DATASOURCE_URL=jdbc:h2:file:/data/h2/database UPLOAD_DIR=/data/uploads ATTACHMENT_SUBDIR=attachments XRAY_SUBDIR=xray_images GRADCAM_SUBDIR=gradcam ML_ANALYSIS_PROVIDER=rest ML_SERVICE_URL="https://$ML_SERVICE_URL" ML_SERVICE_TIMEOUT_SECONDS=60
+```
+
+Persistenten Storage muss noch eingehängt werden. Dafür eine `backend-volume.yaml` erstellen:
+
+```bash
+az containerapp update  --resource-group $RESOURCE_GROUP  --name medic-backend  --yaml backend-volume.yaml
+```
+
+Backend-URL ermitteln:
 
 ```bash
 BACKEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-backend --query properties.configuration.ingress.fqdn -o tsv)
+$BACKEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-backend --query properties.configuration.ingress.fqdn -o tsv)
 
 echo "https://$BACKEND_URL"
-# https://medic-backend.calmhill-fe300a55.germanywestcentral.azurecontainerapps.io
+# https://medic-backend.wittyglacier-cf4c034a.germanywestcentral.azurecontainerapps.io
 ```
 
-`DJANGO_ALLOWED_HOSTS` jetzt mit der echten URL setzen:
-
-```bash
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --set-env-vars DJANGO_ALLOWED_HOSTS="$BACKEND_URL"
-```
+Die App ist jetzt unter `https://$BACKEND_URL/patients` erreichbar.
 
 ---
 
-## 6. Frontend bauen und deployen
+## Checkliste bei Änderungen am Code
 
-> **Hinweis zu INTERNAL_API_URL:** Lokal (docker-compose) ist die Trennung
-> von `NEXT_PUBLIC_API_URL` (Browser) und `INTERNAL_API_URL` (serverseitige
-> Next.js-Calls im Docker-Netzwerk) noetig, weil der Next.js-Server sonst
-> "localhost" mit sich selbst statt mit dem Backend-Container verwechselt.
-> In Azure ist das **optional**: Backend und Frontend erreichen sich hier
-> beide ueber die oeffentliche HTTPS-URL des Backends, `ALLOWED_HOSTS`
-> steht dafuer bereits richtig. `INTERNAL_API_URL` kann daher weggelassen
-> werden (Fallback auf `NEXT_PUBLIC_API_URL`) - oder zur Optimierung auf
-> dieselbe URL gesetzt werden, das aendert nichts am Verhalten.
-
-Jetzt, wo `$BACKEND_URL` feststeht, das Frontend-Image damit bauen:
+Für das Neubauen von Frontend und Backend: siehe [Schritt 3](#3-container-registry-anlegen-und-images-bauen) für die Anleitung über Docker und push
 
 ```bash
-#if
-az acr build --registry $ACR_NAME --image medic-frontend:latest --file frontend/Dockerfile --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" frontend
-#alt
-docker build `
-  -t medic-frontend:latest `
-  -f frontend/Dockerfile `
-  --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" `
-  frontend
-docker tag medic-frontend:latest medicstudyacr1288038825.azurecr.io/medic-frontend:latest
-docker push medicstudyacr1288038825.azurecr.io/medic-frontend:latest
+# Backend-Änderung:
+./gradlew clean build
+az acr build --registry $ACR_NAME --image medic-backend:latest --file Dockerfile .
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend  --image "$ACR_LOGIN_SERVER/medic-backend:latest"
 
-az containerapp create --resource-group $RESOURCE_GROUP --name medic-frontend --environment medic-env --image "$ACR_LOGIN_SERVER/medic-frontend:latest" --registry-server $ACR_LOGIN_SERVER --target-port 3000 --ingress external --min-replicas 0 --max-replicas 1 --cpu 0.5 --memory 1.0Gi
-
-FRONTEND_URL=$(az containerapp show --resource-group $RESOURCE_GROUP --name medic-frontend --query properties.configuration.ingress.fqdn -o tsv)
-
-echo "https://$FRONTEND_URL"
-#https://medic-frontend.calmhill-fe300a55.germanywestcentral.azurecontainerapps.io
+# ML-Service-Änderung:
+az acr build --registry $ACR_NAME --image medic-ml-service:latest --file ml-service/Dockerfile ml-service
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-ml-service  --image "$ACR_LOGIN_SERVER/medic-ml-service:latest"
 ```
-
----
-
-## 7. CORS final verdrahten
-
-Jetzt, wo beide URLs feststehen, dem Backend die echte Frontend-URL fuer
-CORS (und optional CSRF fuer `/admin/`) mitgeben:
-
-```bash
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --set-env-vars DJANGO_CORS_ALLOWED_ORIGINS="https://$FRONTEND_URL" DJANGO_CSRF_TRUSTED_ORIGINS="https://$BACKEND_URL"
-```
-
-Die App ist jetzt unter `https://$FRONTEND_URL` erreichbar.
-
----
-
-## Kurz-Checkliste bei Aenderungen am Code
-
-```bash
-# Backend-Aenderung:
-az acr build --registry $ACR_NAME --image medic-backend:latest --file backend/Dockerfile .
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend \
-  --image "$ACR_LOGIN_SERVER/medic-backend:latest"
-
-# Frontend-Aenderung:
-az acr build --registry $ACR_NAME --image medic-frontend:latest --file frontend/Dockerfile \
-  --build-arg NEXT_PUBLIC_API_URL="https://$BACKEND_URL" frontend
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-frontend \
-  --image "$ACR_LOGIN_SERVER/medic-frontend:latest"
-```
-
----
 
 ## Abschalten
 
