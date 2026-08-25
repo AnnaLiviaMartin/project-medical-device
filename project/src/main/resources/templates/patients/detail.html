@@ -12,7 +12,7 @@
             <div class="pr-topbar">
                 <a th:href="@{/patients}" class="back-link" th:text="#{buttons.back}">← Back to Patient Overview</a>
                 <div class="header-actions">
-                    <a th:href="@{'/patients/' + ${patient.id} + '/edit'}" class="btn-secondary btn-sm"
+                    <a th:href="@{'/patients/' + ${patient.id} + '/edit'}" class="btn-secondary"
                        th:text="#{buttons.edit}">Edit</a>
                     <form method="post" th:action="@{'/patients/' + ${patient.id} + '/delete'}">
                         <button type="submit" class="btn-danger-outline" th:text="#{buttons.delete}">Delete</button>
@@ -27,8 +27,7 @@
                     <p class="pr-subtitle" th:text="#{patients.detail.subtitle}">Complete patient information, treatment
                         history, medications, and scan access.</p>
                 </div>
-                <span class="status-badge"
-                      th:classappend="status-badge--patient-hero"
+                <span class="status-badge" th:classappend="status-badge--patient"
                       th:text="${patient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
             </section>
 
@@ -109,7 +108,7 @@
                                     Timeline</h2>
                             </div>
                             <div class="header-actions">
-                                <span class="status-badge" th:classappend="status-badge--patient-list"
+                                <span class="status-badge"
                                       th:text="${#lists.size(historyEntries)} + ' ' + #{patients.detail.entriesCount.suffix}">0 entries</span>
                                 <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button"
                                    th:text="#{button.addEvent}">+ Add Event</a>
@@ -133,7 +132,7 @@
                                             </h3>
                                         </div>
                                         <div class="timeline-header-actions">
-                                            <span class="status-badge" th:classappend="status-badge--patient-list" th:text="${entry.category.label}">Category</span>
+                                            <span class="status-badge" th:text="${entry.category.label}">Category</span>
                                         </div>
                                     </div>
 

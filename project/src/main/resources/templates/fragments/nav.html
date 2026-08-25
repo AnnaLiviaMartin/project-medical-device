@@ -43,11 +43,13 @@
 
     <div class="side-menu__bottom">
         <a th:href="@{/dsgvo/impressum}"
-           class="side-menu__item">
+           class="side-menu__item"
+           th:classappend="${active == 'impressum'} ? 'is-active' : ''">
             <span th:text="#{nav.impressum}">Impressum</span>
         </a>
         <a th:href="@{/dsgvo/datenschutzerklaerung}"
-           class="side-menu__item">
+           class="side-menu__item"
+           th:classappend="${active == 'datenschutzerklaerung'} ? 'is-active' : ''">
             <span th:text="#{nav.datenschutzerklaerung}">Datenschutzerklärung</span>
         </a>
     </div>

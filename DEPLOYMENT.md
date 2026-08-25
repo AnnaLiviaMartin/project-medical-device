@@ -9,6 +9,9 @@ einen 24/7 laufenden Server.
 ## 1. Lokal testen (empfohlen, bevor es nach Azure geht)
 
 ```bash
+cd xxx/project-medical-device/project
+.\gradlew clean build -x test
+docker compose config
 docker compose up --build
 ```
 

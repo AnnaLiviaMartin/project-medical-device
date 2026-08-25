@@ -21,7 +21,7 @@
                         <h1 class="pr-title pr-title_timeline" th:text="${entry.title}">
                             Title</h1>
                     </div>
-                    <span class="type-badge" th:text="${entry.category.label}">Category</span>
+                    <span class="status-badge" th:text="${entry.category.label}">Category</span>
                 </div>
 
                 <p class="timeline-text" th:if="${not #strings.isEmpty(entry.description)}"
@@ -122,7 +122,7 @@
                             <div class="analysis-card__header-div">
                                 <h2 class="analysis-card__title" th:text="#{history.detail.analysis.title}">AI Analysis
                                     Results</h2>
-                                <a th:href="@{'/patients/' + ${patient.id}}" class="type-badge"
+                                <a th:href="@{'/patients/' + ${patient.id}}" class="status-badge"
                                    th:text="${patient.fullName}">Patient</a>
                             </div>
                         </div>

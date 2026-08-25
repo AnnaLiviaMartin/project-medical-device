@@ -49,7 +49,7 @@
                                 <div class="name-row">
                                     <strong class="patient-name" th:text="${patient.fullName}">Name</strong>
                                     <span class="id-badge" th:text="'#' + ${patient.id}">#1</span>
-                                    <span class="status-badge" th:classappend="status-badge--patient-list" th:text="${patient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
+                                    <span class="status-badge" th:text="${patient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
                                 </div>
                                 <span class="meta-text" th:text="${patient.age} + ' years · ' + ${patient.sex.label}">Meta</span>
                             </div>
@@ -82,7 +82,7 @@
                                     <h2 class="ov-detail-name" th:text="${selectedPatient.fullName}">Name</h2>
                                     <p class="subtitle-small" th:text="'#' + ${selectedPatient.id} + ' · ' + #{patients.list.detail.meta.attendingPhysician} + ' ' + ${selectedPatient.doctor}">Meta</p>
                                 </div>
-                                <span class="status-badge" th:classappend="status-badge--patient-list" th:text="${selectedPatient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
+                                <span class="status-badge" th:text="${selectedPatient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
                             </div>
 
                             <div class="ov-detail-grid">
