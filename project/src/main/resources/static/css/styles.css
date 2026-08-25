@@ -973,6 +973,7 @@ a {
 .scan-section {
     border-top: 1px dashed var(--color-border);
     padding-top: var(--space-md);
+    margin-top: var(--space-md);
 }
 
 .scan-section-label {

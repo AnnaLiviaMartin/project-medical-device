@@ -4,6 +4,7 @@ import de.hsrm.cs.master.medical.project.domain.HistoryEntry;
 import de.hsrm.cs.master.medical.project.domain.Patient;
 import de.hsrm.cs.master.medical.project.domain.XRayImage;
 import de.hsrm.cs.master.medical.project.exception.FileStorageException;
+import de.hsrm.cs.master.medical.project.exception.ResourceNotFoundException;
 import de.hsrm.cs.master.medical.project.forms.FileUploadForm;
 import de.hsrm.cs.master.medical.project.forms.HistoryEntryForm;
 import de.hsrm.cs.master.medical.project.service.AttachmentService;
@@ -17,6 +18,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/patients/{patientId}/history")
@@ -67,9 +70,27 @@ public class HistoryController {
 
         XRayImage latestImage = null;
         if (entry.getStudy() != null && !entry.getStudy().getXrayImages().isEmpty()) {
-            latestImage = entry.getStudy().getXrayImages().stream().max(java.util.Comparator.comparing(XRayImage::getUploadedAt)).orElse(null);
+            latestImage = entry.getStudy().getXrayImages().stream().max(Comparator.comparing(XRayImage::getUploadedAt)).orElseThrow(() -> new ResourceNotFoundException("No X-ray images found for this history entry."));
         }
         model.addAttribute("latestImage", latestImage);
+
+        return "history/detail";
+    }
+
+    @GetMapping("/{entryId}/scan/{xrayId}")
+    public String detail(@PathVariable Long patientId, @PathVariable Long entryId, @PathVariable Long xrayId, Model model) {
+        Patient patient = patientService.getOrThrow(patientId);
+        HistoryEntry entry = historyEntryService.getOrThrowForPatient(patientId, entryId);
+
+        model.addAttribute("patient", patient);
+        model.addAttribute("entry", entry);
+        model.addAttribute("attachments", attachmentService.findByHistoryEntry(entryId));
+        model.addAttribute("attachmentUploadForm", new FileUploadForm());
+        model.addAttribute("scanUploadForm", new FileUploadForm());
+
+        XRayImage xRayImage = entry.getStudy().getXrayImages().stream().filter(i -> i.getId().equals(xrayId)).findFirst().orElseThrow(() -> new ResourceNotFoundException("No X-ray image found with ID " + xrayId + "."));
+
+        model.addAttribute("xrayImage", xRayImage);
 
         return "history/detail";
     }
