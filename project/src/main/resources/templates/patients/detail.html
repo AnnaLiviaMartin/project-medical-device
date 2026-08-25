@@ -26,7 +26,7 @@
                     <p class="pr-subtitle" th:text="#{patients.detail.subtitle}">Complete patient information, treatment history, medications, and scan access.</p>
                 </div>
                 <span class="status-badge"
-                      th:classappend="${patient.status.name() == 'OUTPATIENT'} ? 'status-badge--outpatient-hero' : 'status-badge--inpatient-hero'"
+                      th:classappend="status-badge--patient-hero"
                       th:text="${patient.status.label == 'OUTPATIENT'} ? #{patients.list.filter.outpatient} : #{patients.list.filter.inpatient}">Status</span>
             </section>
 
@@ -97,8 +97,10 @@
                                 <h2 class="section-title" th:text="#{patients.detail.treatmentTimeline.title}">Treatment Timeline</h2>
                             </div>
                             <div class="header-actions">
-                                <span class="count-badge" th:text="${#lists.size(historyEntries)} + ' ' + #{patients.detail.entriesCount.suffix}">0 entries</span>
-                                <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button" th:text="#{button.addEvent}">+ Add Event</a>
+                                <span class="status-badge" th:classappend="status-badge--patient-list"
+                                      th:text="${#lists.size(historyEntries)} + ' ' + #{patients.detail.entriesCount.suffix}">0 entries</span>
+                                <a th:href="@{'/patients/' + ${patient.id} + '/history/new'}" class="add-button"
+                                   th:text="#{button.addEvent}">+ Add Event</a>
                             </div>
                         </div>
 
@@ -117,7 +119,7 @@
                                             </h3>
                                         </div>
                                         <div class="timeline-header-actions">
-                                            <span class="type-badge" th:text="${entry.category.label}">Category</span>
+                                            <span class="status-badge" th:classappend="status-badge--patient-list" th:text="${entry.category.label}">Category</span>
                                         </div>
                                     </div>
 

@@ -522,26 +522,15 @@ a {
     white-space: nowrap;
 }
 
-.status-badge--outpatient-list {
+.status-badge--patient-list {
     background: #f3f4f6;
     color: #374151;
 }
 
-.status-badge--inpatient-list {
-    background: #eff6ff;
-    color: #1d4ed8;
-}
-
-.status-badge--outpatient-hero {
+.status-badge--patient-hero {
     background: #ecfdf5;
     color: var(--color-tertiary);
     border: 1px solid #a7f3d0;
-}
-
-.status-badge--inpatient-hero {
-    background: #fffbeb;
-    color: #b45309;
-    border: 1px solid #fde68a;
 }
 
 .ov-detail-top {
@@ -849,8 +838,8 @@ a {
 .type-badge {
     font-size: 0.75rem;
     font-weight: 700;
-    color: var(--color-primary);
-    background: var(--color-primary-soft);
+    color: var(--color-text-dark);
+    background: var(--color-text-muted);
     border: 1px solid var(--color-primary-soft-border);
     padding: 4px 10px;
     border-radius: var(--radius-pill);
