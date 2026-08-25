@@ -147,7 +147,7 @@ dsgvo.subtitle;Angaben gemäß den gesetzlichen Informationspflichten.;Informati
 dsgvo.impressum.title;Impressum;Imprint;Colofon
 dsgvo.impressum.person;Personenangaben;Personal Details;Persoonsgegevens
 dsgvo.impressum.contact;Kontakt;Contact;Contact
-dsgvo.impressum.mobile;Telefon: 01512 3929411;Phone: 01512 3929411;Telefoon: 01512 3929411
+dsgvo.impressum.mobile;Telefon: +49 ...;Phone: +49 ...;Telefoon: +49 ...
 dsgvo.impressum.mail;E-Mail: anna-livia.martin@student.hs-rm.de;Email: anna-livia.martin@student.hs-rm.de;E-mail: anna-livia.martin@student.hs-rm.de
 dsgvo.datenschutz.title;Datenschutzerklaerung;Data Protection Declaration;Privacyverklaring
 dsgvo.datenschutz.subtitle.one;1. Datenschutz auf einen Blick;1. Data protection at a glance;1. Privacy in het kort
@@ -179,7 +179,7 @@ dsgvo.datenschutz.dataprotection.usage.two;Wenn Sie diese Website benutzen, werd
 dsgvo.datenschutz.dataprotection.interet;Wir weisen darauf hin, dass die Datenübertragung im Internet (z.&nbsp;B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.;We would like to point out that data transmission over the internet (e.g. when communicating by email) may have security vulnerabilities. Complete protection of data against access by third parties is not possible.;Wij wijzen erop dat gegevensoverdracht via internet (bijv. bij communicatie per e-mail) beveiligingslekken kan vertonen. Een volledige bescherming van gegevens tegen toegang door derden is niet mogelijk.
 dsgvo.datenschutz.dataprotection.persondata.title;Hinweis zur verantwortlichen Stelle;Note on the Responsible Party;Verwijzing naar de verantwoordelijke instantie
 dsgvo.datenschutz.dataprotection;Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:;The party responsible for data processing on this website is:;De verantwoordelijke instantie voor de gegevensverwerking op deze website is:
-dsgvo.datenschutz.dataprotection.me;Anna-Livia Martin \n Zur Knopsmühle 19 \n 64521, Groß-Gerau;Anna-Livia Martin \n Zur Knopsmühle 19 \n 64521, Groß-Gerau;Anna-Livia Martin \n Zur Knopsmühle 19 \n 64521, Groß-Gerau
+dsgvo.datenschutz.dataprotection.me;Anna-Livia Martin \n 64521, Groß-Gerau;Anna-Livia Martin \n 64521, Groß-Gerau;Anna-Livia Martin \n 64521, Groß-Gerau
 dsgvo.datenschutz.dataprotection.mobile.title.person;Telefonnummer der verantwortlichen Stelle;Telephone Number of the Responsible Party;Telefoonnummer van de verantwoordelijke instantie
 dsgvo.datenschutz.dataprotection.mail.title.person;E-Mail-Adresse der verantwortlichen Stelle;Email Address of the Responsible Party;E-mailadres van de verantwoordelijke instantie
 dsgvo.datenschutz.dataprotection.person.info;Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z.&nbsp;B. Namen, E-Mail-Adressen o. &Auml;.) entscheidet.;The responsible party is the natural or legal person who, alone or jointly with others, decides on the purposes and means of processing personal data (e.g. names, email addresses, etc.).;Verantwoordelijke instantie is de natuurlijke of rechtspersoon die alleen of samen met anderen beslist over de doeleinden en middelen van de verwerking van persoonsgegevens (bijv. namen, e-mailadressen e.d.).
