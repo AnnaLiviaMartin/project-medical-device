@@ -23,12 +23,12 @@ Demo-Patienten an (nur beim allerersten Start, siehe `DemoDataSeeder`).
 
 Die Schnittstelle `MlAnalysisService` ist austauschbar gehalten, umschaltbar über `ml.analysis.provider` in `application.properties`:
 
-- **`simulated` (Standard):** `SimulatedMlAnalysisService` — erzeugt plausible, deterministische (per Bild-Hash geseedete) Wahrscheinlichkeiten für die 14 NIH-ChestX-ray14-Pathologien sowie ein optisch an Grad-CAM angelehntes, aber komplett synthetisches Overlay-Bild. **Diese Ergebnisse sind nicht medizinisch verwertbar** und werden in der UI durchgängig mit einem Warnhinweis gekennzeichnet. Läuft ohne externe Abhängigkeiten.
-- **`rest`:** `RestMlAnalysisService` — ruft den echten PyTorch/DenseNet-Model-Code über einen kleinen FastAPI-Microservice unter `/ml-service` auf. Setup und Details dort in `ml-service/README.md`.
+- **`simulated`:** `SimulatedMlAnalysisService` — erzeugt plausible, deterministische (per Bild-Hash geseedete) Wahrscheinlichkeiten für die 14 NIH-ChestX-ray14-Pathologien sowie ein optisch an Grad-CAM angelehntes, aber komplett synthetisches Overlay-Bild. **Diese Ergebnisse sind nicht medizinisch verwertbar** und werden in der UI durchgängig mit einem Warnhinweis gekennzeichnet. Läuft ohne externe Abhängigkeiten.
+- **`rest` (Standard):** `RestMlAnalysisService` — ruft den echten PyTorch/DenseNet-Model-Code über einen kleinen FastAPI-Microservice unter `/ml-service` auf. Setup und Details dort in `ml-service/README.md`.
 
 ## Produktivbetrieb
 
-Für den Wechsel von H2 auf Postgres/MySQL: den passenden JDBC-Treiber in die `pom.xml` aufnehmen und `spring.datasource.*` in `application.properties` (oder per Umgebungsvariable) anpassen — der Rest der Anwendung bleibt unverändert, da ausschließlich über Spring Data JPA zugegriffen wird.
+Für den Wechsel von H2 auf Postgres/MySQL: den passenden JDBC-Treiber in die `gradlew` aufnehmen und `spring.datasource.*` in `application.properties` (oder per Umgebungsvariable) anpassen — der Rest der Anwendung bleibt unverändert, da ausschließlich über Spring Data JPA zugegriffen wird.
 
 ## Tests
 
