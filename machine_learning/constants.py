@@ -21,7 +21,7 @@ CONFIG = {
     "data_dir":    "./data",
     "output_dir":  "./checkpoints",
     "plot_dir":    "./plots",
-    "batch_size":  32,
+    "batch_size":  16,
     "num_workers": 4,
     "num_epochs":  10,
     "learning_rate": 1e-4,
@@ -31,7 +31,7 @@ CONFIG = {
     "random_seed":   42,
 }
 
-PIXEL = 320 #224  # Bildgröße für ResNet-Modelle
+PIXEL = 448 #224  # Bildgröße für ResNet-Modelle
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]
