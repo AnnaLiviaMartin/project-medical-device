@@ -249,8 +249,14 @@ def train(config: dict) -> nn.Module:
 
     # Learning Rate Scheduler: reduziert LR wenn Val-AUC nicht besser wird
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode="max", factor=0.5, patience=2
-    )
+    optimizer,
+    mode="max",
+    factor=0.2,
+    patience=2,
+    threshold=0.001,
+    threshold_mode="abs",
+    min_lr=1e-7,
+)
 
     # --- Tracking ---
     best_auc = 0.0
@@ -267,8 +273,14 @@ def train(config: dict) -> nn.Module:
             print("\n  → Wechsel zu Phase 2: Backbone wird aufgetaut.\n")
             optimizer = unfreeze_backbone(model, config["learning_rate"])
             scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-                optimizer, mode="max", factor=0.5, patience=2
-            )
+    optimizer,
+    mode="max",
+    factor=0.2,
+    patience=2,
+    threshold=0.001,
+    threshold_mode="abs",
+    min_lr=1e-7,
+)
 
         # Training
         train_loss = train_one_epoch(

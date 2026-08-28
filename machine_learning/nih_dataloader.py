@@ -235,27 +235,32 @@ class NIHChestXrayDataset(Dataset):
 # ==============================================================================
 
 def get_transforms(mode: str = "train") -> transforms.Compose:
-    """
-    Gibt die richtigen Transforms für Training oder Validation/Test zurück.
-    """
-
     if mode == "train":
         return transforms.Compose([
-            transforms.Resize(PIXEL),
+            transforms.Resize(480),
             transforms.RandomCrop(PIXEL),
-            #transforms.RandomHorizontalFlip(p=0.5), # so kann Herz auf der falschen Seite erscheinen, was die Klassifikation erschwert?
             transforms.RandomRotation(degrees=5),
-            transforms.ColorJitter(brightness=0.2, contrast=0.2),
+            transforms.RandomAffine(
+                degrees=0,
+                translate=(0.03, 0.03),
+                scale=(0.95, 1.05),
+            ),
             transforms.ToTensor(),
-            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+            transforms.Normalize(
+                mean=IMAGENET_MEAN,
+                std=IMAGENET_STD,
+            ),
         ])
-    else:  # val / test
-        return transforms.Compose([
-            transforms.Resize(PIXEL),
-            transforms.CenterCrop(PIXEL),
-            transforms.ToTensor(),
-            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
-        ])
+
+    return transforms.Compose([
+        transforms.Resize(480),
+        transforms.CenterCrop(PIXEL),
+        transforms.ToTensor(),
+        transforms.Normalize(
+            mean=IMAGENET_MEAN,
+            std=IMAGENET_STD,
+        ),
+    ])
 
 # ==============================================================================
 # 7. DATALOADER FACTORY
