@@ -18,17 +18,27 @@ PATHOLOGY_LIST = [
 NUM_CLASSES = len(PATHOLOGY_LIST)  # 14
 
 CONFIG = {
-    "data_dir":    "./data",
-    "output_dir":  "./checkpoints",
-    "plot_dir":    "./plots",
-    "batch_size":  16,
+    "data_dir": "./data",
+    "output_dir": "./checkpoints",
+    "plot_dir": "./plots",
+
+    "batch_size": 16,
     "num_workers": 4,
-    "num_epochs":  10,
+
+    "num_epochs": 25,
     "learning_rate": 1e-4,
-    "weight_decay":  1e-5,
-    "patience":      3,      # Early Stopping: Epochen ohne Verbesserung
-    "num_classes":   14,
-    "random_seed":   42,
+    "weight_decay": 1e-4,
+
+    "patience": 5,
+    "unfreeze_epoch": 4,
+
+    "num_classes": 14,
+    "random_seed": 42,
+
+    "pos_weight_mode": "sqrt",
+    "pos_weight_max": 20.0,
+
+    "dropout": 0.25,
 }
 
 PIXEL = 448 #224  # Bildgröße für ResNet-Modelle
