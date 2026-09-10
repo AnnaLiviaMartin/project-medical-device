@@ -1,6 +1,6 @@
 # Projekt: Spring Boot + Thymeleaf
 
-Diese Anwendung ist die Implementierung des Projekts als **ein einziger Spring-Boot-Monolith**, der seine Oberflaeche direkt serverseitig mit **Thymeleaf** rendert. Jede Nutzereingabe laeuft durch **Jakarta Bean Validation** und wird bei Fehlern mit feldgenauen Meldungen direkt im Formular angezeigt.
+Diese Anwendung ist die Implementierung des Projekts als Spring-Boot-Monolith, der seine Oberflaeche direkt serverseitig mit Thymeleaf rendert. Jede Nutzereingabe laeuft durch Jakarta Bean Validation und wird bei Fehlern mit feldgenauen Meldungen direkt im Formular angezeigt.
 
 ## Los geht's
 
@@ -10,25 +10,22 @@ Voraussetzungen: **Java 21** und **Gradle**
 ./gradlew clean bootRun
 ```
 
-Die App startet auf **http://localhost:8080** und legt automatisch zwei
-Demo-Patienten an (nur beim allerersten Start, siehe `DemoDataSeeder`).
+Die App startet auf **http://localhost:8080** und legt automatisch zwei Demo-Patienten an (nur beim allerersten Start, siehe `DemoDataSeeder`).
 
 - Patientenliste: `/patients`
-- H2-Konsole (zum Reinschauen in die Datenbank): `/h2-console`
-  (JDBC-URL: `jdbc:h2:file:./medic-db`, User `sa`, kein Passwort)
-- Hochgeladene Dateien landen unter `./uploads/` und werden über `/media/**`
-  ausgeliefert.
+- H2-Konsole (zum Reinschauen in die Datenbank): `/h2-console` (JDBC-URL: `jdbc:h2:file:./medic-db`, User `sa`, kein Passwort)
+- Hochgeladene Dateien landen unter `./uploads/` und werden über `/media/**` ausgeliefert.
 
 ## Wichtiger Hinweis zur Röntgenbild-Analyse
 
 Die Schnittstelle `MlAnalysisService` ist austauschbar gehalten, umschaltbar über `ml.analysis.provider` in `application.properties`:
 
-- **`simulated`:** `SimulatedMlAnalysisService` — erzeugt plausible, deterministische (per Bild-Hash geseedete) Wahrscheinlichkeiten für die 14 NIH-ChestX-ray14-Pathologien sowie ein optisch an Grad-CAM angelehntes, aber komplett synthetisches Overlay-Bild. **Diese Ergebnisse sind nicht medizinisch verwertbar** und werden in der UI durchgängig mit einem Warnhinweis gekennzeichnet. Läuft ohne externe Abhängigkeiten.
-- **`rest` (Standard):** `RestMlAnalysisService` — ruft den echten PyTorch/DenseNet-Model-Code über einen kleinen FastAPI-Microservice unter `/ml-service` auf. Setup und Details dort in `ml-service/README.md`.
+- **`simulated`:** `SimulatedMlAnalysisService` — erzeugt deterministische Wahrscheinlichkeiten für die 14 NIH-ChestX-ray14-Pathologien sowie ein optisch an Grad-CAM angelehntes, aber komplett synthetisches Overlay-Bild. **Diese Ergebnisse sind nicht medizinisch verwertbar** und werden in der UI durchgängig mit einem Warnhinweis gekennzeichnet. Läuft ohne externe Abhängigkeiten.
+- **`rest` (Standard):** `RestMlAnalysisService` — ruft den echten PyTorch/DenseNet-Model-Code über einen kleinen FastAPI-Microservice unter `/ml-service` auf. Setup und Details dort in `ml-service/README.md`. Damit dies funktionieren kann, muss der FastAPI-Server gestartet werden. Informationen hierzu werden in der [README des Servers](./ml-service/README.md) beschrieben.
 
 ## Produktivbetrieb
 
-Für den Wechsel von H2 auf Postgres/MySQL: den passenden JDBC-Treiber in die `gradlew` aufnehmen und `spring.datasource.*` in `application.properties` (oder per Umgebungsvariable) anpassen — der Rest der Anwendung bleibt unverändert, da ausschließlich über Spring Data JPA zugegriffen wird.
+Für den Wechsel von H2 auf Postgres/MySQL: den passenden JDBC-Treiber in die `gradlew` aufnehmen und `spring.datasource.*` in `application.properties` (oder per Umgebungsvariable) anpassen.
 
 ## Tests
 

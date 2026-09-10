@@ -46,7 +46,7 @@ Ohne diese Umstellung bleibt `SimulatedMlAnalysisService` aktiv (Standard) - so 
 | Variable         | Default                                          | Bedeutung                                   |
 |-------------------|---------------------------------------------------|----------------------------------------------|
 | `ML_MODEL_PATH`   | `machine_learning/checkpoints/best_model.pt`      | Pfad zum Checkpoint                         |
-| `ML_THRESHOLD`    | `0.7`                                              | Ab welcher Wahrscheinlichkeit ein Befund als "positiv" gilt (muss zur Java-Anzeige-Schwelle passen) |
+| `ML_THRESHOLD`    | `0.7`                                              | Ab welcher Wahrscheinlichkeit ein Befund als "positiv" gilt |
 
 ## API
 
@@ -71,11 +71,3 @@ Response:
 ### `GET /health`
 
 Fuer Monitoring/Docker-Healthcheck.
-
-## Docker
-
-```bash
-docker build -t medic-ml-service .
-docker run -p 8000:8000 \
-  -v $(pwd)/machine_learning/checkpoints:/app/machine_learning/checkpoints medic-ml-service
-```
