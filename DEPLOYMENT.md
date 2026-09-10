@@ -1,6 +1,6 @@
 # Deployment auf Azure (Student-Tarif)
 
-Diese Anleitung deployed **zwei Azure Container Apps**:
+Diese Anleitung deployed **zwei Azure Container Apps**, genauso wie wir es gemacht haben:
 
 - **`medic-backend`**: Spring-Boot-App (Java 21), rendert die komplette Oberfläche selbst über Thymeleaf. Da Thymeleaf serverseitig rendert, spricht der Browser ausschließlich mit `medic-backend`, nicht direkt mit dem ML-Service.
 - **`medic-ml-service`**: FastAPI + PyTorch/DenseNet-Modell. Wird ausschließlich vom Spring-Backend serverseitig aufgerufen (`RestMlAnalysisService`) - braucht daher nur **internen** Zugriff innerhalb der Container Apps Environment, keine öffentliche URL.
