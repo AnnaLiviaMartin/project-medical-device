@@ -12,6 +12,7 @@ The documentation including more information about the process of developting th
 - `notes_and_diagrams/` – Contains notes and diagrams used for writing the paper
 - `user_study_ueq/` – Contains the results of ueq questionaire (TODO)
 - `user_study_think-aloud/` – Contains the results of think-aloud tasks and interview questions (german) (TODO)
+- `screen_recording/` – Contains screen recordings of how to use the web-app (TODO)
 
 ## Machine learning
 
