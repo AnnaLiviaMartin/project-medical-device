@@ -314,6 +314,7 @@ def create_dataloaders(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True,         # Beschleunigt GPU-Transfer
+        drop_last=True,
     )
     val_loader = DataLoader(
         val_dataset,

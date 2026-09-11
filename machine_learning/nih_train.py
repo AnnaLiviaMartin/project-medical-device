@@ -71,7 +71,15 @@ def get_model(
 # ==============================================================================
 # 3. OPTIMIZER, LOSS UND SCHEDULER
 # ==============================================================================
-
+def freeze_batchnorm_stats(model: nn.Module) -> None:
+    """
+    Setzt BatchNorm-Layer im eingefrorenen Backbone auf eval().
+    Dadurch werden ihre running_mean- und running_var-Statistiken
+    in Phase 1 nicht mit kleinen Batches weiter verändert.
+    """
+    for module in model.features.modules():
+        if isinstance(module, nn.modules.batchnorm._BatchNorm):
+            module.eval()
 
 def unfreeze_backbone(
     model: nn.Module,
@@ -181,8 +189,13 @@ def train_one_epoch(
     device: torch.device,
     epoch: int,
 ) -> float:
-    """Führt eine Trainings-Epoche aus und gibt den durchschnittlichen Loss zurück."""
     model.train()
+
+    # Phase 1: Backbone ist eingefroren.
+    # BatchNorm-Statistiken im Backbone ebenfalls festhalten.
+    if not any(parameter.requires_grad for parameter in model.features.parameters()):
+        freeze_batchnorm_stats(model)
+
     total_loss = 0.0
     n_batches = len(loader)
 

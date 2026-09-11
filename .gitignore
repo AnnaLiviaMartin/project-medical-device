@@ -1,10 +1,15 @@
+# Root Python environment
+.venv/
+
+# Machine Learning
 machine_learning/.venv/
 machine_learning/artifacts/
 machine_learning/cache/
-machine_learning/poetry.lock
-machine_learning/pyproject.toml
 machine_learning/data/images/
 machine_learning/__pycache__/
 machine_learning/checkpoints/
-machine_learning/plots*
-machine_learning/plots/*.png
+machine_learning/plots/
+
+# Poetry
+machine_learning/poetry.lock
+machine_learning/pyproject.toml
