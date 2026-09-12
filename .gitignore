@@ -7,7 +7,6 @@ machine_learning/artifacts/
 machine_learning/cache/
 machine_learning/data/images/
 machine_learning/__pycache__/
-machine_learning/checkpoints/
 machine_learning/plots/
 
 # Poetry
