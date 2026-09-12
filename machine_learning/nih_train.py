@@ -367,6 +367,10 @@ def train(config: dict) -> nn.Module:
                 weight_decay=config["weight_decay"],
             )
             scheduler = build_scheduler(optimizer)
+            # Nach dem Auftauen kann die Val-AUC kurzzeitig sinken, bevor
+            # Phase 2 zu wirken beginnt. Ohne Reset würde Early Stopping
+            # genau in diesem Uebergang faelschlicherweise auslösen.
+            patience_counter = 0
 
         train_loss = train_one_epoch(
             model=model,
@@ -530,6 +534,14 @@ def evaluate_on_test(config: dict) -> None:
         thresholds,
     )
     print_threshold_report(threshold_results)
+
+    # Thresholds persistieren, damit z.B. analyse.py (Einzelbild-Inferenz im
+    # Prototyp) dieselben, ausschließlich auf dem Val-Split bestimmten
+    # klassenspezifischen Schwellen verwendet statt eines pauschalen 0.5-Werts.
+    thresholds_path = os.path.join(config["output_dir"], "thresholds.json")
+    with open(thresholds_path, "w", encoding="utf-8") as file:
+        json.dump(thresholds, file, indent=2, ensure_ascii=False)
+    print(f"\nThresholds gespeichert: {thresholds_path}")
 
 
 # ==============================================================================

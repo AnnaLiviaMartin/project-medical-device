@@ -253,8 +253,12 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
         ])
 
     return transforms.Compose([
-        transforms.Resize(480),
-        transforms.CenterCrop(PIXEL),
+        # Direktes Resize auf Zielgroesse statt Resize+CenterCrop: Ein
+        # CenterCrop wuerde bei Thorax-Aufnahmen systematisch die Raender
+        # (u.a. Lungenspitzen, kostophrenische Winkel) abschneiden, in denen
+        # relevante Befunde liegen koennen. Fuer Val/Test soll die Bewertung
+        # nicht durch einen Ausschnitt verzerrt werden.
+        transforms.Resize((PIXEL, PIXEL)),
         transforms.ToTensor(),
         transforms.Normalize(
             mean=IMAGENET_MEAN,
@@ -337,4 +341,3 @@ def create_dataloaders(
     print(f"  Test-Batches:  {len(test_loader)}")
 
     return train_loader, val_loader, test_loader, pos_weights
-    

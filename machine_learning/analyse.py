@@ -1,14 +1,38 @@
+import json
+import os
+
 import torch
 from PIL import Image
 from torchvision import transforms
 from nih_train import get_model
-from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL
+from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL, CONFIG
 
 MODEL_PATH = "./checkpoints/best_model.pt"
 IMAGE_PATH = "./mein_roentgenbild.png"
+THRESHOLDS_PATH = os.path.join(CONFIG["output_dir"], "thresholds.json")
 
 NUM_CLASSES = 14
-THRESHOLD = 0.5
+DEFAULT_THRESHOLD = 0.5  # Fallback, falls thresholds.json (noch) nicht existiert
+
+
+def load_thresholds(path=THRESHOLDS_PATH):
+    """
+    Lädt die klassenspezifischen Decision-Thresholds, die ausschließlich auf
+    dem Validierungssplit bestimmt wurden (siehe nih_threshold.py). Diese
+    werden im Prototyp verwendet, um vorherzusagen, ob ein Befund als
+    positiv angezeigt wird — nicht ein pauschaler Wert von 0.5.
+    """
+    if not os.path.exists(path):
+        print(
+            f"Warnung: '{path}' nicht gefunden. "
+            f"Fällt zurück auf einheitlichen Threshold {DEFAULT_THRESHOLD}. "
+            "Führe evaluate_on_test() in nih_train.py einmal aus, um die "
+            "Thresholds zu erzeugen."
+        )
+        return {pathology: DEFAULT_THRESHOLD for pathology in PATHOLOGY_LIST}
+
+    with open(path, encoding="utf-8") as file:
+        return json.load(file)
 
 def choose_gpu():
     return torch.device(
@@ -65,20 +89,22 @@ def predict_image(model_path=MODEL_PATH, image_path=IMAGE_PATH):
 
     return predict(model, image)
 
-def print_probabilites(probabilities):
+def print_probabilites(probabilities, thresholds):
     print("\nVorhersagen:")
 
     for pathology, probability in zip(PATHOLOGY_LIST, probabilities):
         probability_value = probability.item()
 
-        prediction = probability_value >= THRESHOLD
+        prediction = probability_value >= thresholds[pathology]
 
         print(
             f"{pathology} "
             f"{probability_value:.4f} "
-            f"({'positiv' if prediction else 'negativ'})"
+            f"(Schwelle {thresholds[pathology]:.3f}, "
+            f"{'positiv' if prediction else 'negativ'})"
         )
 
 if __name__ == "__main__":
     probabilities = predict_image()
-    print_probabilites(probabilities)
+    thresholds = load_thresholds()
+    print_probabilites(probabilities, thresholds)

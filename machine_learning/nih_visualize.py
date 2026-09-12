@@ -249,7 +249,7 @@ def plot_auc_barchart(all_probs: np.ndarray,
 
     # Referenzlinie: CheXNet-Paper Durchschnitt (~0.841)
     ax.axvline(x=0.841, color="#7c3aed", linestyle="--",
-               linewidth=1.5, label="CheXNet (Wang et al., 2017)")
+               linewidth=1.5, label="CheXNet (Rajpurkar et al., 2017)")
     ax.axvline(x=np.mean(scores), color="#0891b2", linestyle="-.",
                linewidth=1.5, label=f"Unser Modell Ø {np.mean(scores):.3f}")
 
@@ -555,8 +555,6 @@ def visualise_all():
     else:
         print(f"  Warnung: '{history_path}' nicht gefunden.")
         print("  (Datei entsteht automatisch beim nächsten Trainingslauf.)")
-
-    plot_training_history(history, "plots/training_history.png")
 
     # --- B) ROC-Kurven ---
     print("\n[B] ROC-Kurven...")
