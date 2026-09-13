@@ -10,8 +10,8 @@ The documentation including more information about the process of developting th
 - `project/ml-service` — FastAPI Code, contains README with information on how to run the ml-server
 - `machine_learning/` — PyTorch training, data loading, and evaluation scripts for the NIH Chest X-ray dataset
 - `notes_and_diagrams/` – Contains notes and diagrams used for writing the paper
-- `user_study_ueq/` – Contains the results of ueq questionaire (TODO)
-- `user_study_think-aloud/` – Contains the results of think-aloud tasks and interview questions (german) (TODO)
+- `user_study_ueq/` – Contains the results of ueq questionaire
+- `user_study_think-aloud/` – Contains the results of think-aloud tasks and interview questions (german)
 - `screen_recording/` – Contains screen recordings of how to use the web-app (TODO)
 
 ## Machine learning
