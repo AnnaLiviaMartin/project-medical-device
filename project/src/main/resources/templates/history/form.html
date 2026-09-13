@@ -42,7 +42,10 @@
                             </span>
                             <select th:field="*{category}">
                                 <option value="" th:text="#{history.form.category.placeholder}">— Select —</option>
-                                <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.HistoryCategory).values()}" th:value="${option}" th:text="${option.label}"></option>
+                                <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.HistoryCategory).values()}"
+                                        th:value="${option}"
+                                        th:text="#{${option.getMessageKey()}}">
+                                </option>
                             </select>
                             <span class="field-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></span>
                         </label>

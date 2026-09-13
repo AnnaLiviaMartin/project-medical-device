@@ -27,6 +27,9 @@ button.addEvent;+ Ereignis hinzufügen;+ Add Event;+ Gebeurtenis toevoegen
 patients.status;Status;Status;Status
 patients.diagnosis;Diagnose;Diagnosis;Diagnose
 patients.ward;Station / Abteilung;Ward / Unit;Afdeling / Unit
+patients.gender.male;Männlich;Male;Man
+patients.gender.female;Weiblich;Female;Vrouw
+patients.gender.nonbinary;Nicht-binär;Non-binary;Non-binair
 error.generic.title;Fehler;Error;Fout
 
 # Patientenliste
@@ -133,6 +136,11 @@ history.detail.image.mode.original;Zeigt das Original-Röntgenbild.;Showing the 
 history.detail.noXray.label;Röntgenanalyse Thorax;Chest X-ray Analysis;Röntgenanalyse thorax
 history.detail.noXray.hint;"Für diesen Eintrag wurde noch kein Röntgenbild hochgeladen. Verwenden Sie oben ""+ Röntgenbild"", um eines hochzuladen und zu analysieren.";"No X-ray uploaded for this entry yet. Use ""+ X-ray"" above to upload and analyze one.";"Voor dit item is nog geen röntgenfoto geüpload. Gebruik hierboven ""+ Röntgenfoto"" om er een te uploaden en te analyseren."
 history.form.category.placeholder;— Auswählen —;— Select —;— Selecteer —
+history.category.visit;Besuch;Visit;Bezoek
+history.category.procedure;Prozedur;Procedure;Procedure
+history.category.finding;Befund;Finding;Bevinding
+history.category.medication;Medikation;Medication;Medicatie
+history.category.followup;Nachsorge;Follow-up;Nazorg
 
 # Fehler
 error404.headTitle;Nicht gefunden;Not found;Niet gevonden

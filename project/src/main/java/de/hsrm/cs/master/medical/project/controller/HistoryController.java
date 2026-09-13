@@ -124,7 +124,7 @@ public class HistoryController {
                 redirectAttributes.addFlashAttribute("errorMessage", "Please choose an X-ray image before uploading.");
             } else {
                 imagingService.uploadScan(patientId, entryId, form.getFile());
-                redirectAttributes.addFlashAttribute("successMessage", "X-ray uploaded and analyzed (simulated analysis, see notice on the results card).");
+                redirectAttributes.addFlashAttribute("successMessage", "X-ray uploaded and analyzed.");
             }
         } catch (FileStorageException ex) {
             redirectAttributes.addFlashAttribute("errorMessage", ex.getMessage());

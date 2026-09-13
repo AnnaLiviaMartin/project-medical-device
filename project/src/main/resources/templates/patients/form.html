@@ -60,14 +60,16 @@
                             <span class="field-label" th:text="#{patients.gender}">Gender</span>
                             <select th:field="*{sex}">
                                 <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.Sex).values()}"
-                                        th:value="${option}" th:text="${option.label}"></option>
+                                        th:value="${option}" th:text="#{${option.getMessageKey()}}"></option>
                             </select>
                         </label>
                         <label class="field">
                             <span class="field-label" th:text="#{patients.status}">Status</span>
                             <select th:field="*{status}">
                                 <option th:each="option : ${T(de.hsrm.cs.master.medical.project.domain.PatientStatus).values()}"
-                                        th:value="${option}" th:text="${option.label}"></option>
+                                        th:value="${option}"
+                                        th:text="#{${option.getMessageKey()}}">
+                                </option>
                             </select>
                         </label>
                         <label class="field" th:classappend="${#fields.hasErrors('diagnosis')} ? 'has-error'">
