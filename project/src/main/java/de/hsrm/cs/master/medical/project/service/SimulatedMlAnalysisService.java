@@ -129,12 +129,6 @@ public class SimulatedMlAnalysisService implements MlAnalysisService {
         return image;
     }
 
-    /**
-     * Zeichnet einen halbtransparenten roten "Aktivierungsfleck" auf eine
-     * abgedunkelte Graustufen-Kopie des Originalbilds - optisch angelehnt an
-     * ein Grad-CAM-Overlay, aber komplett synthetisch und ohne jede
-     * Verbindung zu echten Modellgewichten.
-     */
     private BufferedImage renderSyntheticHeatmap(BufferedImage base, long seed, String pathology) {
         int size = Math.min(OVERLAY_SIZE, Math.max(base.getWidth(), base.getHeight()));
         BufferedImage scaledBase = scale(base, size, size);
