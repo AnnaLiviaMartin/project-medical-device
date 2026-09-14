@@ -401,7 +401,6 @@ def plot_gradcam(model: nn.Module,
     """
     transform = transforms.Compose([
         transforms.Resize(PIXEL),
-        transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])
