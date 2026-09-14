@@ -42,3 +42,16 @@ Train or evaluate the model with the available scripts:
 ```bash
 python x-ray-analysis.py
 ```
+
+## Statements of contribution
+
+1. David Rossel
+
+2. Anna-Livia Martin
+
+## AI Usage for Coding
+
+1. Machine Learning
+
+2. Webbased Application
+For the webbased application Claude was used to code the basis of the final prototype (entities, services, controller) building upon the definitions in the earlier version using django (see [Doku](DOCU.md)). Further AI was used when CSS-issues arose and we didnt know how to fix these.
