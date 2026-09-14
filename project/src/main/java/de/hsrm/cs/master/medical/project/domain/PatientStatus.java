@@ -4,8 +4,8 @@ import lombok.Getter;
 
 @Getter
 public enum PatientStatus {
-    INPATIENT("Outpatient", "patients.list.filter.inpatient"),
-    OUTPATIENT("Inpatient", "patients.list.filter.outpatient");
+    INPATIENT("INPATIENT", "patients.list.filter.inpatient"),
+    OUTPATIENT("OUTPATIENT", "patients.list.filter.outpatient");
 
     private final String messageKey;
     private final String label;
