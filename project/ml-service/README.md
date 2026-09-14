@@ -1,19 +1,19 @@
-# Projekt: Inference Service
+# Project: Inference Service
 
-Kleiner FastAPI-Wrapper um das urspruengliche PyTorch/DenseNet-Modell samt Grad-CAM (`ml/services.py` aus dem alten Django-Backend). Wird vom Spring-Boot-Backend ueber `RestMlAnalysisService` per REST aufgerufen, siehe `MlAnalysisService`-Interface dort.
+A small FastAPI wrapper around the original PyTorch/DenseNet model, including Grad-CAM (`ml/services.py` from the old Django backend). It is called via REST by the Spring Boot backend using `RestMlAnalysisService`; see the `MlAnalysisService` interface there.
 
 ## Setup
 
-### 1. Modell-Assets an die richtige Stelle legen
+### 1. Place the model assets in the correct location
 
 ```
 ml-service/
   machine_learning/
     checkpoints/
-      best_model.pt            <- trainierter Checkpoint
+      best_model.pt            <- trained checkpoint
 ```
 
-### 2. Abhaengigkeiten installieren
+### 2. Install dependencies
 
 ```bash
 cd ml-service
@@ -22,37 +22,37 @@ source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 3. Starten
+### 3. Starting
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-Kurzer Check: `curl http://localhost:8000/health` sollte `{"status":"ok"}` liefern. `GET /docs` zeigt die interaktive Swagger-UI.
+Quick check: `curl http://localhost:8000/health` should return `{‘status’:‘ok’}`. `GET /docs` displays the interactive Swagger UI.
 
-### 4. Java-Backend darauf umstellen
+### 4. Switch the Java backend to this
 
-In `application.properties` (oder per Env-Var):
+In `application.properties` (or via an environment variable):
 
 ```properties
 ml.analysis.provider=rest
 ml.service.url=http://localhost:8000
 ```
 
-Ohne diese Umstellung bleibt `SimulatedMlAnalysisService` aktiv (Standard) - so kann das Java-Backend weiter ohne laufenden ML-Service gestartet werden.
+Without this change, `SimulatedMlAnalysisService` remains active (by default) – this means the Java backend can still be started without the ML service running.
 
-## Konfiguration (Umgebungsvariablen)
+## Configuration (environment variables)
 
 | Variable         | Default                                          | Bedeutung                                   |
 |-------------------|---------------------------------------------------|----------------------------------------------|
-| `ML_MODEL_PATH`   | `machine_learning/checkpoints/best_model.pt`      | Pfad zum Checkpoint                         |
-| `ML_THRESHOLD`    | `0.7`                                              | Ab welcher Wahrscheinlichkeit ein Befund als "positiv" gilt |
+| `ML_MODEL_PATH`   | `machine_learning/checkpoints/best_model.pt`      | Path to checkpoint                         |
+| `ML_THRESHOLD`    | `0.7`                                              | At what probability is a test result considered ‘positive’? |
 
 ## API
 
 ### `POST /analyze`
 
-Multipart-Upload, Feldname `file` (PNG/JPEG).
+Multipart upload, field name `file` (PNG/JPEG).
 
 Response:
 
@@ -62,12 +62,12 @@ Response:
   "confidence": 0.83,
   "threshold": 0.7,
   "scores": { "Atelectasis": 0.12, "Effusion": 0.83, "...": "..." },
-  "gradcam_images": { "Effusion": "<base64-kodiertes PNG>" }
+  "gradcam_images": { "Effusion": "<base64-encoded PNG>" }
 }
 ```
 
-`gradcam_images` enthaelt nur Pathologien, deren Score >= `threshold` ist - fuer jede davon ein eigenes Grad-CAM-Overlay (analog zur alten Django-Logik, nur dass das Bild statt in `MEDIA_ROOT` gespeichert direkt im Response zurueckgegeben wird; das Java-Backend uebernimmt das Abspeichern).
+`gradcam_images` contains only pathologies with a score >= `threshold` – each with its own Grad-CAM overlay (similar to the old Django logic, except that the image is returned directly in the response rather than being stored in `MEDIA_ROOT`; the Java backend handles the storage).
 
 ### `GET /health`
 
-Fuer Monitoring/Docker-Healthcheck.
+For monitoring/Docker health checks.

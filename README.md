@@ -1,6 +1,6 @@
-# From Model to Prototype: A User-Centred Pipeline for Cloud-Based AI-Assisted Chest X-Ray Analysis
+# From Model to Prototype: A User-Centred Workflow for Cloud-Based AI-Assisted Chest X-Ray Analysis
 
-This is the repository to the paper: "From Model to Prototype: A User-Centred Pipeline for Cloud-Based AI-Assisted Chest X-Ray Analysis" by Anna-Livia Martin and David Rossel
+This is the repository to the paper: "From Model to Prototype: A User-Centred Workflow for Cloud-Based AI-Assisted Chest X-Ray Analysis" by Anna-Livia Martin and David Rossel
 
 The documentation including more information about the process of developting the prototype can be found at the [Doku](./DOCU.md).
 
