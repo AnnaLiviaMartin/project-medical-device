@@ -164,12 +164,16 @@ Für das Neubauen von Frontend und Backend: siehe [Schritt 3](#3-container-regis
 ```bash
 # Backend-Änderung:
 ./gradlew clean build
-az acr build --registry $ACR_NAME --image medic-backend:latest --file Dockerfile .
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend  --image "$ACR_LOGIN_SERVER/medic-backend:latest"
+docker build -t medic-backend:v2 -f Dockerfile .
+az acr login --name $ACR_NAME
+docker tag medic-backend:v2 $ACR_LOGIN_SERVER/medic-backend:v2
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --image "$ACR_LOGIN_SERVER/medic-backend:v2"
 
 # ML-Service-Änderung:
-az acr build --registry $ACR_NAME --image medic-ml-service:latest --file ml-service/Dockerfile ml-service
-az containerapp update --resource-group $RESOURCE_GROUP --name medic-ml-service  --image "$ACR_LOGIN_SERVER/medic-ml-service:latest"
+docker build -t medic-ml-service:v2 -f ml-service/Dockerfile ml-service
+docker tag medic-ml-service:v2 $ACR_LOGIN_SERVER/medic-ml-service:v2
+docker push $ACR_LOGIN_SERVER/medic-ml-service:v2
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-ml-service  --image "$ACR_LOGIN_SERVER/medic-ml-service:v2"
 ```
 
 ## Abschalten
