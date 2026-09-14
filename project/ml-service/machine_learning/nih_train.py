@@ -164,7 +164,7 @@ def build_criterion(
 def build_scheduler(
     optimizer: torch.optim.Optimizer,
 ) -> torch.optim.lr_scheduler.ReduceLROnPlateau:
-    """Scheduler: reduziert LR, wenn sich die Validation-Macro-AUC nicht verbessert."""
+    """Scheduler: reduziert LR, wenn sich der Validation-Loss nicht verbessert."""
     return torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
         mode="max",
@@ -388,7 +388,7 @@ def train(config: dict) -> nn.Module:
             device=device,
         )
 
-        scheduler.step(macro_auc)
+        scheduler.step(val_loss)
 
         current_lrs = [group["lr"] for group in optimizer.param_groups]
         elapsed_seconds = time.time() - started_at

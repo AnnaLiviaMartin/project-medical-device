@@ -167,7 +167,7 @@ def build_scheduler(
     """Scheduler: reduziert LR, wenn sich die Validation-Macro-AUC nicht verbessert."""
     return torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
-        mode="max",
+        mode="min",
         factor=0.2,
         patience=2,
         threshold=0.001,
@@ -350,7 +350,7 @@ def train(config: dict) -> nn.Module:
         "learning_rates": [],
     }
     checkpoint_path = os.path.join(config["output_dir"], "best_model.pt")
-    unfreeze_epoch = int(config.get("unfreeze_epoch", 4))
+    unfreeze_epoch = int(config.get("unfreeze_epoch", config["unfreeze_epoch"]))
 
     print(f"\nTraining gestartet: {config['num_epochs']} Epochen")
     print(f"Phase 1: nur Classifier bis einschließlich Epoche {unfreeze_epoch - 1}")
@@ -367,9 +367,6 @@ def train(config: dict) -> nn.Module:
                 weight_decay=config["weight_decay"],
             )
             scheduler = build_scheduler(optimizer)
-            # Nach dem Auftauen kann die Val-AUC kurzzeitig sinken, bevor
-            # Phase 2 zu wirken beginnt. Ohne Reset würde Early Stopping
-            # genau in diesem Uebergang faelschlicherweise auslösen.
             patience_counter = 0
 
         train_loss = train_one_epoch(
@@ -388,7 +385,7 @@ def train(config: dict) -> nn.Module:
             device=device,
         )
 
-        scheduler.step(macro_auc)
+        scheduler.step(val_loss)
 
         current_lrs = [group["lr"] for group in optimizer.param_groups]
         elapsed_seconds = time.time() - started_at
