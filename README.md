@@ -4,6 +4,8 @@ This is the repository to the paper: "From Model to Prototype: A User-Centred Pi
 
 The documentation including more information about the process of developting the prototype can be found at the [Doku](./DOCU.md).
 
+The URL to Azure is: https://medic-backend.wittyglacier-cf4c034a.germanywestcentral.azurecontainerapps.io
+
 ## Repository structure
 
 - `project/` — Webbased Application Code, contains README with information on how to run the web-app (spring boot + fastapi servers)
