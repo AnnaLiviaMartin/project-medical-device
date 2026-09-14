@@ -10,7 +10,6 @@ The machine learning component was developed based on the architectural and mode
 
 A DenseNet-121 model pre-trained on ImageNet was used as the foundation and further trained on the NIH Chest X-ray Dataset. The architecture was adapted to meet the requirements of the developed prototype.
 
-
 ### Data Set and Data Split
 
 The NIH Chest X-ray Dataset, comprising 112,120 X-ray images from 30,805 patients and representing 14 thoracic pathologies, served as the data set [2].
@@ -18,7 +17,6 @@ The NIH Chest X-ray Dataset, comprising 112,120 X-ray images from 30,805 patient
 The official training and test lists from the dataset were used for the split. Additionally, a separate validation dataset was created from the training data. The split was performed at the patient level, ensuring that images from a single patient do not appear simultaneously in the training, validation, and test datasets.
 
 To ensure this technically, three overlap checks between the training, validation, and test data were implemented and verified using assertions. This prevents data from the same patient from being accidentally used in multiple datasets.
-
 
 ### Model Architecture and Classification Task
 
@@ -29,7 +27,6 @@ The original classification head of the pre-trained model was replaced with a cu
 The classification head also includes a dropout layer with $p=0.25$. The model initially outputs logits, which are converted into probabilities between 0 and 1 during inference using the sigmoid function.
 
 “No Finding” was not modeled as a separate output class. This outcome is implicitly assumed when none of the 14 pathologies exceeds the respective classification threshold.
-
 
 ### Training Procedure
 
