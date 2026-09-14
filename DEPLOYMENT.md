@@ -174,6 +174,10 @@ docker build -t medic-ml-service:v2 -f ml-service/Dockerfile ml-service
 docker tag medic-ml-service:v2 $ACR_LOGIN_SERVER/medic-ml-service:v2
 docker push $ACR_LOGIN_SERVER/medic-ml-service:v2
 az containerapp update --resource-group $RESOURCE_GROUP --name medic-ml-service  --image "$ACR_LOGIN_SERVER/medic-ml-service:v2"
+
+
+az containerapp update --resource-group $RESOURCE_GROUP --name medic-backend --set-env-vars "ML_ANALYSIS_PROVIDER=rest" "ML_SERVICE_URL=https://$ML_SERVICE_URL" "ML_SERVICE_TIMEOUT_SECONDS=60"
+# az containerapp revision list --resource-group $RESOURCE_GROUP --name medic-backend -o table
 ```
 
 ## Abschalten
