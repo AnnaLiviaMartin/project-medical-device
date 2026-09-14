@@ -42,7 +42,10 @@ async def analyze(file: UploadFile = File(...)):
             tmp_path = tmp.name
 
         result = run_model_on_image(tmp_path)
-        return JSONResponse(result)
+        response = JSONResponse(content=result)
+        logger.info("ML response media_type: %s", response.media_type)
+        logger.info("ML response headers: %s", response.headers)
+        return response
 
     except ModelLoadError as exc:
         logger.error("Modell konnte nicht geladen werden: %s", exc)
