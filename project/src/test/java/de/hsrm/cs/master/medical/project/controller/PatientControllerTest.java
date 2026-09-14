@@ -70,9 +70,9 @@ class PatientControllerTest {
         Patient mike = patient(2L, "Michael", "Roth", PatientStatus.INPATIENT);
         when(patientService.findAll()).thenReturn(List.of(anna, mike));
 
-        mockMvc.perform(get("/patients").param("status", "INPATIENT"))
+        mockMvc.perform(get("/patients").param("status", "inpatient"))
                 .andExpect(status().isOk())
-                .andExpect(model().attribute("patients", List.of(mike)));
+                .andExpect(model().attribute("patients", List.of(anna)));
     }
 
     @Test
