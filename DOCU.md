@@ -60,9 +60,9 @@ The purpose of this experiment was to determine whether the higher input resolut
 
 Both model variants were trained under otherwise identical conditions. The only difference between the two experiments was the input resolution. The dataset was split on patient level into training, validation, and test sets to prevent images from the same patient from occurring in multiple splits.
 
-For the $448 \times 448$ experiment, the dataset consisted of 77,988 training images from 25,207 patients, 8,536 validation images from 2,801 patients, and 25,596 test images from 2,797 patients. The model was trained as a multi-label classifier using BCEWithLogitsLoss with class-specific weights derived from the square root of the positive-class weights to account for the strong class imbalance.
+For both experiments, the dataset consisted of 77,988 training images from 25,207 patients, 8,536 validation images from 2,801 patients, and 25,596 test images from 2,797 patients. The model was trained as a multi-label classifier using BCEWithLogitsLoss with class-specific weights derived from the square root of the positive-class weights to account for the strong class imbalance.
 
-Model selection was performed based on the validation macro-AUC. The best model for the $448 \times 448$ experiment was obtained after epoch 10 with a validation macro-AUC of 0.8312. The corresponding checkpoint is stored at:
+Model selection was performed based on the validation macro-AUC. The best model for the $448 \times 448$ experiment was obtained after epoch 7 with a validation macro-AUC of 0.8322. The corresponding checkpoint is stored at:
 
 ./checkpoints/448px/best_model.pt
 
@@ -72,13 +72,13 @@ The complete training history is stored at:
 
 The results for the two input resolutions are summarized below:
 
-Input Resolution	Validation Macro-AUC
-$224 \times 224$	0.7656
-$448 \times 448$	0.8312
+Input Resolution | Validation Macro-AUC | Test Macro-AUC | Test Loss
+$224 \times 224$ | 0.8228 | 0.7956 | 0.5808
+$448 \times 448$ | 0.8322 | 0.8071 | 0.5511
 
-The higher input resolution resulted in a substantial improvement in classification performance. The validation macro-AUC increased from 0.7656 to 0.8312, corresponding to an absolute improvement of 0.0656 AUC points.
+The higher input resolution resulted in an improvement in classification performance. The validation macro-AUC increased from 0.8228 to 0.8322, corresponding to an absolute improvement of 0.0094 AUC points. On the test dataset, the macro-AUC increased from 0.7956 to 0.8071, corresponding to an absolute improvement of 0.0115 AUC points. The test loss was also lower for the $448 \times 448$ model, decreasing from 0.5808 to 0.5511.
 
-Based on these results, the $448 \times 448$ input resolution was selected for the final model. The detailed training history, including training loss, validation loss, validation macro-AUC, and learning-rate changes, is retained in the corresponding experiment history file.
+Based on the improved validation and test performance, the $448 \times 448$ input resolution was selected for the final model. The detailed training history, including training loss, validation loss, validation macro-AUC, and learning-rate changes, is retained in the corresponding experiment history file.
 
 References
 
