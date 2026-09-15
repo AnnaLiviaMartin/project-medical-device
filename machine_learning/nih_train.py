@@ -239,17 +239,17 @@ def validate(
 
             logits = model(images) # abgabe der rohen vorhersagen (logits) des Modells
             loss = criterion(logits, labels) # loss berechnen
-            total_loss += loss.item()
+            total_loss += loss.item() # aufsummieren
 
-            probabilities = torch.sigmoid(logits) # TODO erklaeren: warum sigmoid? warum roc-auc?
-            all_probs.append(probabilities.cpu().numpy())
+            probabilities = torch.sigmoid(logits) # threshold braucht etwas Interpretierbares z.B. Wahrscheinlichkeiten, nicht Logits (abstrakt), wandelt jeden Wert in eine Zahl zwischen 0 und 1 um
+            all_probs.append(probabilities.cpu().numpy()) # Wahrscheinlichkeiten und echten Labels batchweise in Listen sammeln
             all_labels.append(labels.cpu().numpy())
 
-    all_probs = np.concatenate(all_probs, axis=0)
+    all_probs = np.concatenate(all_probs, axis=0) 
     all_labels = np.concatenate(all_labels, axis=0)
 
     auc_scores = {}
-    for index, pathology in enumerate(PATHOLOGY_LIST):
+    for index, pathology in enumerate(PATHOLOGY_LIST): # Fügt alle einzelnen Batch-Arrays zu zwei großen Arrays zusammen als Form (N, 14), N = Anzahl aller Validation-Bilder.
         try:
             auc_scores[pathology] = roc_auc_score(
                 all_labels[:, index],
@@ -280,14 +280,14 @@ def get_probs_and_labels(
     with torch.no_grad():
         for images, labels in loader:
             images = images.to(device, non_blocking=True)
-            logits = model(images)
-            probabilities = torch.sigmoid(logits)
+            logits = model(images) # logits = rohe Vorhersagen des Modells, die noch nicht in Wahrscheinlichkeiten umgerechnet wurden
+            probabilities = torch.sigmoid(logits) # wandelt jeden Wert in eine Zahl zwischen 0 und 1 um, die als Wahrscheinlichkeit interpretiert werden kann
 
             all_probs.append(probabilities.cpu().numpy())
             all_labels.append(labels.cpu().numpy())
 
     return (
-        np.concatenate(all_probs, axis=0),
+        np.concatenate(all_probs, axis=0), # zusammenfügen
         np.concatenate(all_labels, axis=0),
     )
 
@@ -387,9 +387,9 @@ def train(config: dict) -> nn.Module:
             device=device,
         )
 
-        scheduler.step(macro_auc) # TODO weiter hier
+        scheduler.step(macro_auc) # vergleicht ob macro_auc > bester wert um mehr als threshold=0.001 verbessert hat, wenn nicht, wird patience hochgezählt
 
-        current_lrs = [group["lr"] for group in optimizer.param_groups]
+        current_lrs = [group["lr"] for group in optimizer.param_groups] # liest akt. Lernrate (zwei verschiedene Phasen)
         elapsed_seconds = time.time() - started_at
 
         history["train_loss"].append(float(train_loss))
@@ -411,7 +411,7 @@ def train(config: dict) -> nn.Module:
             bar = "█" * int(auc * 20)
             print(f"    {name:<22} {auc:.4f}  {bar}")
 
-        if macro_auc > best_auc:
+        if macro_auc > best_auc: # Model-Checkpointing: Nur wenn die aktuelle Epoche einen neuen AUC-Rekord aufstellt, speichern -> so hat man immer das beste Ergebnis, auch wenn am Ende z.B. Overfitting auftritt
             best_auc = macro_auc
             patience_counter = 0
 
@@ -429,13 +429,13 @@ def train(config: dict) -> nn.Module:
             )
             print(f"\n  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
         else:
-            patience_counter += 1
+            patience_counter += 1 # eine Epoche ohne Fortschritt
             print(
                 f"\n  Kein Fortschritt "
                 f"({patience_counter}/{config['patience']})"
             )
 
-        if patience_counter >= config["patience"]:
+        if patience_counter >= config["patience"]: # bricht ab um zu starkes Overfitting zu vermeiden
             print(f"\n  Early Stopping nach Epoche {epoch}.")
             break
 
@@ -477,7 +477,7 @@ def evaluate_on_test(config: dict) -> None:
         random_seed=config["random_seed"],
     )
 
-    checkpoint = torch.load(
+    checkpoint = torch.load( # lade den besten Checkpoint, der waehrend Training gespeichert wurde
         checkpoint_path,
         map_location=device,
         weights_only=False,

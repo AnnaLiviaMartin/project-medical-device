@@ -99,7 +99,7 @@ def plot_training_history(history: dict, save_path: str):
     fig.suptitle("Trainingshistorie", fontsize=14, fontweight="bold", y=1.02)
 
     # — Loss-Plot —
-    ax1.plot(epochs, history["train_loss"], "o-",
+    ax1.plot(epochs, history["train_loss"], "o-", # Train-Loss (blau), Val-Loss (rot).
              color="#2563eb", label="Train Loss", linewidth=2)
     ax1.plot(epochs, history["val_loss"],   "s--",
              color="#dc2626", label="Val Loss",   linewidth=2)
@@ -121,13 +121,13 @@ def plot_training_history(history: dict, save_path: str):
     ax2.set_xlabel("Epoche")
     ax2.set_ylabel("Macro ROC-AUC")
     ax2.set_title("Validation AUC")
-    ax2.set_ylim(0.5, 1.0)
+    ax2.set_ylim(0.5, 1.0) # reines raten, perfekt -> so korrekter Maßstab
     ax2.set_xticks(list(epochs))
-    ax2.axhline(y=0.8, color="gray", linestyle=":", alpha=0.6, label="Baseline ~0.80")
+    ax2.axhline(y=0.8, color="gray", linestyle=":", alpha=0.6, label="Baseline ~0.80") # Referenzlinie von CheXNet
     ax2.legend(fontsize=9)
 
     # Bestes Ergebnis markieren
-    best_epoch = int(np.argmax(history["val_auc"])) + 1
+    best_epoch = int(np.argmax(history["val_auc"])) + 1 # höchster Val-AUC in Liste
     best_auc   = max(history["val_auc"])
     ax2.annotate(f"Best: {best_auc:.4f}",
                  xy=(best_epoch, best_auc),
@@ -150,7 +150,7 @@ def plot_roc_curves(all_probs: np.ndarray,
                     all_labels: np.ndarray,
                     save_path: str):
     """
-    Zeichnet alle 14 ROC-Kurven in einem 4x4-Grid.
+    Zeichnet alle 14 ROC-AUC-Kurven in einem 4x4-Grid.
 
     Jede Kurve zeigt den Trade-off zwischen True Positive Rate (Sensitivität)
     und False Positive Rate (1 - Spezifität). Je näher an der oberen linken
@@ -476,7 +476,7 @@ def plot_gradcam(model: nn.Module,
 
 
 def get_auc_per_class(all_probs: np.ndarray, all_labels: np.ndarray) -> dict:
-    """AUC pro Pathologie — wird sowohl für den Barchart als auch für die
+    """AUC pro Pathologie — wird für die
     automatische Grad-CAM-Klassenauswahl gebraucht."""
     scores = {}
     for i, p in enumerate(PATHOLOGY_LIST):
@@ -571,7 +571,7 @@ def visualise_all():
     # ob das Modell auf die falschen Bildregionen schaut.
     N_WORST = 3
     auc_scores = get_auc_per_class(all_probs, all_labels)
-    worst_pathologies = sorted(auc_scores, key=lambda p: auc_scores[p])[:N_WORST]
+    worst_pathologies = sorted(auc_scores, key=lambda p: auc_scores[p])[:N_WORST] # sortiert anhang von Wert
 
     print(f"  Schwächste {N_WORST} Pathologien (niedrigste Test-AUC):")
     for p in worst_pathologies:
