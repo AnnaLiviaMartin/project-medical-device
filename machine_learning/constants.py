@@ -27,12 +27,12 @@ CONFIG = {
     "batch_size": 16,
     "num_workers": 4,
 
-    "num_epochs": 25,
+    "num_epochs": 20,
     "learning_rate": 1e-4,
     "weight_decay": 1e-4,
 
-    "patience": 5,
-    "unfreeze_epoch": 4,
+    "patience": 3,
+    "unfreeze_epoch": 2,
 
     "num_classes": 14,
     "random_seed": 42,

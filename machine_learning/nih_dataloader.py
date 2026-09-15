@@ -233,12 +233,27 @@ class NIHChestXrayDataset(Dataset):
 # ==============================================================================
 # 6. TRANSFORMS & AUGMENTATION
 # ==============================================================================
+class ResizeWithPad:
+    """Skaliert die längere Seite auf `size`, füllt den Rest mit schwarzen Rändern.
+    Erhält das Seitenverhältnis UND schneidet nichts ab."""
+    def __init__(self, size):
+        self.size = size
+
+    def __call__(self, img):
+        w, h = img.size
+        scale = self.size / max(w, h)
+        new_w, new_h = int(w * scale), int(h * scale)
+        img = img.resize((new_w, new_h), Image.BILINEAR)
+
+        pad_w = self.size - new_w
+        pad_h = self.size - new_h
+        padding = (pad_w // 2, pad_h // 2, pad_w - pad_w // 2, pad_h - pad_h // 2)
+        return transforms.functional.pad(img, padding, fill=0)
 
 def get_transforms(mode: str = "train") -> transforms.Compose:
     if mode == "train":
         return transforms.Compose([
-            transforms.Resize(480),
-            transforms.RandomCrop(PIXEL),
+            ResizeWithPad(PIXEL),
             transforms.RandomRotation(degrees=5),
             transforms.RandomAffine(
                 degrees=0,
@@ -246,13 +261,20 @@ def get_transforms(mode: str = "train") -> transforms.Compose:
                 scale=(0.95, 1.05),
             ),
             transforms.ToTensor(),
-            transforms.Normalize(
-                mean=IMAGENET_MEAN,
-                std=IMAGENET_STD,
-            ),
+            transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
         ])
 
     return transforms.Compose([
+        ResizeWithPad(PIXEL),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
+    ])
+        # Direktes Resize auf Zielgroesse statt Resize+CenterCrop: Ein
+        # CenterCrop wuerde bei Thorax-Aufnahmen systematisch die Raender
+        # (u.a. Lungenspitzen, kostophrenische Winkel) abschneiden, in denen
+        # relevante Befunde liegen koennen. Fuer Val/Test soll die Bewertung
+        # nicht durch einen Ausschnitt verzerrt werden.
+
         transforms.Resize((PIXEL, PIXEL)),
         transforms.ToTensor(),
         transforms.Normalize(
