@@ -40,6 +40,7 @@ public class PatientForm {
     private PatientStatus status = PatientStatus.OUTPATIENT;
 
     @NotNull(message = "{validation.patient.lastVisit.notnull}")
+    @Past(message = "{validation.patient.lastVisit.past}")
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate lastVisit;
 

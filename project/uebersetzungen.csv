@@ -249,3 +249,4 @@ validation.patient.emergencyContactRelation.size;Die Beziehung zum Notfallkontak
 validation.patient.insuranceProvider.size;Der Name des Versicherungsanbieters darf höchstens 150 Zeichen lang sein.;Insurance provider may be at most 150 characters long.;Naam van de verzekeraar mag maximaal 150 tekens lang zijn.
 validation.patient.insurancePolicyNumber.size;Die Versicherungsnummer darf höchstens 100 Zeichen lang sein.;Insurance policy number may be at most 100 characters long.;Verzekeringsnummer mag maximaal 100 tekens lang zijn.
 validation.history.title.size;Der Titel darf höchstens 255 Zeichen lang sein.;Title may be at most 255 characters long.;Titel mag maximaal 255 tekens lang zijn.
+validation.patient.lastVisit.past;Der letzte Besuch muss in der Vergangenheit liegen.;The last visit must be in the past.;Het laatste bezoek moet in het verleden liggen.

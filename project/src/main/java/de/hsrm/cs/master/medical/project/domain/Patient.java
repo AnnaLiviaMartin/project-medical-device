@@ -1,6 +1,7 @@
 package de.hsrm.cs.master.medical.project.domain;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Past;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
