@@ -17,21 +17,31 @@ PATHOLOGY_LIST = [
 
 NUM_CLASSES = len(PATHOLOGY_LIST)  # 14
 
-CONFIG = {
-    "data_dir":    "./data",
-    "output_dir":  "./checkpoints",
-    "plot_dir":    "./plots",
-    "batch_size":  32,
-    "num_workers": 4,
-    "num_epochs":  10,
-    "learning_rate": 1e-4,
-    "weight_decay":  1e-5,
-    "patience":      3,      # Early Stopping: Epochen ohne Verbesserung
-    "num_classes":   14,
-    "random_seed":   42,
-}
+PIXEL = 448 #224  # Eingangsaufloesung fuer DenseNet-121 (Vergleich 224 vs. 448 getestet)
 
-PIXEL = 320 #224  # Bildgröße für ResNet-Modelle
+CONFIG = {
+    "data_dir": "./data",
+    "output_dir": f"./checkpoints/{PIXEL}px",
+    "plot_dir": f"./plots/{PIXEL}px",
+
+    "batch_size": 16,
+    "num_workers": 4,
+
+    "num_epochs": 25,
+    "learning_rate": 1e-4,
+    "weight_decay": 1e-4,
+
+    "patience": 5,
+    "unfreeze_epoch": 4,
+
+    "num_classes": 14,
+    "random_seed": 42,
+
+    "pos_weight_mode": "sqrt",
+    "pos_weight_max": 20.0,
+
+    "dropout": 0.25,
+}
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]

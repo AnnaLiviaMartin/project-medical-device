@@ -7,7 +7,7 @@ from torchvision import transforms
 from nih_train import get_model
 from constants import IMAGENET_MEAN, IMAGENET_STD, PATHOLOGY_LIST, PIXEL, CONFIG
 
-MODEL_PATH = "./checkpoints/best_model.pt"
+MODEL_PATH = os.path.join(CONFIG["output_dir"], "best_model.pt")
 IMAGE_PATH = "./mein_roentgenbild.png"
 THRESHOLDS_PATH = os.path.join(CONFIG["output_dir"], "thresholds.json")
 

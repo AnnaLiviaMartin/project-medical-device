@@ -17,10 +17,12 @@ PATHOLOGY_LIST = [
 
 NUM_CLASSES = len(PATHOLOGY_LIST)  # 14
 
+PIXEL = 448 #224  # Eingangsaufloesung fuer DenseNet-121 (Vergleich 224 vs. 448 getestet)
+
 CONFIG = {
     "data_dir": "./data",
-    "output_dir": "./checkpoints",
-    "plot_dir": "./plots",
+    "output_dir": f"./checkpoints/{PIXEL}px",
+    "plot_dir": f"./plots/{PIXEL}px",
 
     "batch_size": 16,
     "num_workers": 4,
@@ -40,8 +42,6 @@ CONFIG = {
 
     "dropout": 0.25,
 }
-
-PIXEL = 448 #224  # Eingangsaufloesung fuer DenseNet-121 (Vergleich 224 vs. 448 getestet)
 
 IMAGENET_MEAN = [0.485, 0.456, 0.406]
 IMAGENET_STD = [0.229, 0.224, 0.225]

@@ -4,69 +4,84 @@ This documentation describes any additional information we want to provide you (
 
 ## Machine Learning
 
-### Machine-Learning-Modell
+### Machine Learning Model
 
-Die Machine-Learning-Komponente wurde in Anlehnung an die Architektur- und Modellierungsentscheidungen von CheXNet von Rajpurkar et al. [1] entwickelt. Ziel war die Erkennung von Auffälligkeiten in Röntgenaufnahmen des Brustkorbs.
+The machine learning component was developed based on the architectural and modeling decisions of CheXNet by Rajpurkar et al. [1]. The goal was to detect abnormalities in chest X-rays.
 
-Als Grundlage wurde ein auf ImageNet vortrainiertes DenseNet-121 verwendet und auf dem NIH Chest X-ray Dataset weitertrainiert. Die Architektur wurde dabei an die Anforderungen des entwickelten Prototyps angepasst.
+A DenseNet-121 model pre-trained on ImageNet was used as the foundation and further trained on the NIH Chest X-ray Dataset. The architecture was adapted to meet the requirements of the developed prototype.
 
-### Datengrundlage und Datenaufteilung
+### Data Set and Data Split
 
-Als Datengrundlage diente das NIH Chest X-ray Dataset mit 112.120 Röntgenaufnahmen von 30.805 Patienten und 14 thorakalen Pathologien [2].
+The NIH Chest X-ray Dataset, comprising 112,120 X-ray images from 30,805 patients and representing 14 thoracic pathologies, served as the data set [2].
 
-Für die Aufteilung wurden die offiziellen Train- und Test-Listen des Datensatzes verwendet. Zusätzlich wurde aus den Trainingsdaten ein separater Validierungsdatensatz erstellt. Die Aufteilung erfolgte auf Patientenebene, sodass Aufnahmen eines Patienten nicht gleichzeitig in Trainings-, Validierungs- und Testdaten vorkommen.
+The official training and test lists from the dataset were used for the split. Additionally, a separate validation dataset was created from the training data. The split was performed at the patient level, ensuring that images from a single patient do not appear simultaneously in the training, validation, and test datasets.
 
-Um dies technisch abzusichern, wurden drei Überschneidungsprüfungen zwischen Trainings-, Validierungs- und Testdaten implementiert und über Assertions abgesichert. Dadurch wird verhindert, dass Daten desselben Patienten versehentlich in mehreren Datensätzen verwendet werden.
+To ensure this technically, three overlap checks between the training, validation, and test data were implemented and verified using assertions. This prevents data from the same patient from being accidentally used in multiple datasets.
 
-Modellarchitektur und Klassifikationsaufgabe
+### Model Architecture and Classification Task
 
-Als Modell wurde DenseNet-121 gewählt, da diese Architektur auch in CheXNet für den NIH Chest X-ray Dataset verwendet wird [1].
+DenseNet-121 was chosen as the model because this architecture is also used in CheXNet for the NIH Chest X-ray Dataset [1].
 
-Der ursprüngliche Klassifikationskopf des vortrainierten Modells wurde durch einen eigenen Klassifikationskopf mit 14 Ausgabeneuronen ersetzt. Jede Ausgabe entspricht einer der 14 Pathologien des Datensatzes. Da mehrere Pathologien gleichzeitig auftreten können, wurde die Aufgabe als Multi-Label-Klassifikation umgesetzt.
+The original classification head of the pre-trained model was replaced with a custom classification head containing 14 output neurons. Each output corresponds to one of the 14 pathologies in the dataset. Since multiple pathologies can occur simultaneously, the task was implemented as multi-label classification.
 
-Der Klassifikationskopf enthält zusätzlich eine Dropout-Schicht mit $p=0.25$. Das Modell gibt zunächst Logits aus, die bei der Inferenz mithilfe der Sigmoid-Funktion in Wahrscheinlichkeiten zwischen 0 und 1 umgewandelt werden.
+The classification head also includes a dropout layer with $p=0.25$. The model initially outputs logits, which are converted into probabilities between 0 and 1 during inference using the sigmoid function.
 
-No Finding wurde nicht als eigene Ausgabeklasse modelliert. Der Zustand wird implizit angenommen, wenn keine der 14 Pathologien den jeweiligen Klassifikationsschwellenwert überschreitet.
+“No Finding” was not modeled as a separate output class. This outcome is implicitly assumed when none of the 14 pathologies exceeds the respective classification threshold.
 
-### Trainingsverfahren
+### Training Procedure
 
-Das Training wurde in zwei Phasen umgesetzt. Zunächst wurden die trainierbaren Parameter auf den neu hinzugefügten Klassifikationskopf beschränkt. Anschließend wurde der Backbone für das Fine-Tuning freigegeben und mit einer niedrigeren Lernrate weitertrainiert.
+Training was carried out in two phases. First, the trainable parameters were restricted to the newly added classification head. Subsequently, the backbone was made available for fine-tuning and further trained with a lower learning rate.
 
-Als Verlustfunktion wurde BCEWithLogitsLoss verwendet. Diese eignet sich für die verwendete Multi-Label-Klassifikation und kombiniert die Sigmoid-Funktion mit der binären Kreuzentropie in einer numerisch stabilen Form.
+BCEWithLogitsLoss was used as the loss function. This function is suitable for the multi-label classification used here and combines the sigmoid function with binary cross-entropy in a numerically stable form.
 
-Da die Pathologien unterschiedlich häufig im Trainingsdatensatz vorkommen, wurden klassenabhängige pos_weight-Werte verwendet. Diese wurden aus der Klassenverteilung des Trainingsdatensatzes abgeleitet. Zur Begrenzung der Gewichtung sehr seltener Klassen wurden die Werte zusätzlich mittels Quadratwurzel-Dämpfung angepasst.
+Since the pathologies occur with varying frequencies in the training dataset, class-dependent pos_weight values were used. These were derived from the class distribution of the training dataset. To limit the weighting of very rare classes, the values were additionally adjusted using square-root damping.
 
-Modellauswahl und Evaluation
+Model Selection and Evaluation
 
-Für die Auswahl des besten Modellzustands wurde die Macro-AUC auf dem Validierungsdatensatz verwendet. Dabei werden die ROC-AUC-Werte der einzelnen 14 Pathologien gemittelt, sodass jede Klasse unabhängig von ihrer Häufigkeit gleich berücksichtigt wird.
+The Macro-AUC on the validation dataset was used to select the best model state. In this process, the ROC-AUC values for each of the 14 pathologies are averaged so that each class is given equal consideration regardless of its frequency.
 
-Das beste beobachtete Ergebnis auf dem Validierungsdatensatz betrug:
+The best result observed on the validation dataset was:
 
-Validation Macro-AUC: 0.8354
+Validation Macro-AUC: 0.8322
 
-Für die einzelnen Pathologien wurden anschließend Klassifikationsschwellen mithilfe des Youden-Index auf dem Validierungsdatensatz bestimmt. Die ermittelten Schwellenwerte wurden unverändert auf den Testdatensatz angewendet. Die Testdaten wurden somit nicht zur Optimierung der Schwellenwerte verwendet.
+Classification thresholds for the individual pathologies were then determined using the Youden index on the validation dataset. The thresholds determined were applied unchanged to the test dataset. The test data were therefore not used to optimize the thresholds.
 
-Erklärbarkeit und Integration
+Explainability and Integration
 
-Die vom Modell berechneten Wahrscheinlichkeiten werden im Prototyp zur Darstellung der erkannten Pathologien verwendet. Zusätzlich wird Grad-CAM eingesetzt, um relevante Bildbereiche für eine Modellvorhersage hervorzuheben [3].
+The probabilities calculated by the model are used in the prototype to visualize the detected pathologies. In addition, Grad-CAM is used to highlight image regions relevant to a model prediction [3].
 
-Die Grad-CAM-Darstellung dient dabei als zusätzliche Information zur Nachvollziehbarkeit der Modellentscheidung und stellt keine eigenständige medizinische Diagnose dar.
+The Grad-CAM visualization serves as supplementary information to help understand the model’s decision and does not constitute an independent medical diagnosis.
 
-### Vergleich der Eingabeauflösungen
+### Comparison of Input Resolutions
 
-Neben der ursprünglichen Auflösung von $224 \times 224$ Pixeln aus CheXNet [1] wurde eine höhere Eingabeauflösung von $448 \times 448$ Pixeln untersucht. Die Originalaufnahmen des Datensatzes liegen teilweise mit einer Auflösung von bis zu $1024 \times 1024$ Pixeln vor [2].
+In addition to the original resolution of $224 \times 224$ pixels used by CheXNet [1], a higher input resolution of $448 \times 448$ pixels was investigated. Some of the original images in the NIH Chest X-ray Dataset have a resolution of up to $1024 \times 1024$ pixels [2].
 
-Die Untersuchung sollte zeigen, ob kleinere Bildstrukturen bei höherer Eingabeauflösung besser erhalten bleiben und dadurch insbesondere die Erkennung von Nodule und Mass verbessert wird. Gleichzeitig erhöht sich durch die Verdopplung von Breite und Höhe der Rechen- und Speicherbedarf ungefähr um den Faktor vier.
+The purpose of this experiment was to determine whether the higher input resolution improves the classification performance by preserving more fine-grained image information. This is particularly relevant for small or localized abnormalities, where spatial information may be lost when the original images are resized to a lower resolution. At the same time, doubling both the width and height increases the number of input pixels by a factor of four, resulting in higher computational and memory requirements.
 
-Die Ergebnisse der beiden Auflösungen werden anhand der Macro-AUC sowie der ROC-AUC der einzelnen Pathologien verglichen:
+Both model variants were trained under otherwise identical conditions. The only difference between the two experiments was the input resolution. The dataset was split on patient level into training, validation, and test sets to prevent images from the same patient from occurring in multiple splits.
 
-Eingabeauflösung	Macro-AUC	Nodule	Mass
-$224 \times 224$	…	…	…
-$448 \times 448$	…	…	…
+For the $448 \times 448$ experiment, the dataset consisted of 77,988 training images from 25,207 patients, 8,536 validation images from 2,801 patients, and 25,596 test images from 2,797 patients. The model was trained as a multi-label classifier using BCEWithLogitsLoss with class-specific weights derived from the square root of the positive-class weights to account for the strong class imbalance.
 
-Der Vergleich dient als Grundlage für die Entscheidung über die im finalen Modell verwendete Eingabeauflösung.
+Model selection was performed based on the validation macro-AUC. The best model for the $448 \times 448$ experiment was obtained after epoch 10 with a validation macro-AUC of 0.8312. The corresponding checkpoint is stored at:
 
-Quellen
+./checkpoints/448px/best_model.pt
+
+The complete training history is stored at:
+
+./checkpoints/448px/history.json
+
+The results for the two input resolutions are summarized below:
+
+Input Resolution	Validation Macro-AUC
+$224 \times 224$	0.7656
+$448 \times 448$	0.8312
+
+The higher input resolution resulted in a substantial improvement in classification performance. The validation macro-AUC increased from 0.7656 to 0.8312, corresponding to an absolute improvement of 0.0656 AUC points.
+
+Based on these results, the $448 \times 448$ input resolution was selected for the final model. The detailed training history, including training loss, validation loss, validation macro-AUC, and learning-rate changes, is retained in the corresponding experiment history file.
+
+References
+
 [1] Rajpurkar, P. et al. (2017): CheXNet: Radiologist-Level Pneumonia Detection on Chest X-Rays with Deep Learning.
 
 [2] Wang, X. et al. (2017): ChestX-ray8: Hospital-scale Chest X-ray Database and Benchmarks on Weakly-Supervised Classification and Localization of Common Thorax Diseases.

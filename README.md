@@ -1,6 +1,6 @@
-# From Model to Prototype: A User-Centred Pipeline for Cloud-Based AI-Assisted Chest X-Ray Analysis
+# From Model to Prototype: A User-Centred Workflow for Cloud-Based AI-Assisted Chest X-Ray Analysis
 
-This is the repository to the paper: "From Model to Prototype: A User-Centred Pipeline for Cloud-Based AI-Assisted Chest X-Ray Analysis" by Anna-Livia Martin and David Rossel
+This is the repository to the paper: "From Model to Prototype: A User-Centred Workflow for Cloud-Based AI-Assisted Chest X-Ray Analysis" by Anna-Livia Martin and David Rossel
 
 The documentation including more information about the process of developting the prototype can be found at the [Doku](./DOCU.md).
 
@@ -43,15 +43,19 @@ Train or evaluate the model with the available scripts:
 python x-ray-analysis.py
 ```
 
-## Statements of contribution
+## AI Usage
 
-1. David Rossel
+Information on AI usage for the paper can be found in the paper.
 
-2. Anna-Livia Martin
+1. Machine learning
+AI was used extensively as a supporting tool during the development of the machine learning model. In the initial development phase in particular, AI was utilised to provide an initial guide for the structure of the pipeline and possible approaches. This included, amongst other things, loading and preparing the data, loading or integrating the model, as well as training and validation. To assess and validate the proposed approaches, examples and implementations from public Git repositories were also consulted and compared with one another. On this basis, an approach suitable for the project was selected and subsequently replicated and adapted in-house.
 
-## AI Usage for Coding
+AI was also used to assist with the implementation and formulation of the code when creating the visualisations.
 
-1. Machine Learning
+The AI-generated suggestions were not adopted without scrutiny, but were checked for their functionality, plausibility and suitability for the specific model.
 
-2. Webbased Application
-For the webbased application Claude was used to code the basis of the final prototype (entities, services, controller) building upon the definitions in the earlier version using django (see [Doku](DOCU.md)). Further AI was used when CSS-issues arose and we didnt know how to fix these.
+2. Web Application
+The second prototype (using Spring and FastAPI) was initially generated using Claude, based on the existing Django app. This primarily involved simpler components (e.g. entities, services, controllers, HTML pages), which simply had to be ‘adopted’ by Django and did not require any changes to the logic. Logic was then built upon this generated code. Test cases were designed with the aid of AI (ChatGPT) to achieve the highest possible coverage.
+
+3. Literature
+During the literature review, ChatGPT was used for initial orientation and to select the first potentially relevant papers. The actual analysis – reading and evaluating the papers, as well as drawing conclusions regarding their content – was carried out without the support of AI.
