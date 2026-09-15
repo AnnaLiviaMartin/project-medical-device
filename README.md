@@ -48,11 +48,7 @@ python x-ray-analysis.py
 Information on AI usage for the paper can be found in the paper.
 
 1. Machine learning
-AI was used extensively as a supporting tool during the development of the machine learning model. In the initial development phase in particular, AI was utilised to provide an initial guide for the structure of the pipeline and possible approaches. This included, amongst other things, loading and preparing the data, loading or integrating the model, as well as training and validation. To assess and validate the proposed approaches, examples and implementations from public Git repositories were also consulted and compared with one another. On this basis, an approach suitable for the project was selected and subsequently replicated and adapted in-house.
-
-AI was also used to assist with the implementation and formulation of the code when creating the visualisations.
-
-The AI-generated suggestions were not adopted without scrutiny, but were checked for their functionality, plausibility and suitability for the specific model.
+AI was used extensively as a supporting tool during the development of the machine learning model. In the initial development phase in particular, AI was utilised to provide an initial guide for the structure of the pipeline and possible approaches. This included, amongst other things, loading and preparing the data, loading or integrating the model, as well as training and validation. To assess and validate the proposed approaches, examples and implementations from public Git repositories were also consulted and compared with one another. On this basis, an approach suitable for the project was selected and subsequently replicated and adapted in-house. AI was also used to assist with the implementation and formulation of the code when creating the visualisations. The AI-generated suggestions were not adopted without scrutiny, but were checked for their functionality, plausibility and suitability for the specific model.
 
 2. Web Application
 The second prototype (using Spring and FastAPI) was initially generated using Claude, based on the existing Django app. This primarily involved simpler components (e.g. entities, services, controllers, HTML pages), which simply had to be ‘adopted’ by Django and did not require any changes to the logic. Logic was then built upon this generated code. Test cases were designed with the aid of AI (ChatGPT) to achieve the highest possible coverage.
