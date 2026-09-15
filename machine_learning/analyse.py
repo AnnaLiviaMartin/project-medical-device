@@ -43,7 +43,6 @@ def load_image(image_path, device):
     # Bild Transformation
     transform = transforms.Compose([
         transforms.Resize(PIXEL),
-        transforms.CenterCrop(PIXEL),
         transforms.ToTensor(),
         transforms.Normalize(mean=IMAGENET_MEAN, std=IMAGENET_STD),
     ])

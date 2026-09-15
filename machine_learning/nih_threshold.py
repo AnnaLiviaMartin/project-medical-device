@@ -30,7 +30,7 @@ from constants import PATHOLOGY_LIST
 
 
 # ==============================================================================
-# 1. SCHWELLENWERTE AUF DEM VALIDATION-SET BESTIMMEN
+# 1. SCHWELLENWERTE BESTIMMEN
 # ==============================================================================
 
 def find_optimal_thresholds(
@@ -56,28 +56,28 @@ def find_optimal_thresholds(
     """
     thresholds = {}
 
-    for i, pathology in enumerate(PATHOLOGY_LIST):
-        y_true = val_labels[:, i]
-        y_prob = val_probs[:, i]
+    for i, pathology in enumerate(PATHOLOGY_LIST): # pro Durchlauf aus (N, 14) eins Spalte nehmen
+        y_true = val_labels[:, i] # 0/1 labels
+        y_prob = val_probs[:, i] # vorhergesagte Wahrscheinlichkeiten
 
-        if y_true.sum() == 0:
+        if y_true.sum() == 0: # y_true.sum() = Anzahl der positiven Beispiele, wenn 0, dann gibt es keine positiven Beispiele
             # Keine positiven Beispiele im Val-Set für diese Klasse
             # -> Schwellenwert kann nicht sinnvoll bestimmt werden, Default behalten
             thresholds[pathology] = 0.5
             continue
 
         if method == "youden":
-            fpr, tpr, roc_thresh = roc_curve(y_true, y_prob)
+            fpr, tpr, roc_thresh = roc_curve(y_true, y_prob) # false positive rate, true positive rate, thresholds
             j_scores = tpr - fpr
-            best_idx = int(np.argmax(j_scores))
+            best_idx = int(np.argmax(j_scores)) # findet Index des besten Schwellenwertes, an dem am weitesten von der Zufalls-Diagonale entfernt ist
             thresholds[pathology] = float(roc_thresh[best_idx])
 
         elif method == "f1":
-            candidate_thresholds = np.linspace(0.01, 0.99, 99)
+            candidate_thresholds = np.linspace(0.01, 0.99, 99) # festes Raster von 0.01 bis 0.99, um den besten Schwellenwert zu finden
             f1_scores = [
-                f1_score(y_true, (y_prob >= t).astype(int), zero_division=0)
+                f1_score(y_true, (y_prob >= t).astype(int), zero_division=0) # F1-Score berechnet(Wahrscheinlichkeiten bei genau diesem t in 0/1-Vorhersagen umgewandelt)
                 for t in candidate_thresholds
-            ]
+            ] # Liste von 99 F1-Werten, quasi Brute-Force-Suche: alle 99 Kandidaten durchprobieren und besten nehmen
             best_idx = int(np.argmax(f1_scores))
             thresholds[pathology] = float(candidate_thresholds[best_idx])
 
@@ -96,8 +96,7 @@ def evaluate_with_thresholds(
     thresholds: dict,
 ) -> dict:
     """
-    Wendet die (auf Val bestimmten) Schwellenwerte auf beliebige Daten an
-    — typischerweise das Test-Set — und berechnet pro Pathologie:
+    Wendet die Schwellenwerte auf beliebige Daten an und berechnet pro Pathologie:
     Sensitivität (Recall), Spezifität, Precision und F1.
 
     Returns:
@@ -107,10 +106,10 @@ def evaluate_with_thresholds(
 
     for i, pathology in enumerate(PATHOLOGY_LIST):
         t = thresholds[pathology]
-        y_true = labels[:, i]
-        y_pred = (probs[:, i] >= t).astype(int)
+        y_true = labels[:, i] # 0/1 labels
+        y_pred = (probs[:, i] >= t).astype(int) # Wahrscheinlichkeit, jede Wahrscheinlichkeit, die mind. t betraegt, wird True, sonst False
 
-        tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel()
+        tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels=[0, 1]).ravel() # alle 4 Werte erhaltbar durch eine Berechnung
 
         sensitivity = tp / (tp + fn) if (tp + fn) > 0 else float("nan")
         specificity = tn / (tn + fp) if (tn + fp) > 0 else float("nan")

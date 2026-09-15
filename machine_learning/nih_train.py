@@ -54,15 +54,15 @@ def get_model(
     Hinweis: Kein Sigmoid im Modell. BCEWithLogitsLoss verarbeitet rohe
     Logits numerisch stabil; Sigmoid wird nur für AUC und Thresholds benutzt.
     """
-    model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT)
+    model = models.densenet121(weights=models.DenseNet121_Weights.DEFAULT) # laedt DenseNet Architektur inkl. Gewichte, die auf ImageNet vortrainiert wurden
 
     for parameter in model.parameters():
-        parameter.requires_grad = False
+        parameter.requires_grad = False # so wird kein kein Gradient berechnet (fuer alle) -> einfrieren des Backbones
 
-    num_features = model.classifier.in_features
-    model.classifier = nn.Sequential(
-        nn.Dropout(p=dropout),
-        nn.Linear(num_features, num_classes),
+    num_features = model.classifier.in_features # Anzahl der Features, die in den Classifier gehen (1024 fuer DenseNet-121)
+    model.classifier = nn.Sequential( # ersetzt den Classifier durch zwei neue Schichten
+        nn.Dropout(p=dropout), # random 25% der 1024 Eingabewerte auf 0 setzen, um Overfitting zu vermeiden
+        nn.Linear(num_features, num_classes), # berechnet aus 1024 Features 14 Zahlen (eine pro Pathologie)
     )
 
     return model
@@ -133,17 +133,17 @@ def build_criterion(
         print("\nLoss: BCEWithLogitsLoss ohne pos_weight")
         return nn.BCEWithLogitsLoss()
 
-    if mode == "sqrt":
+    if mode == "sqrt": # daempt sehr seltene Klassen ab, die sonst evtl zu stark gewichtet werden wuerden durch sqrt(neg/pos) statt neg/pos, Kompromiss zwischen "Ungleichgewicht ignorieren" und "Ungleichgewicht 1:1 ausgleichen".
         pos_weight = torch.sqrt(raw_pos_weights)
         print("\nLoss: BCEWithLogitsLoss mit sqrt(pos_weight)")
-    elif mode == "clip":
+    elif mode == "clip": # alternativ: Wert hart deckeln
         max_weight = float(config.get("pos_weight_max", 20.0))
         pos_weight = torch.clamp(raw_pos_weights, min=1.0, max=max_weight)
         print(
             "\nLoss: BCEWithLogitsLoss mit geclipptem pos_weight "
             f"(max={max_weight})"
         )
-    elif mode == "raw":
+    elif mode == "raw": # ungedaempftes Ungleichgewicht
         pos_weight = raw_pos_weights
         print("\nLoss: BCEWithLogitsLoss mit ursprünglichem pos_weight")
     else:
@@ -158,13 +158,13 @@ def build_criterion(
     for pathology, weight in zip(PATHOLOGY_LIST, pos_weight.detach().cpu().tolist()):
         print(f"  {pathology:<22} {weight:.3f}")
 
-    return nn.BCEWithLogitsLoss(pos_weight=pos_weight)
+    return nn.BCEWithLogitsLoss(pos_weight=pos_weight) # jede Klasse hat ihr eigenes Gewicht
 
 
 def build_scheduler(
     optimizer: torch.optim.Optimizer,
 ) -> torch.optim.lr_scheduler.ReduceLROnPlateau:
-    """Scheduler: reduziert LR, wenn sich die Validation-Macro-AUC nicht verbessert."""
+    """Scheduler: reduziert Lernrate, wenn sich die Validation-Macro-AUC nicht verbessert."""
     return torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
         mode="min",
@@ -191,23 +191,22 @@ def train_one_epoch(
 ) -> float:
     model.train()
 
-    # Phase 1: Backbone ist eingefroren.
-    # BatchNorm-Statistiken im Backbone ebenfalls festhalten.
+    # Phase 1: Backbone ist eingefroren
     if not any(parameter.requires_grad for parameter in model.features.parameters()):
         freeze_batchnorm_stats(model)
 
-    total_loss = 0.0
+    total_loss = 0.0 # um Fehler ueber ganze Epoche zu ermitteln
     n_batches = len(loader)
 
     for batch_idx, (images, labels) in enumerate(loader):
-        images = images.to(device, non_blocking=True)
-        labels = labels.to(device, non_blocking=True).float()
+        images = images.to(device, non_blocking=True) # auf gpu laden
+        labels = labels.to(device, non_blocking=True).float() # auf gpu laden
 
-        optimizer.zero_grad(set_to_none=True)
-        logits = model(images)
-        loss = criterion(logits, labels)
-        loss.backward()
-        optimizer.step()
+        optimizer.zero_grad(set_to_none=True) # gradient auf 0 setzten, sonst mischen sich alte und neue Gradienten
+        logits = model(images) # abgabe der rohen vorhersagen (logits) des Modells
+        loss = criterion(logits, labels) # berechnet anhand der Loss-Funktion wie falsch die Vorhersage im Vergleich zu den Labels war
+        loss.backward() # Gradientenberechnung
+        optimizer.step() # optimizer schiebt die Gewichte in Richtung der Gradienten, um den Fehler zu minimieren
 
         total_loss += loss.item()
 
@@ -218,7 +217,7 @@ def train_one_epoch(
                 f"Loss: {average_loss:.4f}"
             )
 
-    return total_loss / n_batches
+    return total_loss / n_batches # durchschnittlicher Fehler ueber alle Batches der Epoche
 
 
 def validate(
@@ -235,22 +234,22 @@ def validate(
 
     with torch.no_grad():
         for images, labels in loader:
-            images = images.to(device, non_blocking=True)
-            labels = labels.to(device, non_blocking=True).float()
+            images = images.to(device, non_blocking=True) # auf gpu laden
+            labels = labels.to(device, non_blocking=True).float() # auf gpu laden
 
-            logits = model(images)
-            loss = criterion(logits, labels)
-            total_loss += loss.item()
+            logits = model(images) # abgabe der rohen vorhersagen (logits) des Modells
+            loss = criterion(logits, labels) # loss berechnen
+            total_loss += loss.item() # aufsummieren
 
-            probabilities = torch.sigmoid(logits)
-            all_probs.append(probabilities.cpu().numpy())
+            probabilities = torch.sigmoid(logits) # threshold braucht etwas Interpretierbares z.B. Wahrscheinlichkeiten, nicht Logits (abstrakt), wandelt jeden Wert in eine Zahl zwischen 0 und 1 um
+            all_probs.append(probabilities.cpu().numpy()) # Wahrscheinlichkeiten und echten Labels batchweise in Listen sammeln
             all_labels.append(labels.cpu().numpy())
 
-    all_probs = np.concatenate(all_probs, axis=0)
+    all_probs = np.concatenate(all_probs, axis=0) 
     all_labels = np.concatenate(all_labels, axis=0)
 
     auc_scores = {}
-    for index, pathology in enumerate(PATHOLOGY_LIST):
+    for index, pathology in enumerate(PATHOLOGY_LIST): # Fügt alle einzelnen Batch-Arrays zu zwei großen Arrays zusammen als Form (N, 14), N = Anzahl aller Validation-Bilder.
         try:
             auc_scores[pathology] = roc_auc_score(
                 all_labels[:, index],
@@ -281,14 +280,14 @@ def get_probs_and_labels(
     with torch.no_grad():
         for images, labels in loader:
             images = images.to(device, non_blocking=True)
-            logits = model(images)
-            probabilities = torch.sigmoid(logits)
+            logits = model(images) # logits = rohe Vorhersagen des Modells, die noch nicht in Wahrscheinlichkeiten umgerechnet wurden
+            probabilities = torch.sigmoid(logits) # wandelt jeden Wert in eine Zahl zwischen 0 und 1 um, die als Wahrscheinlichkeit interpretiert werden kann
 
             all_probs.append(probabilities.cpu().numpy())
             all_labels.append(labels.cpu().numpy())
 
     return (
-        np.concatenate(all_probs, axis=0),
+        np.concatenate(all_probs, axis=0), # zusammenfügen
         np.concatenate(all_labels, axis=0),
     )
 
@@ -323,23 +322,23 @@ def train(config: dict) -> nn.Module:
     print(f"  Label-Shape:  {labels.shape}")
     print(f"  Raw pos_weights: {pos_weights}")
 
-    model = get_model(
+    model = get_model( # Modell erzeugen aus vortrainierten DenseNet-121 Backbone und neuem Classifier
         num_classes=config["num_classes"],
         dropout=config.get("dropout", 0.25),
     ).to(device)
 
-    criterion = build_criterion(
+    criterion = build_criterion( # Loss-Funktion erzeugen, die die Ungleichverteilung der Klassen berücksichtigt
         raw_pos_weights=pos_weights,
         config=config,
         device=device,
     )
 
-    optimizer = torch.optim.AdamW(
+    optimizer = torch.optim.AdamW( # optimiert die Gewichte des Modells, sobald Fehler (Loss) berechnet wurde, um die Gewichte zu aktualisieren
         filter(lambda parameter: parameter.requires_grad, model.parameters()),
         lr=config["learning_rate"],
         weight_decay=config["weight_decay"],
     )
-    scheduler = build_scheduler(optimizer)
+    scheduler = build_scheduler(optimizer) # passt lernrate an
 
     best_auc = float("-inf")
     patience_counter = 0
@@ -350,7 +349,7 @@ def train(config: dict) -> nn.Module:
         "learning_rates": [],
     }
     checkpoint_path = os.path.join(config["output_dir"], "best_model.pt")
-    unfreeze_epoch = int(config.get("unfreeze_epoch", config["unfreeze_epoch"]))
+    unfreeze_epoch = int(config.get("unfreeze_epoch", config["unfreeze_epoch"])) # nach ausprobieren festgelegt
 
     print(f"\nTraining gestartet: {config['num_epochs']} Epochen")
     print(f"Phase 1: nur Classifier bis einschließlich Epoche {unfreeze_epoch - 1}")
@@ -385,9 +384,9 @@ def train(config: dict) -> nn.Module:
             device=device,
         )
 
-        scheduler.step(val_loss)
+        scheduler.step(val_loss) # vergleicht ob macro_auc > bester wert um mehr als threshold=0.001 verbessert hat, wenn nicht, wird patience hochgezählt
 
-        current_lrs = [group["lr"] for group in optimizer.param_groups]
+        current_lrs = [group["lr"] for group in optimizer.param_groups] # liest akt. Lernrate (zwei verschiedene Phasen)
         elapsed_seconds = time.time() - started_at
 
         history["train_loss"].append(float(train_loss))
@@ -409,7 +408,7 @@ def train(config: dict) -> nn.Module:
             bar = "█" * int(auc * 20)
             print(f"    {name:<22} {auc:.4f}  {bar}")
 
-        if macro_auc > best_auc:
+        if macro_auc > best_auc: # Model-Checkpointing: Nur wenn die aktuelle Epoche einen neuen AUC-Rekord aufstellt, speichern -> so hat man immer das beste Ergebnis, auch wenn am Ende z.B. Overfitting auftritt
             best_auc = macro_auc
             patience_counter = 0
 
@@ -427,13 +426,13 @@ def train(config: dict) -> nn.Module:
             )
             print(f"\n  ✓ Neues bestes Modell gespeichert (AUC: {best_auc:.4f})")
         else:
-            patience_counter += 1
+            patience_counter += 1 # eine Epoche ohne Fortschritt
             print(
                 f"\n  Kein Fortschritt "
                 f"({patience_counter}/{config['patience']})"
             )
 
-        if patience_counter >= config["patience"]:
+        if patience_counter >= config["patience"]: # bricht ab um zu starkes Overfitting zu vermeiden
             print(f"\n  Early Stopping nach Epoche {epoch}.")
             break
 
@@ -475,7 +474,7 @@ def evaluate_on_test(config: dict) -> None:
         random_seed=config["random_seed"],
     )
 
-    checkpoint = torch.load(
+    checkpoint = torch.load( # lade den besten Checkpoint, der waehrend Training gespeichert wurde
         checkpoint_path,
         map_location=device,
         weights_only=False,
