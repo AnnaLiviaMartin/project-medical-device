@@ -8,13 +8,16 @@ The URL to Azure is: https://medic-backend.wittyglacier-cf4c034a.germanywestcent
 
 ## Repository structure
 
-- `project/` — Webbased Application Code, contains README with information on how to run the web-app (spring boot + fastapi servers)
-- `project/ml-service` — FastAPI Code, contains README with information on how to run the ml-server
-- `machine_learning/` — PyTorch training, data loading, and evaluation scripts for the NIH Chest X-ray dataset
-- `notes_and_diagrams/` – Contains notes and diagrams used for writing the paper
-- `user_study_ueq/` – Contains the results of ueq questionaire
-- `user_study_think-aloud/` – Contains the results of think-aloud tasks and interview questions (german)
-- `screen_recording/` – Contains screen recordings of how to use the web-app
+- `machine_learning/` — PyTorch-based training, data loading, evaluation, and visualisation scripts for the NIH Chest X-ray dataset.
+- `notes_and_diagrams/` — Notes, diagrams, and other material used during the development of the project and preparation of the paper.
+- `paper/` — The paper associated with this project in PDF format.
+- `project/` — Source code of the web-based application. The application consists of a Spring Boot backend and a FastAPI-based machine-learning service. See the README files within the directory for instructions on how to run the application locally.
+- `screen_recording/` — Screen recording demonstrating the use of the web application.
+- `user_study_think-aloud/` — Materials and results from the think-aloud study, including interview questions and participant results. The study material is in German.
+- `user_study_ueq/` — Results of the User Experience Questionnaire (UEQ).
+- `DEPLOYMENT.md` — Documentation of the deployment process and configuration of the application.
+- `DOCU.md` — Documentation  including more information about the development process.
+- `README.md` — What you are currently reading.
 
 ## Machine learning
 
